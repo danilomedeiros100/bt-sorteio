@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Participantes - Masculino e Feminino</title>
+    <style>
+        table {
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+        th, td {
+            border: 1px solid #ccc;
+            padding: 8px 12px;
+        }
+        th {
+            background: #eee;
+        }
+    </style>
+</head>
+<body>
+    <h1>Lista de Participantes – Masculino e Feminino (25/05)</h1>
+
+    {% set total = [jogadores_m|length, jogadores_f|length]|max %}
+
+    <table>
+        <tr>
+            <th>#</th>
+            <th>Feminino</th>
+            <th>Masculino</th>
+        </tr>
+        {% for i in range(total) %}
+        <tr>
+            <td>{{ i + 1 }}</td>
+            <td>{{ jogadores_f[i]['nome'] if i < jogadores_f|length else '' }}</td>
+            <td>{{ jogadores_m[i]['nome'] if i < jogadores_m|length else '' }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+
+    <br><a href="/">Voltar</a>
+</body>
+</html>

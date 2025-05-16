@@ -1,0 +1,234 @@
+{
+  "A": [
+    [
+      [
+        {
+          "nome": "Thiago",
+          "sexo": "M",
+          "categorias": [
+            "mista",
+            "masculino"
+          ]
+        },
+        {
+          "nome": "Raul",
+          "sexo": "M",
+          "categorias": [
+            "mista",
+            "masculino"
+          ]
+        }
+      ],
+      [
+        {
+          "nome": "Wellington",
+          "sexo": "M",
+          "categorias": [
+            "mista",
+            "masculino"
+          ]
+        },
+        {
+          "nome": "David",
+          "sexo": "M",
+          "categorias": [
+            "mista",
+            "masculino"
+          ]
+        }
+      ]
+    ],
+    [
+      [
+        {
+          "nome": "Thiago",
+          "sexo": "M",
+          "categorias": [
+            "mista",
+            "masculino"
+          ]
+        },
+        {
+          "nome": "Raul",
+          "sexo": "M",
+          "categorias": [
+            "mista",
+            "masculino"
+          ]
+        }
+      ],
+      [
+        {
+          "nome": "Jonathan",
+          "sexo": "M",
+          "categorias": [
+            "mista",
+            "masculino"
+          ]
+        },
+        {
+          "nome": "Edgard",
+          "sexo": "M",
+          "categorias": [
+            "mista",
+            "masculino"
+          ]
+        }
+      ]
+    ],
+    [
+      [
+        {
+          "nome": "Wellington",
+          "sexo": "M",
+          "categorias": [
+            "mista",
+            "masculino"
+          ]
+        },
+        {
+          "nome": "David",
+          "sexo": "M",
+          "categorias": [
+            "mista",
+            "masculino"
+          ]
+        }
+      ],
+      [
+        {
+          "nome": "Jonathan",
+          "sexo": "M",
+          "categorias": [
+            "mista",
+            "masculino"
+          ]
+        },
+        {
+          "nome": "Edgard",
+          "sexo": "M",
+          "categorias": [
+            "mista",
+            "masculino"
+          ]
+        }
+      ]
+    ]
+  ],
+  "B": [
+    [
+      [
+        {
+          "nome": "Neudson",
+          "sexo": "M",
+          "categorias": [
+            "mista",
+            "masculino"
+          ]
+        },
+        {
+          "nome": "Arthur",
+          "sexo": "M",
+          "categorias": [
+            "mista",
+            "masculino"
+          ]
+        }
+      ],
+      [
+        {
+          "nome": "Danilo",
+          "sexo": "M",
+          "categorias": [
+            "mista",
+            "masculino"
+          ]
+        },
+        {
+          "nome": "Francisco",
+          "sexo": "M",
+          "categorias": [
+            "mista",
+            "masculino"
+          ]
+        }
+      ]
+    ],
+    [
+      [
+        {
+          "nome": "Neudson",
+          "sexo": "M",
+          "categorias": [
+            "mista",
+            "masculino"
+          ]
+        },
+        {
+          "nome": "Arthur",
+          "sexo": "M",
+          "categorias": [
+            "mista",
+            "masculino"
+          ]
+        }
+      ],
+      [
+        {
+          "nome": "Marcelo",
+          "sexo": "M",
+          "categorias": [
+            "mista",
+            "masculino"
+          ]
+        },
+        {
+          "nome": "Thallys",
+          "sexo": "M",
+          "categorias": [
+            "mista",
+            "masculino"
+          ]
+        }
+      ]
+    ],
+    [
+      [
+        {
+          "nome": "Danilo",
+          "sexo": "M",
+          "categorias": [
+            "mista",
+            "masculino"
+          ]
+        },
+        {
+          "nome": "Francisco",
+          "sexo": "M",
+          "categorias": [
+            "mista",
+            "masculino"
+          ]
+        }
+      ],
+      [
+        {
+          "nome": "Marcelo",
+          "sexo": "M",
+          "categorias": [
+            "mista",
+            "masculino"
+          ]
+        },
+        {
+          "nome": "Thallys",
+          "sexo": "M",
+          "categorias": [
+            "mista",
+            "masculino"
+          ]
+        }
+      ]
+    ]
+  ]
+}

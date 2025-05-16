@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Participantes - Categoria Mista</title>
+    <style>
+        table {
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+        th, td {
+            border: 1px solid #ccc;
+            padding: 8px 12px;
+        }
+        th {
+            background: #eee;
+        }
+    </style>
+</head>
+<body>
+    <h1>Lista de Participantes – Categoria Mista (24/05)</h1>
+
+    {% set jogadores_f = jogadores | selectattr("sexo", "equalto", "F") | list %}
+    {% set jogadores_m = jogadores | selectattr("sexo", "equalto", "M") | list %}
+    {% set total = [jogadores_f|length, jogadores_m|length]|max %}
+
+    <table>
+        <tr>
+            <th>#</th>
+            <th>Feminino</th>
+            <th>Masculino</th>
+        </tr>
+        {% for i in range(total) %}
+        <tr>
+            <td>{{ i + 1 }}</td>
+            <td>{{ jogadores_f[i]['nome'] if i < jogadores_f|length else '' }}</td>
+            <td>{{ jogadores_m[i]['nome'] if i < jogadores_m|length else '' }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+
+    <br><a href="/">Voltar</a>
+</body>
+</html>

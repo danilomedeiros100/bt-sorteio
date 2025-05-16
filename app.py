@@ -7,12 +7,20 @@ import os
 app = Flask(__name__)
 DATA_FILE = "data/jogadores.json"
 
+# --- Utilitários ---
+
 def carregar_jogadores():
     try:
         with open(DATA_FILE, "r", encoding="utf-8") as f:
-            return json.load(f)
+            jogadores = json.load(f)
+            return sorted(jogadores, key=lambda x: x["nome"])
     except:
         return []
+
+def salvar_jogadores(jogadores):
+    jogadores_ordenados = sorted(jogadores, key=lambda x: x["nome"])
+    with open(DATA_FILE, "w", encoding="utf-8") as f:
+        json.dump(jogadores_ordenados, f, ensure_ascii=False, indent=2)
 
 def salvar_sorteio(categoria, chaves):
     path = f"data/sorteio_{categoria}.json"
@@ -37,7 +45,8 @@ def criar_duplas(jogadores, categoria):
         mulheres = [j for j in jogadores if "mista" in j["categorias"] and j["sexo"] == "F"]
         random.shuffle(homens)
         random.shuffle(mulheres)
-        return list(zip(homens, mulheres))
+        total_duplas = min(len(homens), len(mulheres))
+        return list(zip(homens[:total_duplas], mulheres[:total_duplas]))
     else:
         grupo = [j for j in jogadores if categoria in j["categorias"] and j["sexo"].lower().startswith(categoria[0])]
         random.shuffle(grupo)
@@ -59,22 +68,12 @@ def gerar_chaves(duplas):
             chave_atual = chr(ord(chave_atual) + 1)
     return chaves
 
+# --- Rotas públicas ---
+
 @app.route("/")
 def index():
-    return '''
-        <h1>Painel do Torneio</h1>
-        <ul>
-            <li><a href="/chaves/mista">Categoria Mista - 24/05</a></li>
-            <li><a href="/chaves/genero">Masculino e Feminino - 25/05</a></li>
-        </ul>
-        <h3>Administração</h3>
-        <ul>
-            <li><a href="/painel/mista">Painel Mista</a></li>
-            <li><a href="/painel/genero">Painel Masculino/Feminino</a></li>
-        </ul>
-    '''
-
-# --- Rotas públicas ---
+    jogadores = carregar_jogadores()
+    return render_template("index.html", jogadores=jogadores)
 
 @app.route("/chaves/mista")
 def chaves_mista():
@@ -92,20 +91,15 @@ def chaves_genero():
     jogadores_f = [j for j in jogadores if "feminino" in j["categorias"] and j["sexo"] == "F"]
     return render_template("chaves_genero.html", masculino=masc, feminino=fem, jogadores_m=jogadores_m, jogadores_f=jogadores_f)
 
-# --- Painéis administrativos ---
+# --- Painel administrativo único ---
 
-@app.route("/painel/mista")
-def painel_mista():
+@app.route("/painel")
+def painel_admin():
     jogadores = carregar_jogadores()
     jogadores_mista = [j for j in jogadores if "mista" in j["categorias"]]
-    return render_template("painel_mista.html", jogadores=jogadores_mista)
-
-@app.route("/painel/genero")
-def painel_genero():
-    jogadores = carregar_jogadores()
     jogadores_m = [j for j in jogadores if "masculino" in j["categorias"] and j["sexo"] == "M"]
     jogadores_f = [j for j in jogadores if "feminino" in j["categorias"] and j["sexo"] == "F"]
-    return render_template("painel_genero.html", jogadores_m=jogadores_m, jogadores_f=jogadores_f)
+    return render_template("painel.html", jogadores=jogadores, jogadores_m=jogadores_m, jogadores_f=jogadores_f)
 
 # --- Ações ---
 
@@ -115,11 +109,14 @@ def sortear_categoria(categoria):
     duplas = criar_duplas(jogadores, categoria)
     chaves = gerar_chaves(duplas)
     salvar_sorteio(categoria, chaves)
-    destino = "genero" if categoria in ["masculino", "feminino"] else "mista"
-    return redirect(f"/chaves/{destino}")
+    return redirect("/painel")
 
 @app.route("/resetar/<categoria>")
 def resetar_categoria(categoria):
     resetar_sorteio(categoria)
-    destino = "genero" if categoria in ["masculino", "feminino"] else "mista"
-    return redirect(f"/chaves/{destino}")
+    return redirect("/painel")
+
+# --- Execução ---
+
+if __name__ == "__main__":
+    app.run(debug=True)

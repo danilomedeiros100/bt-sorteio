@@ -1,41 +1,70 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Participantes - Masculino e Feminino</title>
-    <style>
-        table {
-            border-collapse: collapse;
-            margin-top: 15px;
-        }
-        th, td {
-            border: 1px solid #ccc;
-            padding: 8px 12px;
-        }
-        th {
-            background: #eee;
-        }
-    </style>
-</head>
-<body>
-    <h1>Lista de Participantes – Masculino e Feminino (25/05)</h1>
+{% extends "base.html" %}
 
-    {% set total = [jogadores_m|length, jogadores_f|length]|max %}
+{% block content %}
+<h2 class="text-center mb-4">Chaves – Categorias Masculino e Feminino (25/05)</h2>
 
-    <table>
-        <tr>
-            <th>#</th>
-            <th>Feminino</th>
-            <th>Masculino</th>
-        </tr>
-        {% for i in range(total) %}
-        <tr>
-            <td>{{ i + 1 }}</td>
-            <td>{{ jogadores_f[i]['nome'] if i < jogadores_f|length else '' }}</td>
-            <td>{{ jogadores_m[i]['nome'] if i < jogadores_m|length else '' }}</td>
-        </tr>
-        {% endfor %}
-    </table>
+<div class="row">
+  <div class="col-md-6">
+    <h3 class="text-primary text-center">Masculino</h3>
+    {% if masculino %}
+      {% for chave, confrontos in masculino.items() %}
+        <div class="digital-panel text-center shadow-lg p-4 rounded mb-5">
+          <h2 class="display-6 fw-bold mb-4">🏆 Chave {{ chave }}</h2>
+          {% for (dupla1, dupla2) in confrontos %}
+            <div class="matchup mb-3">
+              <div class="team">{{ dupla1[0].nome }} & {{ dupla1[1].nome }}</div>
+              <div class="vs">X</div>
+              <div class="team">{{ dupla2[0].nome }} & {{ dupla2[1].nome }}</div>
+            </div>
+          {% endfor %}
+        </div>
+      {% endfor %}
+    {% else %}
+      <p class="text-muted">Nenhum sorteio realizado ainda.</p>
+    {% endif %}
+  </div>
 
-    <br><a href="/">Voltar</a>
-</body>
-</html>
+  <div class="col-md-6">
+    <h3 class="text-danger text-center">Feminino</h3>
+    {% if feminino %}
+      {% for chave, confrontos in feminino.items() %}
+        <div class="digital-panel text-center shadow-lg p-4 rounded mb-5">
+          <h2 class="display-6 fw-bold mb-4">🏆 Chave {{ chave }}</h2>
+          {% for (dupla1, dupla2) in confrontos %}
+            <div class="matchup mb-3">
+              <div class="team">{{ dupla1[0].nome }} & {{ dupla1[1].nome }}</div>
+              <div class="vs">X</div>
+              <div class="team">{{ dupla2[0].nome }} & {{ dupla2[1].nome }}</div>
+            </div>
+          {% endfor %}
+        </div>
+      {% endfor %}
+    {% else %}
+      <p class="text-muted">Nenhum sorteio realizado ainda.</p>
+    {% endif %}
+  </div>
+</div>
+
+<hr>
+<h4 class="text-center mt-5">Lista de Participantes</h4>
+<table class="table table-striped table-bordered text-center mt-3">
+  <thead>
+    <tr>
+      <th>#</th>
+      <th>Masculino</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% set total = [jogadores_f|length, jogadores_m|length] | max %}
+    {% for i in range(total) %}
+    <tr>
+      <td>{{ i + 1 }}</td>
+      <td>{{ jogadores_f[i].nome if i < jogadores_f|length else '' }}</td>
+      <td>{{ jogadores_m[i].nome if i < jogadores_m|length else '' }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+<a href="/" class="btn btn-outline-secondary mt-4">⬅ Voltar</a>
+{% endblock %}

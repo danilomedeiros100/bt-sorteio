@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="text-center">
+  <h2 class="mb-4">Painel Administrativo</h2>
+  <p class="mb-5 text-muted">Somente administradores podem acessar esta área para realizar e resetar os sorteios.</p>
+
+  <div class="row justify-content-center mb-5">
+    <div class="col-md-4 mb-3">
+      <div class="card border-success shadow-sm">
+        <div class="card-body">
+          <h5 class="card-title text-success">Categoria Mista</h5>
+          <div class="d-grid gap-2">
+            <a href="/sortear/mista" class="btn btn-outline-success">Sortear Duplas</a>
+            <a href="/resetar/mista" class="btn btn-outline-danger">Resetar Sorteio</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-4 mb-3">
+      <div class="card border-primary shadow-sm">
+        <div class="card-body">
+          <h5 class="card-title text-primary">Categoria Masculino</h5>
+          <div class="d-grid gap-2">
+            <a href="/sortear/masculino" class="btn btn-outline-primary">Sortear Duplas</a>
+            <a href="/resetar/masculino" class="btn btn-outline-danger">Resetar Sorteio</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-4 mb-3">
+      <div class="card border-pink shadow-sm">
+        <div class="card-body">
+          <h5 class="card-title text-danger">Categoria Feminino</h5>
+          <div class="d-grid gap-2">
+            <a href="/sortear/feminino" class="btn btn-outline-danger">Sortear Duplas</a>
+            <a href="/resetar/feminino" class="btn btn-outline-secondary">Resetar Sorteio</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <a href="/" class="btn btn-outline-dark mt-3">Voltar à Página Inicial</a>
+</div>
+{% endblock %}

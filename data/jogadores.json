@@ -34,5 +34,6 @@
   { "nome": "Sérgio", "sexo": "M", "categorias": ["mista", "masculino"] },
   { "nome": "Thallys", "sexo": "M", "categorias": ["mista", "masculino"] },
   { "nome": "Thiago", "sexo": "M", "categorias": ["mista", "masculino"] },
-  { "nome": "Wellington", "sexo": "M", "categorias": ["mista", "masculino"] }
+  { "nome": "Wellington", "sexo": "M", "categorias": ["mista", "masculino"] },
+  { "nome": "Bruno Rolim", "sexo": "M", "categorias": ["masculino"] }
 ]

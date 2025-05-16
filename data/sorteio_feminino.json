@@ -3,7 +3,7 @@
     [
       [
         {
-          "nome": "Ilka",
+          "nome": "Deninha",
           "sexo": "F",
           "categorias": [
             "mista",
@@ -11,7 +11,7 @@
           ]
         },
         {
-          "nome": "Lorrany",
+          "nome": "Adriana Carla",
           "sexo": "F",
           "categorias": [
             "mista",
@@ -21,7 +21,7 @@
       ],
       [
         {
-          "nome": "Lorena",
+          "nome": "Raianne",
           "sexo": "F",
           "categorias": [
             "mista",
@@ -29,7 +29,7 @@
           ]
         },
         {
-          "nome": "Dani Cantarelli",
+          "nome": "Cecília",
           "sexo": "F",
           "categorias": [
             "mista",
@@ -41,7 +41,7 @@
     [
       [
         {
-          "nome": "Ilka",
+          "nome": "Deninha",
           "sexo": "F",
           "categorias": [
             "mista",
@@ -49,7 +49,7 @@
           ]
         },
         {
-          "nome": "Lorrany",
+          "nome": "Adriana Carla",
           "sexo": "F",
           "categorias": [
             "mista",
@@ -59,7 +59,7 @@
       ],
       [
         {
-          "nome": "Pamela",
+          "nome": "Alline Reis",
           "sexo": "F",
           "categorias": [
             "mista",
@@ -67,7 +67,7 @@
           ]
         },
         {
-          "nome": "Neuzete",
+          "nome": "Lorena",
           "sexo": "F",
           "categorias": [
             "mista",
@@ -79,7 +79,7 @@
     [
       [
         {
-          "nome": "Lorena",
+          "nome": "Raianne",
           "sexo": "F",
           "categorias": [
             "mista",
@@ -87,7 +87,7 @@
           ]
         },
         {
-          "nome": "Dani Cantarelli",
+          "nome": "Cecília",
           "sexo": "F",
           "categorias": [
             "mista",
@@ -97,7 +97,7 @@
       ],
       [
         {
-          "nome": "Pamela",
+          "nome": "Alline Reis",
           "sexo": "F",
           "categorias": [
             "mista",
@@ -105,7 +105,7 @@
           ]
         },
         {
-          "nome": "Neuzete",
+          "nome": "Lorena",
           "sexo": "F",
           "categorias": [
             "mista",
@@ -119,15 +119,14 @@
     [
       [
         {
-          "nome": "Rayane",
+          "nome": "Paula Aquino",
           "sexo": "F",
           "categorias": [
-            "mista",
             "feminino"
           ]
         },
         {
-          "nome": "Irly",
+          "nome": "Lorrany",
           "sexo": "F",
           "categorias": [
             "mista",
@@ -137,7 +136,7 @@
       ],
       [
         {
-          "nome": "Adriana Carla",
+          "nome": "Pamela",
           "sexo": "F",
           "categorias": [
             "mista",
@@ -145,7 +144,7 @@
           ]
         },
         {
-          "nome": "Emylle GABY",
+          "nome": "Rayane",
           "sexo": "F",
           "categorias": [
             "mista",
@@ -157,15 +156,14 @@
     [
       [
         {
-          "nome": "Rayane",
+          "nome": "Paula Aquino",
           "sexo": "F",
           "categorias": [
-            "mista",
             "feminino"
           ]
         },
         {
-          "nome": "Irly",
+          "nome": "Lorrany",
           "sexo": "F",
           "categorias": [
             "mista",
@@ -175,7 +173,7 @@
       ],
       [
         {
-          "nome": "Alline Reis",
+          "nome": "Irly",
           "sexo": "F",
           "categorias": [
             "mista",
@@ -183,7 +181,7 @@
           ]
         },
         {
-          "nome": "Deninha",
+          "nome": "Neuzete",
           "sexo": "F",
           "categorias": [
             "mista",
@@ -195,7 +193,7 @@
     [
       [
         {
-          "nome": "Adriana Carla",
+          "nome": "Pamela",
           "sexo": "F",
           "categorias": [
             "mista",
@@ -203,7 +201,7 @@
           ]
         },
         {
-          "nome": "Emylle GABY",
+          "nome": "Rayane",
           "sexo": "F",
           "categorias": [
             "mista",
@@ -213,7 +211,7 @@
       ],
       [
         {
-          "nome": "Alline Reis",
+          "nome": "Irly",
           "sexo": "F",
           "categorias": [
             "mista",
@@ -221,7 +219,7 @@
           ]
         },
         {
-          "nome": "Deninha",
+          "nome": "Neuzete",
           "sexo": "F",
           "categorias": [
             "mista",
@@ -235,7 +233,7 @@
     [
       [
         {
-          "nome": "Bruna",
+          "nome": "Rafa Felix",
           "sexo": "F",
           "categorias": [
             "mista",
@@ -243,7 +241,7 @@
           ]
         },
         {
-          "nome": "Rita",
+          "nome": "Emylle GABY",
           "sexo": "F",
           "categorias": [
             "mista",
@@ -253,7 +251,7 @@
       ],
       [
         {
-          "nome": "Cecília",
+          "nome": "Ilka",
           "sexo": "F",
           "categorias": [
             "mista",
@@ -261,7 +259,7 @@
           ]
         },
         {
-          "nome": "Raianne",
+          "nome": "Bruna",
           "sexo": "F",
           "categorias": [
             "mista",
@@ -273,7 +271,7 @@
     [
       [
         {
-          "nome": "Bruna",
+          "nome": "Rafa Felix",
           "sexo": "F",
           "categorias": [
             "mista",
@@ -281,7 +279,7 @@
           ]
         },
         {
-          "nome": "Rita",
+          "nome": "Emylle GABY",
           "sexo": "F",
           "categorias": [
             "mista",
@@ -291,9 +289,10 @@
       ],
       [
         {
-          "nome": "Paula Aquino",
+          "nome": "Dani Cantarelli",
           "sexo": "F",
           "categorias": [
+            "mista",
             "feminino"
           ]
         },
@@ -310,7 +309,7 @@
     [
       [
         {
-          "nome": "Cecília",
+          "nome": "Ilka",
           "sexo": "F",
           "categorias": [
             "mista",
@@ -318,7 +317,7 @@
           ]
         },
         {
-          "nome": "Raianne",
+          "nome": "Bruna",
           "sexo": "F",
           "categorias": [
             "mista",
@@ -328,9 +327,10 @@
       ],
       [
         {
-          "nome": "Paula Aquino",
+          "nome": "Dani Cantarelli",
           "sexo": "F",
           "categorias": [
+            "mista",
             "feminino"
           ]
         },

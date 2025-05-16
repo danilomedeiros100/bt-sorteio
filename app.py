@@ -123,6 +123,3 @@ def resetar_categoria(categoria):
     resetar_sorteio(categoria)
     destino = "genero" if categoria in ["masculino", "feminino"] else "mista"
     return redirect(f"/chaves/{destino}")
-
-if __name__ == "__main__":
-    app.run(debug=True)

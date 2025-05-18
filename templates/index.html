@@ -1,189 +1,21 @@
-{% extends "base.html" %}
+{% extends 'base.html' %}
+{% block title %}Início{% endblock %}
 
 {% block content %}
-<style>
-  .tv-title {
-    font-size: 2.4rem;
-    font-weight: bold;
-    color: #00d1ff;
-    text-shadow: 1px 1px 6px rgba(0,0,0,0.4);
-  }
+  <div class="d-flex flex-column align-items-center justify-content-center" style="min-height: 80vh; gap: 2rem;">
 
-  .categoria-card {
-    background: linear-gradient(135deg, #202b3f, #1a2233);
-    border: 2px solid #00d1ff;
-    border-radius: 16px;
-    padding: 20px;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
-    color: #fff;
-    transition: transform 0.3s ease;
-    position: relative;
-  }
+    <!-- Logo no topo -->
+    <img src="{{ url_for('static', filename='logo-btmania.png') }}" alt="Logo BT Mania"
+         class="img-fluid" style="max-height: 320px;">
 
-  .categoria-card:hover {
-    transform: scale(1.02);
-    box-shadow: 0 0 20px #00d1ff;
-  }
+    <!-- Card de Categorias -->
+    <div class="glass-card text-center w-100" style="max-width: 400px;">
+      <h2 class="text-white mb-4">Categorias do Torneio</h2>
 
-  .categoria-header {
-    font-weight: 600;
-    font-size: 1.4rem;
-    padding: 8px 12px;
-    border-radius: 8px;
-    margin-bottom: 16px;
-    text-align: center;
-    color: #fff;
-    text-shadow: 0 1px 3px rgba(0,0,0,0.3);
-  }
-
-  .categoria-header.mista {
-    background-color: #d8b4ff;
-    color: #5a2d91;
-  }
-
-  .categoria-header.masculino {
-    background-color: #00bcd4;
-    color: #003d4d;
-  }
-
-  .categoria-header.feminino {
-    background-color: #ffb3c6;
-    color: #7a1b3a;
-  }
-
-  .jogador-nome {
-    background-color: #2d3748;
-    border-radius: 6px;
-    padding: 8px 12px;
-    margin-bottom: 8px;
-    font-size: 1.1rem;
-    font-weight: 500;
-    color: #fff;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    border: 1px solid rgba(255,255,255,0.2);
-    box-shadow: 0 2px 6px rgba(0,0,0,0.2);
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-
-  .numero {
-    font-weight: bold;
-    color: #00d1ff;
-    min-width: 24px;
-    text-align: right;
-  }
-
-  .subtitulo {
-    color: #bbb;
-    font-size: 1rem;
-    margin-top: -10px;
-  }
-
-  h6 {
-    font-weight: 600;
-    color: #00bcd4;
-    text-align: center;
-    margin-bottom: 8px;
-  }
-
-  .btn-ver-chaves {
-    background-color: #0077b6;
-    color: white;
-    font-weight: 500;
-    border: none;
-    border-radius: 6px;
-    padding: 10px;
-    transition: all 0.3s ease;
-    text-transform: uppercase;
-    font-size: 0.9rem;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-  }
-
-  .btn-ver-chaves:hover {
-    background-color: #00b4d8;
-    transform: scale(1.03);
-    box-shadow: 0 0 12px #00d1ff;
-  }
-</style>
-
-<!-- Botões no topo -->
-<div class="container text-center mb-4">
-  <div class="row justify-content-center gap-3">
-    <div class="col-md-5 col-sm-6 mb-2">
-      <a href="/chaves/mista" class="btn btn-lg w-100 text-white" style="background-color:#7b2cbf;">
-        🎾 Chaves Mista
-      </a>
+      <a href="{{ url_for('chaves_categoria', categoria='mista') }}" class="btn btn-glass text-uppercase mb-2 w-100">Duplas Mistas</a>
+      <a href="{{ url_for('chaves_categoria', categoria='masculino') }}" class="btn btn-glass text-uppercase mb-2 w-100"> Masculino</a>
+      <a href="{{ url_for('chaves_categoria', categoria='feminino') }}" class="btn btn-glass text-uppercase w-100"> Feminino</a>
     </div>
-    <div class="col-md-5 col-sm-6 mb-2">
-      <a href="/chaves/genero" class="btn btn-lg w-100 text-white" style="background-color:#0096c7;">
-        👫 Chaves Masculino/Feminino
-      </a>
-    </div>
+
   </div>
-</div>
-
-<div class="row justify-content-center">
-
-  <!-- Categoria Mista -->
-  <div class="col-md-6 mb-4">
-    <div class="categoria-card">
-      <div class="categoria-header mista">Categoria Mista</div>
-      <div class="row">
-        <div class="col-6">
-          <h6>Feminino</h6>
-          {% set count_mista_f = namespace(val=1) %}
-          {% for jogador in jogadores if jogador.sexo == 'F' and 'mista' in jogador.categorias %}
-            <div class="jogador-nome"><span class="numero">{{ count_mista_f.val }}</span> {{ jogador.nome }}</div>
-            {% set count_mista_f.val = count_mista_f.val + 1 %}
-          {% endfor %}
-        </div>
-        <div class="col-6">
-          <h6>Masculino</h6>
-          {% set count_mista_m = namespace(val=1) %}
-          {% for jogador in jogadores if jogador.sexo == 'M' and 'mista' in jogador.categorias %}
-            <div class="jogador-nome"><span class="numero">{{ count_mista_m.val }}</span> {{ jogador.nome }}</div>
-            {% set count_mista_m.val = count_mista_m.val + 1 %}
-          {% endfor %}
-        </div>
-      </div>
-      <div class="text-center mt-3">
-        <a href="/chaves/mista" class="btn-ver-chaves w-75">Ver Chaves</a>
-      </div>
-    </div>
-  </div>
-
-  <!-- Categoria Masculina -->
-  <div class="col-md-3 mb-4">
-    <div class="categoria-card">
-      <div class="categoria-header masculino">Categoria Masculina</div>
-      {% set count_masc = namespace(val=1) %}
-      {% for jogador in jogadores if jogador.sexo == 'M' and 'masculino' in jogador.categorias %}
-        <div class="jogador-nome"><span class="numero">{{ count_masc.val }}</span> {{ jogador.nome }}</div>
-        {% set count_masc.val = count_masc.val + 1 %}
-      {% endfor %}
-      <div class="text-center mt-3">
-        <a href="/chaves/genero" class="btn-ver-chaves w-75">Ver Chaves</a>
-      </div>
-    </div>
-  </div>
-
-  <!-- Categoria Feminina -->
-  <div class="col-md-3 mb-4">
-    <div class="categoria-card">
-      <div class="categoria-header feminino">Categoria Feminina</div>
-      {% set count_fem = namespace(val=1) %}
-      {% for jogador in jogadores if jogador.sexo == 'F' and 'feminino' in jogador.categorias %}
-        <div class="jogador-nome"><span class="numero">{{ count_fem.val }}</span> {{ jogador.nome }}</div>
-        {% set count_fem.val = count_fem.val + 1 %}
-      {% endfor %}
-      <div class="text-center mt-3">
-        <a href="/chaves/genero" class="btn-ver-chaves w-75">Ver Chaves</a>
-      </div>
-    </div>
-  </div>
-
-</div>
 {% endblock %}

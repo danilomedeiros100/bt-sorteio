@@ -1,63 +1,148 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="pt-br">
 <head>
-  <meta charset="utf-8">
-  <title>Torneio Beach Tênis</title>
+  <meta charset="UTF-8">
+  <title>{% block title %}Torneio Beach Tênis{% endblock %}</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600&display=swap" rel="stylesheet">
+
   <style>
+    :root {
+      --cor-fundo: #332D56;
+      --cor-card: #4E6688;
+      --cor-primaria: #71C0B8;
+      --cor-destaque: #E3EEB2;
+    }
+
     body {
-      font-family: 'Rajdhani', sans-ser
-      background-color: #f0f0f5;
+      background-color: var(--cor-fundo);
+      color: var(--cor-destaque);
+      font-family: 'Rajdhani', sans-serif;
     }
-    header {
-      background: url("/static/beachtennis-header.jpg") no-repeat center center;
-      background-size: cover;
-      height: 200px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+
+    .logo-topo {
+      max-height: 120px;
+      width: auto;
+      margin-right: -10px;
+    }
+
+    .tv-title {
+      font-size: 2.5rem;
+      font-weight: bold;
+      color: var(--cor-destaque);
+      margin: 0;
+    }
+
+    .subtitle {
+      font-size: 1.2rem;
+      color: var(--cor-primaria);
+      margin: 0;
+    }
+
+    .assinatura {
+      font-family: 'Dancing Script', cursive;
+      font-size: 2.8rem;
       color: white;
+      margin-bottom: 0.2rem;
+      text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5);
     }
-    .header-title {
-      background-color: rgba(0, 0, 0, 0.5);
-      padding: 10px 20px;
+
+.header-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px; /* Valor menor que os 20px anteriores */
+  margin-top: 30px;
+  margin-bottom: 20px;
+  text-align: left;
+  flex-wrap: wrap;
+}
+
+    .glass-card {
+      background: var(--cor-card);
+      border-radius: 16px;
+      padding: 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.25);
+      border: 2px solid var(--cor-primaria);
+    }
+
+    .btn-glass {
+      width: 100%;
+      font-size: 1.2rem;
+      padding: 15px;
+      margin: 10px 0;
+      background-color: var(--cor-primaria);
+      color: var(--cor-fundo);
+      border: none;
+      transition: background-color 0.3s ease, color 0.3s ease;
+    }
+
+    .btn-glass:hover {
+      background-color: var(--cor-destaque);
+      color: var(--cor-fundo);
+    }
+
+    .list-group-item {
+      border: none;
+      background-color: transparent;
+      color: var(--cor-destaque);
+      font-size: 1.1rem;
+      padding-top: 0.25rem !important;
+      padding-bottom: 0.25rem !important;
+    }
+
+    .matchup {
+      font-size: 1.3rem;
+      font-weight: 600;
+      background-color: rgba(255, 255, 255, 0.05);
       border-radius: 10px;
     }
-    .digital-panel {
-      background: linear-gradient(135deg, #202b3f, #1a2233);
-      color: #fff;
-      border: 3px solid #00d1ff;
-      text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.6);
-    }
-    .matchup {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      gap: 16px;
-      font-size: 1.2rem;
-    }
-    .matchup .team {
-      background: #2d3748;
-      padding: 10px 16px;
-      border-radius: 8px;
+
+    .dupla {
       flex: 1;
-      text-align: center;
-      color: #fff;
-      border: 1px solid rgba(255,255,255,0.2);
-    }
-    .matchup .vs {
-      font-size: 1.8rem;
-      color: #ffcb05;
-      padding: 0 10px;
+      font-size: 1.2rem;
       font-weight: bold;
-    }x
+      color: var(--cor-destaque);
+      padding: 0 10px;
+      text-align: center;
+    }
+
+    .versus {
+      font-size: 1.6rem;
+      font-weight: 900;
+      color: var(--cor-primaria);
+      width: 50px;
+      text-align: center;
+    }
+
+    .w-45 {
+      width: 45%;
+    }
+
+    .w-10 {
+      width: 10%;
+    }
   </style>
 </head>
 <body>
-  <div class="container my-5">
+  <div class="container">
+
+    {% if request.endpoint != 'index' %}
+    <!-- Cabeçalho com logo à esquerda e textos à direita, todos centralizados -->
+    <div class="header-container">
+      <img src="{{ url_for('static', filename='images/logo_btmania.png') }}" alt="Logo BT Mania" class="logo-topo">
+      <div>
+        <h1 class="assinatura">Torneio BT Mania</h1>
+        <p class="subtitle">Sorteio e Grupos de Confronto</p>
+      </div>
+    </div>
+    {% endif %}
+
     {% block content %}{% endblock %}
+
   </div>
 </body>
 </html>

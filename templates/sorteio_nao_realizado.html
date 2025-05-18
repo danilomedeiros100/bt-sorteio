@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+{% block title %}Sorteio não realizado{% endblock %}
+
+{% block content %}
+  <div class="glass-card text-center">
+    <h2 class="mb-3">Sorteio não realizado</h2>
+    <p>A categoria <strong>{{ categoria }}</strong> ainda não teve o sorteio realizado.</p>
+    <p>Volte mais tarde ou aguarde a organização iniciar o sorteio.</p>
+    <a href="/" class="btn btn-glass mt-3">⬅ Voltar ao Início</a>
+  </div>
+{% endblock %}

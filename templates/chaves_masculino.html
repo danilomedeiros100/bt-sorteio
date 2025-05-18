@@ -1,8 +1,8 @@
 {% extends 'base.html' %}
-{% block title %}Chaves Mistas{% endblock %}
+{% block title %}Chaves Masculino{% endblock %}
 
 {% block content %}
-<h1 class="text-center display-5 fw-bold mb-4">🎾 ⚥ Categoria Mista</h1>
+<h1 class="text-center display-5 fw-bold mb-4">🎾♂️ Categoria Masculino</h1>
 
 {% if not chaves %}
   <div class="alert alert-warning text-center fw-bold">
@@ -15,12 +15,12 @@
 <div class="glass-card text-center">
   <h2 class="mb-3">Lista de Participantes</h2>
   <div class="row">
-    <!-- Coluna Feminino -->
+    {% set homens = jogadores | selectattr("sexo", "equalto", "M") | sort(attribute="nome") %}
+    {% set metade = (homens | length // 2) + (homens | length % 2) %}
+
     <div class="col-6">
-      <h4 class="text-start text-white mb-2">👩 Feminino</h4>
-      {% set mulheres = jogadores | selectattr("sexo", "equalto", "F") | sort(attribute="nome") %}
       <ul class="list-group list-group-flush">
-        {% for jogador in mulheres %}
+        {% for jogador in homens[:metade] %}
           <li class="list-group-item py-0 px-2 d-flex align-items-center" style="line-height: 1.2;">
             <span class="me-2 fw-bold text-white" style="width: 25px;">{{ loop.index }}.</span>
             <span>{{ jogador.nome }}</span>
@@ -29,14 +29,11 @@
       </ul>
     </div>
 
-    <!-- Coluna Masculino -->
     <div class="col-6">
-      <h4 class="text-start text-white mb-2">👨 Masculino</h4>
-      {% set homens = jogadores | selectattr("sexo", "equalto", "M") | sort(attribute="nome") %}
       <ul class="list-group list-group-flush">
-        {% for jogador in homens %}
+        {% for jogador in homens[metade:] %}
           <li class="list-group-item py-0 px-2 d-flex align-items-center" style="line-height: 1.2;">
-            <span class="me-2 fw-bold text-white" style="width: 25px;">{{ loop.index }}.</span>
+            <span class="me-2 fw-bold text-white" style="width: 25px;">{{ loop.index + metade }}.</span>
             <span>{{ jogador.nome }}</span>
           </li>
         {% endfor %}
@@ -69,5 +66,5 @@
   {% endfor %}
 {% endif %}
 
-<a href="/" class="btn btn-glass mt-4">⬅ Voltar ao início </a>
+<a href="/" class="btn btn-glass mt-4">⬅ Voltar ao início</a>
 {% endblock %}

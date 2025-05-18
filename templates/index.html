@@ -2,20 +2,23 @@
 {% block title %}Início{% endblock %}
 
 {% block content %}
-  <div class="d-flex flex-column align-items-center justify-content-center" style="min-height: 80vh; gap: 2rem;">
+  <div class="d-flex flex-column align-items-center justify-content-center" style="min-height: 80vh; gap: 2rem; padding-top: 2rem;">
 
     <!-- Logo no topo -->
     <img src="{{ url_for('static', filename='logo-btmania.png') }}" alt="Logo BT Mania"
-         class="img-fluid" style="max-height: 320px;">
+         class="img-fluid" style="max-height: 320px; margin-top: 20px;">
 
     <!-- Card de Categorias -->
     <div class="glass-card text-center w-100" style="max-width: 400px;">
       <h2 class="text-white mb-4">Categorias do Torneio</h2>
 
       <a href="{{ url_for('chaves_categoria', categoria='mista') }}" class="btn btn-glass text-uppercase mb-2 w-100">Duplas Mistas</a>
-      <a href="{{ url_for('chaves_categoria', categoria='masculino') }}" class="btn btn-glass text-uppercase mb-2 w-100"> Masculino</a>
-      <a href="{{ url_for('chaves_categoria', categoria='feminino') }}" class="btn btn-glass text-uppercase w-100"> Feminino</a>
+      <a href="{{ url_for('chaves_categoria', categoria='masculino') }}" class="btn btn-glass text-uppercase mb-2 w-100">Masculino</a>
+      <a href="{{ url_for('chaves_categoria', categoria='feminino') }}" class="btn btn-glass text-uppercase w-100">Feminino</a>
     </div>
+
+    <!-- Espaço para afastar do final da tela em mobile -->
+    <div style="height: 60px;"></div>
 
   </div>
 {% endblock %}

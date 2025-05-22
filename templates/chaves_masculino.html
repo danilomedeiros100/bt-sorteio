@@ -15,12 +15,19 @@
 <div class="glass-card text-center">
   <h2 class="mb-3">Lista de Participantes</h2>
   <div class="row">
-    {% set homens = jogadores | selectattr("sexo", "equalto", "M") | sort(attribute="nome") %}
-    {% set metade = (homens | length // 2) + (homens | length % 2) %}
+    {# Filtra e exibe diretamente os participantes masculinos da categoria "masculino" #}
+    {% set homens = jogadores | sort(attribute="nome") %}
+    {% set lista_homens = [] %}
+    {% for jogador in homens %}
+      {% if jogador.sexo == "M" and "masculino" in jogador.categorias %}
+        {% set _ = lista_homens.append(jogador) %}
+      {% endif %}
+    {% endfor %}
+    {% set metade = (lista_homens | length // 2) + (lista_homens | length % 2) %}
 
     <div class="col-6">
       <ul class="list-group list-group-flush">
-        {% for jogador in homens[:metade] %}
+        {% for jogador in lista_homens[:metade] %}
           <li class="list-group-item py-0 px-2 d-flex align-items-center" style="line-height: 1.2;">
             <span class="me-2 fw-bold text-white" style="width: 25px;">{{ loop.index }}.</span>
             <span>{{ jogador.nome }}</span>
@@ -31,7 +38,7 @@
 
     <div class="col-6">
       <ul class="list-group list-group-flush">
-        {% for jogador in homens[metade:] %}
+        {% for jogador in lista_homens[metade:] %}
           <li class="list-group-item py-0 px-2 d-flex align-items-center" style="line-height: 1.2;">
             <span class="me-2 fw-bold text-white" style="width: 25px;">{{ loop.index + metade }}.</span>
             <span>{{ jogador.nome }}</span>

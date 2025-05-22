@@ -15,7 +15,13 @@
 <div class="glass-card text-center">
   <h2 class="mb-3">Lista de Participantes</h2>
   <div class="row">
-    {% set mulheres = jogadores | selectattr("sexo", "equalto", "F") | sort(attribute="nome") %}
+    {% set mulheres = [] %}
+    {% for jogadora in jogadores %}
+      {% if jogadora.sexo == "F" and "feminino" in jogadora.categorias %}
+        {% set _ = mulheres.append(jogadora) %}
+      {% endif %}
+    {% endfor %}
+    {% set mulheres = mulheres | sort(attribute="nome") %}
     {% set metade = (mulheres | length // 2) + (mulheres | length % 2) %}
 
     <div class="col-6">

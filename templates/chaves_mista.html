@@ -15,12 +15,25 @@
 <div class="glass-card text-center">
   <h2 class="mb-3">Lista de Participantes</h2>
   <div class="row">
-    <!-- Coluna Feminino -->
+    {% set lista_mulheres = [] %}
+    {% set lista_homens = [] %}
+    {% for jogador in jogadores %}
+      {% if 'mista' in jogador.categorias %}
+        {% if jogador.sexo == 'F' %}
+          {% set _ = lista_mulheres.append(jogador) %}
+        {% elif jogador.sexo == 'M' %}
+          {% set _ = lista_homens.append(jogador) %}
+        {% endif %}
+      {% endif %}
+    {% endfor %}
+
+    {% set lista_mulheres = lista_mulheres | sort(attribute='nome') %}
+    {% set lista_homens = lista_homens | sort(attribute='nome') %}
+
     <div class="col-6">
       <h4 class="text-start text-white mb-2">👩 Feminino</h4>
-      {% set mulheres = jogadores | selectattr("sexo", "equalto", "F") | sort(attribute="nome") %}
       <ul class="list-group list-group-flush">
-        {% for jogador in mulheres %}
+        {% for jogador in lista_mulheres %}
           <li class="list-group-item py-0 px-2 d-flex align-items-center" style="line-height: 1.2;">
             <span class="me-2 fw-bold text-white" style="width: 25px;">{{ loop.index }}.</span>
             <span>{{ jogador.nome }}</span>
@@ -29,12 +42,10 @@
       </ul>
     </div>
 
-    <!-- Coluna Masculino -->
     <div class="col-6">
       <h4 class="text-start text-white mb-2">👨 Masculino</h4>
-      {% set homens = jogadores | selectattr("sexo", "equalto", "M") | sort(attribute="nome") %}
       <ul class="list-group list-group-flush">
-        {% for jogador in homens %}
+        {% for jogador in lista_homens %}
           <li class="list-group-item py-0 px-2 d-flex align-items-center" style="line-height: 1.2;">
             <span class="me-2 fw-bold text-white" style="width: 25px;">{{ loop.index }}.</span>
             <span>{{ jogador.nome }}</span>

@@ -6,7 +6,7 @@
       "mista",
       "feminino"
     ],
-    "confirmado": false
+    "confirmado": true
   },
   {
     "nome": "Alline Reis",
@@ -58,7 +58,7 @@
     "categorias": [
       "feminino"
     ],
-    "confirmado": false
+    "confirmado": true
   },
   {
     "nome": "Dani Cantarelli",
@@ -154,10 +154,9 @@
     "nome": "Jonathan",
     "sexo": "M",
     "categorias": [
-      "mista",
-      "masculino"
+      "mista"
     ],
-    "confirmado": false
+    "confirmado": true
   },
   {
     "nome": "Lorena",
@@ -202,7 +201,7 @@
       "mista",
       "masculino"
     ],
-    "confirmado": false
+    "confirmado": true
   },
   {
     "nome": "Pamela",
@@ -228,7 +227,7 @@
       "mista",
       "feminino"
     ],
-    "confirmado": false
+    "confirmado": true
   },
   {
     "nome": "Raianne",
@@ -255,7 +254,7 @@
       "mista",
       "feminino"
     ],
-    "confirmado": false
+    "confirmado": true
   },
   {
     "nome": "Ricardo",

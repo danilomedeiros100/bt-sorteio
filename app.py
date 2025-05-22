@@ -1,20 +1,25 @@
-from flask import Flask, render_template, redirect, url_for, request
+from flask import Flask, render_template, redirect, url_for, request, jsonify
 import json
 import os
 import random
 from collections import defaultdict
 
 app = Flask(__name__)
-DATA_FILE = "data/jogadores.json"
+DATA_FILE = os.path.join("data", "jogadores.json")
 
 def carregar_jogadores():
     try:
         with open(DATA_FILE, "r", encoding="utf-8") as f:
-            return json.load(f)
-    except:
+            jogadores = json.load(f)
+            for j in jogadores:
+                if "confirmado" not in j:
+                    j["confirmado"] = False
+            return jogadores
+    except FileNotFoundError:
         return []
 
 def criar_duplas(jogadores, categoria):
+    jogadores = [j for j in jogadores if j.get("confirmado")]
     if categoria == "mista":
         homens = [j for j in jogadores if "mista" in j["categorias"] and j["sexo"] == "M"]
         mulheres = [j for j in jogadores if "mista" in j["categorias"] and j["sexo"] == "F"]
@@ -57,9 +62,30 @@ def index():
 def painel():
     return render_template("painel.html", status=get_status())
 
+@app.route("/presenca")
+def presenca():
+    jogadores = sorted(carregar_jogadores(), key=lambda j: j["nome"])
+    categorias = {
+        "mista_m": len([j for j in jogadores if j["confirmado"] and "mista" in j["categorias"] and j["sexo"] == "M"]),
+        "mista_f": len([j for j in jogadores if j["confirmado"] and "mista" in j["categorias"] and j["sexo"] == "F"]),
+        "masculino": len([j for j in jogadores if j["confirmado"] and "masculino" in j["categorias"]]),
+        "feminino": len([j for j in jogadores if j["confirmado"] and "feminino" in j["categorias"]]),
+    }
+    return render_template("presenca.html", jogadores=jogadores, categorias=categorias)
+
+@app.route("/confirmar_presenca", methods=["POST"])
+def confirmar_presenca():
+    jogadores = carregar_jogadores()
+    confirmados = request.json.get("confirmado", [])
+    for j in jogadores:
+        j["confirmado"] = j["nome"] in confirmados
+    with open(DATA_FILE, "w", encoding="utf-8") as f:
+        json.dump(jogadores, f, ensure_ascii=False, indent=2)
+    return {"status": "ok"}
+
 @app.route("/sortear/<categoria>", methods=["POST"])
 def sortear_categoria(categoria):
-    jogadores = carregar_jogadores()
+    jogadores = [j for j in carregar_jogadores() if j.get("confirmado")]
     duplas = criar_duplas(jogadores, categoria)
     chaves = gerar_chaves(duplas)
 
@@ -80,10 +106,59 @@ def resetar_categoria(categoria):
         os.remove(path)
     return redirect(url_for("painel"))
 
+@app.route("/excluir_jogador", methods=["POST"])
+def excluir_jogador():
+    try:
+        data = request.get_json(force=True)
+        nome = data.get("nome")
+
+        if not nome:
+            return jsonify({'status': 'erro', 'mensagem': 'Nome não fornecido'}), 400
+
+        jogadores = carregar_jogadores()
+        jogadores_filtrados = [j for j in jogadores if j["nome"] != nome]
+
+        with open(DATA_FILE, "w", encoding="utf-8") as f:
+            json.dump(jogadores_filtrados, f, indent=2, ensure_ascii=False)
+
+        return jsonify({'status': 'ok'})
+
+    except Exception as e:
+        return jsonify({'status': 'erro', 'mensagem': str(e)}), 500
+
+@app.route("/adicionar_ou_editar_jogador", methods=["POST"])
+def adicionar_ou_editar_jogador():
+    data = request.get_json()
+    nome = data.get("nome", "").strip()
+    sexo = data.get("sexo")
+    categorias = data.get("categorias", [])
+
+    if not nome or not sexo or not categorias:
+        return {"status": "erro", "mensagem": "Dados incompletos"}, 400
+
+    jogadores = carregar_jogadores()
+    jogador_existente = next((j for j in jogadores if j["nome"].lower() == nome.lower()), None)
+
+    if jogador_existente:
+        jogador_existente["sexo"] = sexo
+        jogador_existente["categorias"] = categorias
+    else:
+        jogadores.append({
+            "nome": nome,
+            "sexo": sexo,
+            "categorias": categorias,
+            "confirmado": False
+        })
+
+    with open(DATA_FILE, "w", encoding="utf-8") as f:
+        json.dump(jogadores, f, ensure_ascii=False, indent=2)
+
+    return {"status": "ok"}
+
 @app.route("/chaves/<categoria>")
 def chaves_categoria(categoria):
     path = f"data/sorteio_{categoria}.json"
-    jogadores = carregar_jogadores()
+    jogadores = [j for j in carregar_jogadores() if j.get("confirmado")]
     if os.path.exists(path):
         with open(path, "r", encoding="utf-8") as f:
             data = json.load(f)

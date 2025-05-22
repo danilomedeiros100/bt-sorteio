@@ -131,17 +131,38 @@
   background-image: radial-gradient(rgba(255,255,255,0.04) 1px, transparent 1px);
   background-size: 20px 20px;
 }
+.zebra-row:nth-child(even) {
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+.zebra-row:nth-child(odd) {
+  background-color: rgba(255, 255, 255, 0.02);
+}
+
+.zebra-row {
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  transition: background-color 0.2s ease;
+}
   </style>
 </head>
 <body>
+  {% if request.endpoint != 'index' %}
+  <!-- Logo no topo (exceto na home) -->
+  <div class="text-center mt-3 mb-2">
+    <img src="{{ url_for('static', filename='images/logo_btmania.png') }}"
+         alt="Logo BT Mania"
+         class="img-fluid"
+         style="max-height: 140px;">
+  </div>
+  {% endif %}
   <div class="container">
 
     {% if request.endpoint != 'index' %}
     <!-- Cabeçalho com logo à esquerda e textos à direita, todos centralizados -->
     <div class="header-container">
-      <img src="{{ url_for('static', filename='images/logo_btmania.png') }}" alt="Logo BT Mania" class="logo-topo">
+<!--      <img src="{{ url_for('static', filename='images/logo_btmania.png') }}" alt="Logo BT Mania" class="logo-topo">-->
       <div>
-        <h1 class="assinatura">Torneio BT Mania</h1>
+<!--        <h1 class="assinatura">Torneio BT Mania</h1>-->
         <p class="subtitle">Sorteio e Grupos de Confronto</p>
       </div>
     </div>

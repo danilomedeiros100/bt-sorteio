@@ -1,0 +1,203 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+  <div class="glass-card text-center">
+    <h2 class="mb-3">Participantes Confirmados</h2>
+    <div class="row justify-content-center">
+      <div class="col-md-6">
+        <div class="text-white fw-bold fs-5">
+          <div class="mb-1">
+            Mista: Masculino: <span id="cont-mista-m">{{ categorias.mista_m }}</span>
+            Feminino: <span id="cont-mista-f">{{ categorias.mista_f }}</span>
+            = <span id="cont-mista-total">{{ categorias.mista_m + categorias.mista_f }}</span>
+          </div>
+          <div class="mb-1">Feminino: <span id="cont-fem">{{ categorias.feminino }}</span></div>
+          <div>Masculino: <span id="cont-masc">{{ categorias.masculino }}</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Formulário de confirmação -->
+  <div class="glass-card text-center mt-5">
+    <h2 class="mb-3">Confirmar Presença dos Jogadores</h2>
+    <form id="form-presenca">
+      <div class="row justify-content-center">
+        <div class="col-md-8">
+          {% for jogador in jogadores %}
+            <div class="form-check mb-2 text-start d-flex justify-content-between align-items-center zebra-row py-2 px-3 rounded">
+            <div>
+              <div class="d-flex align-items-center">
+  <input class="form-check-input me-2" type="checkbox" name="confirmado" value="{{ jogador.nome }}" id="jogador-{{ loop.index }}" {% if jogador.confirmado %}checked{% endif %}>
+  <label class="form-check-label text-white" for="jogador-{{ loop.index }}">
+    {{ jogador.nome }} ({{ jogador.sexo }}) - {{ jogador.categorias | join(', ') }}
+  </label>
+</div>
+            </div>
+            <button type="button" class="btn btn-sm btn-warning ms-2">Excluir</button>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+    </form>
+  </div>
+
+  <!-- Formulário de cadastro/edição -->
+  <div class="glass-card text-center mt-5">
+    <h2 class="mb-3">Adicionar ou Editar Participante</h2>
+    <form id="form-editar" onsubmit="salvarJogador(event)">
+      <div class="row justify-content-center">
+        <div class="col-md-6">
+          <div class="mb-3">
+            <input type="text" class="form-control" id="nome" placeholder="Nome do jogador" required>
+          </div>
+          <div class="mb-3">
+            <select class="form-select" id="sexo" onchange="filtrarCategorias()" required>
+              <option value="">Sexo</option>
+              <option value="M">Masculino</option>
+              <option value="F">Feminino</option>
+            </select>
+          </div>
+          <div class="mb-3">
+            <label class="form-label text-white">Categorias</label><br>
+            <div class="form-check form-check-inline">
+              <input class="form-check-input" type="checkbox" id="cat-mista" value="mista">
+              <label class="form-check-label" for="cat-mista">Mista</label>
+            </div>
+            <div class="form-check form-check-inline">
+              <input class="form-check-input" type="checkbox" id="cat-masculino" value="masculino">
+              <label class="form-check-label" for="cat-masculino">Masculino</label>
+            </div>
+            <div class="form-check form-check-inline">
+              <input class="form-check-input" type="checkbox" id="cat-feminino" value="feminino">
+              <label class="form-check-label" for="cat-feminino">Feminino</label>
+            </div>
+          </div>
+          <div class="d-grid">
+            <button type="submit" class="btn btn-glass">Salvar</button>
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+  function atualizarTotais() {
+    const checkboxes = document.querySelectorAll('input[name="confirmado"]');
+    let mista_m = 0, mista_f = 0, masc = 0, fem = 0;
+
+    checkboxes.forEach(cb => {
+      if (cb.checked) {
+        const label = cb.nextElementSibling.textContent.toLowerCase();
+        const sexo = label.includes('(m)') ? 'M' : (label.includes('(f)') ? 'F' : '');
+
+        if (label.includes('mista')) {
+          if (sexo === 'M') mista_m++;
+          if (sexo === 'F') mista_f++;
+        }
+        if (label.includes('masculino') && sexo === 'M') masc++;
+        if (label.includes('feminino') && sexo === 'F') fem++;
+      }
+    });
+
+    document.getElementById('cont-mista-m').textContent = mista_m;
+    document.getElementById('cont-mista-f').textContent = mista_f;
+    document.getElementById('cont-mista-total').textContent = mista_m + mista_f;
+    document.getElementById('cont-masc').textContent = masc;
+    document.getElementById('cont-fem').textContent = fem;
+  }
+
+  function filtrarCategorias() {
+    const sexo = document.getElementById("sexo").value;
+    const catMasc = document.getElementById("cat-masculino");
+    const catFem = document.getElementById("cat-feminino");
+
+    catMasc.disabled = false;
+    catFem.disabled = false;
+
+    if (sexo === "M") {
+      catFem.checked = false;
+      catFem.disabled = true;
+    } else if (sexo === "F") {
+      catMasc.checked = false;
+      catMasc.disabled = true;
+    }
+  }
+
+  function salvarJogador(event) {
+    event.preventDefault();
+    const nome = document.getElementById("nome").value.trim();
+    const sexo = document.getElementById("sexo").value;
+    const categorias = [];
+    if (document.getElementById("cat-mista").checked) categorias.push("mista");
+    if (document.getElementById("cat-masculino").checked) categorias.push("masculino");
+    if (document.getElementById("cat-feminino").checked) categorias.push("feminino");
+
+    if (!nome || !sexo) {
+      alert("Preencha o nome e o sexo.");
+      return;
+    }
+    if (categorias.length === 0) {
+      alert("Selecione pelo menos uma categoria.");
+      return;
+    }
+
+    fetch("/adicionar_ou_editar_jogador", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ nome, sexo, categorias })
+    })
+    .then(res => res.json())
+    .then(data => {
+      if (data.status === "ok") {
+        alert("Jogador salvo com sucesso.");
+        location.reload();
+      } else {
+        alert("Erro ao salvar jogador.");
+      }
+    });
+  }
+
+  function excluirJogador(nome) {
+    if (!confirm(`Deseja excluir o jogador ${nome}?`)) return;
+
+    fetch("/excluir_jogador", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ nome: nome })
+    })
+    .then(res => {
+      if (res.ok) {
+        location.reload();
+      } else {
+        alert("Erro ao excluir jogador.");
+      }
+    })
+    .catch(error => {
+      console.error("Erro na exclusão:", error);
+      alert("Erro ao excluir jogador.");
+    });
+  }
+
+  document.querySelectorAll('input[name="confirmado"]').forEach(cb => {
+    cb.addEventListener('change', () => {
+      const checkboxes = document.querySelectorAll('input[name="confirmado"]:checked');
+      const nomes = Array.from(checkboxes).map(cb => cb.value);
+
+      fetch("{{ url_for('confirmar_presenca') }}", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ confirmado: nomes })
+      })
+      .then(() => atualizarTotais())
+      .catch(error => {
+        console.error("Erro ao atualizar presença:", error);
+      });
+    });
+  });
+
+  document.addEventListener('DOMContentLoaded', filtrarCategorias);
+</script>
+{% endblock %}

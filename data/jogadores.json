@@ -15,7 +15,7 @@
       "mista",
       "feminino"
     ],
-    "confirmado": false
+    "confirmado": true
   },
   {
     "nome": "Arthur",
@@ -130,7 +130,7 @@
       "mista",
       "feminino"
     ],
-    "confirmado": false
+    "confirmado": true
   },
   {
     "nome": "Irly",
@@ -139,7 +139,7 @@
       "mista",
       "feminino"
     ],
-    "confirmado": false
+    "confirmado": true
   },
   {
     "nome": "João",
@@ -201,15 +201,6 @@
     "categorias": [
       "mista",
       "masculino"
-    ],
-    "confirmado": false
-  },
-  {
-    "nome": "Neuzete",
-    "sexo": "F",
-    "categorias": [
-      "mista",
-      "feminino"
     ],
     "confirmado": false
   },

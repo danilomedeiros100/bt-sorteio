@@ -3,6 +3,7 @@ import json
 import os
 import random
 from collections import defaultdict
+import hashlib
 
 app = Flask(__name__)
 DATA_FILE = os.path.join("data", "jogadores.json")
@@ -17,6 +18,27 @@ def carregar_jogadores():
             return jogadores
     except FileNotFoundError:
         return []
+
+
+
+VISITAS_FILE = "data/visitas.json"
+
+def registrar_visita():
+    ip = request.remote_addr
+    user_hash = hashlib.md5(ip.encode()).hexdigest()  # ou use diretamente o IP
+    try:
+        with open(VISITAS_FILE, "r", encoding="utf-8") as f:
+            content = f.read().strip()
+            ips = json.loads(content) if content else []
+    except (FileNotFoundError, json.JSONDecodeError):
+        ips = []
+
+    if user_hash not in ips:
+        ips.append(user_hash)
+        with open(VISITAS_FILE, "w", encoding="utf-8") as f:
+            json.dump(ips, f)
+
+    return len(ips)
 
 def criar_duplas(jogadores, categoria):
     jogadores = [j for j in jogadores if j.get("confirmado")]
@@ -54,13 +76,19 @@ def get_status():
         "feminino": {"realizado": os.path.exists("data/sorteio_feminino.json")}
     }
 
-@app.route("/")
-def index():
-    return render_template("index.html")
 
 @app.route("/painel")
 def painel():
-    return render_template("painel.html", status=get_status())
+    total_visitas = 0
+    try:
+        with open("data/visitas.json", "r", encoding="utf-8") as f:
+            content = f.read().strip()
+            visitas = json.loads(content) if content else []
+            total_visitas = len(visitas)
+    except (FileNotFoundError, json.JSONDecodeError):
+        pass
+
+    return render_template("painel.html", status=get_status(), total_visitas=total_visitas)
 
 @app.route("/presenca")
 def presenca():
@@ -164,6 +192,11 @@ def chaves_categoria(categoria):
             data = json.load(f)
         return render_template(f"chaves_{categoria}.html", jogadores=data["jogadores"], chaves=data["chaves"], categoria=categoria)
     return render_template(f"chaves_{categoria}.html", jogadores=jogadores, chaves={}, categoria=categoria)
+
+@app.route("/")
+def index():
+    total_visitas = registrar_visita()
+    return render_template("index.html", total_visitas=total_visitas)
 
 if __name__ == "__main__":
     app.run(debug=True)

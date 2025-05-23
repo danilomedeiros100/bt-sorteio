@@ -23,22 +23,6 @@ def carregar_jogadores():
 
 VISITAS_FILE = "data/visitas.json"
 
-def registrar_visita():
-    ip = request.remote_addr
-    user_hash = hashlib.md5(ip.encode()).hexdigest()  # ou use diretamente o IP
-    try:
-        with open(VISITAS_FILE, "r", encoding="utf-8") as f:
-            content = f.read().strip()
-            ips = json.loads(content) if content else []
-    except (FileNotFoundError, json.JSONDecodeError):
-        ips = []
-
-    if user_hash not in ips:
-        ips.append(user_hash)
-        with open(VISITAS_FILE, "w", encoding="utf-8") as f:
-            json.dump(ips, f)
-
-    return len(ips)
 
 def criar_duplas(jogadores, categoria):
     jogadores = [j for j in jogadores if j.get("confirmado")]
@@ -195,8 +179,31 @@ def chaves_categoria(categoria):
 
 @app.route("/")
 def index():
-    total_visitas = registrar_visita()
+    total_visitas = 0
+    try:
+        with open("data/visitas.json", "r", encoding="utf-8") as f:
+            content = f.read().strip()
+            visitas = json.loads(content) if content else []
+            total_visitas = len(visitas)
+    except (FileNotFoundError, json.JSONDecodeError):
+        pass
     return render_template("index.html", total_visitas=total_visitas)
+
+@app.before_request
+def registrar_visita_global():
+    try:
+        ip = request.remote_addr
+        user_hash = hashlib.md5(ip.encode()).hexdigest()
+        with open(VISITAS_FILE, "r", encoding="utf-8") as f:
+            content = f.read().strip()
+            ips = json.loads(content) if content else []
+    except (FileNotFoundError, json.JSONDecodeError):
+        ips = []
+
+    if user_hash not in ips:
+        ips.append(user_hash)
+        with open(VISITAS_FILE, "w", encoding="utf-8") as f:
+            json.dump(ips, f)
 
 if __name__ == "__main__":
     app.run(debug=True)

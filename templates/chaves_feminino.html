@@ -53,18 +53,19 @@
     <div class="glass-card text-center">
       <h2 class="display-6 fw-bold mb-4">🏆 Grupo {{ grupo }}</h2>
 
-      {% for dupla1, dupla2 in confrontos %}
+      {% for confronto in confrontos %}
         <div class="matchup d-flex justify-content-between align-items-center mb-4">
           <div class="d-flex flex-column justify-content-center w-45 text-center dupla">
-            <div>{{ dupla1[0].nome }}</div>
-            <div>{{ dupla1[1].nome }}</div>
+            <div>{{ confronto.dupla1[0].nome if confronto.dupla1|length > 0 else "" }}</div>
+            <div>{{ confronto.dupla1[1].nome if confronto.dupla1|length > 1 else "" }}</div>
           </div>
-          <div class="d-flex align-items-center justify-content-center w-10">
+          <div class="d-flex align-items-center justify-content-center w-10 flex-column">
             <div class="versus">🆚</div>
+            <div class="mt-1 text-white fw-bold small">Quadra {{ confronto.quadra }}</div>
           </div>
           <div class="d-flex flex-column justify-content-center w-45 text-center dupla">
-            <div>{{ dupla2[0].nome }}</div>
-            <div>{{ dupla2[1].nome }}</div>
+            <div>{{ confronto.dupla2[0].nome if confronto.dupla2|length > 0 else "" }}</div>
+            <div>{{ confronto.dupla2[1].nome if confronto.dupla2|length > 1 else "" }}</div>
           </div>
         </div>
       {% endfor %}

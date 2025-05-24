@@ -1,3 +1,28 @@
+def criar_grupos_duplas(duplas):
+    total = len(duplas)
+    grupos_tamanhos = []
+
+    while total > 0:
+        if total % 3 == 0 or total == 3:
+            grupos_tamanhos.append(3)
+            total -= 3
+        elif total % 4 == 0:
+            grupos_tamanhos.append(4)
+            total -= 4
+        elif total >= 7:
+            grupos_tamanhos.append(3)
+            total -= 3
+        else:
+            grupos_tamanhos.append(total)
+            break
+
+    grupos = []
+    inicio = 0
+    for tamanho in grupos_tamanhos:
+        grupos.append(duplas[inicio:inicio + tamanho])
+        inicio += tamanho
+
+    return grupos
 from flask import Flask, render_template, redirect, url_for, request, jsonify
 import json
 import os
@@ -20,7 +45,6 @@ def carregar_jogadores():
         return []
 
 
-
 VISITAS_FILE = "data/visitas.json"
 
 
@@ -35,22 +59,39 @@ def criar_duplas(jogadores, categoria):
     else:
         grupo = [j for j in jogadores if categoria in j["categorias"] and j["sexo"].lower().startswith(categoria[0])]
         random.shuffle(grupo)
-        return [tuple(grupo[i:i + 2]) for i in range(0, len(grupo) - 1, 2)]
+        return [tuple(grupo[i:i + 2]) for i in range(0, len(grupo) - 1, 2) if len(grupo[i:i + 2]) == 2]
 
-def gerar_chaves(duplas):
-    chaves = defaultdict(list)
+def gerar_chaves(duplas, categoria=None):
+    chaves = {}
     random.shuffle(duplas)
-    chave_atual = "A"
-    for i in range(0, len(duplas), 3):
-        grupo = duplas[i:i + 3]
+    grupos = criar_grupos_duplas(duplas)
+
+    if categoria == "masculino":
+        quadras_disponiveis = [1, 3, 5]
+    elif categoria == "feminino":
+        quadras_disponiveis = [2, 4, 6]
+    else:
+        quadras_disponiveis = list(range(1, 7))
+
+    for idx, grupo in enumerate(grupos):
+        chave = chr(ord("A") + idx)
+        confrontos = []
+        quadra = quadras_disponiveis[idx % len(quadras_disponiveis)]
+        quadra2 = quadras_disponiveis[(idx + 1) % len(quadras_disponiveis)]
         if len(grupo) == 3:
             confrontos = [
-                (grupo[0], grupo[1]),
-                (grupo[0], grupo[2]),
-                (grupo[1], grupo[2])
+                (grupo[0], grupo[1], quadra),
+                (grupo[0], grupo[2], quadra),
+                (grupo[1], grupo[2], quadra)
             ]
-            chaves[chave_atual] = confrontos
-            chave_atual = chr(ord(chave_atual) + 1)
+        elif len(grupo) == 4:
+            confrontos = [
+                (grupo[0], grupo[1], quadra),
+                (grupo[2], grupo[3], quadra2),
+                (grupo[0], grupo[2], quadra),
+                (grupo[1], grupo[3], quadra2)
+            ]
+        chaves[chave] = confrontos
     return chaves
 
 def get_status():
@@ -99,7 +140,7 @@ def confirmar_presenca():
 def sortear_categoria(categoria):
     jogadores = [j for j in carregar_jogadores() if j.get("confirmado")]
     duplas = criar_duplas(jogadores, categoria)
-    chaves = gerar_chaves(duplas)
+    chaves = gerar_chaves(duplas, categoria)
 
     data = {
         "chaves": chaves,
@@ -174,7 +215,15 @@ def chaves_categoria(categoria):
     if os.path.exists(path):
         with open(path, "r", encoding="utf-8") as f:
             data = json.load(f)
-        return render_template(f"chaves_{categoria}.html", jogadores=data["jogadores"], chaves=data["chaves"], categoria=categoria)
+        # Reestruturando confrontos para exibir no HTML
+        chaves_convertidas = {}
+        for chave, jogos in data["chaves"].items():
+            chaves_convertidas[chave] = [{
+                "dupla1": jogo[0],
+                "dupla2": jogo[1],
+                "quadra": jogo[2]
+            } for jogo in jogos]
+        return render_template(f"chaves_{categoria}.html", jogadores=data["jogadores"], chaves=chaves_convertidas, categoria=categoria)
     return render_template(f"chaves_{categoria}.html", jogadores=jogadores, chaves={}, categoria=categoria)
 
 @app.route("/")

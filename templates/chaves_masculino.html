@@ -1,8 +1,8 @@
 {% extends 'base.html' %}
-{% block title %}Chaves Masculino{% endblock %}
+{% block title %}Chaves Masculinas{% endblock %}
 
 {% block content %}
-<h1 class="text-center display-5 fw-bold mb-4">🎾♂️ Categoria Masculino</h1>
+<h1 class="text-center display-5 fw-bold mb-4">🎾 ♂ Categoria Masculina</h1>
 
 {% if not chaves %}
   <div class="alert alert-warning text-center fw-bold">
@@ -14,39 +14,14 @@
 
 <div class="glass-card text-center">
   <h2 class="mb-3">Lista de Participantes</h2>
-  <div class="row">
-    {# Filtra e exibe diretamente os participantes masculinos da categoria "masculino" #}
-    {% set homens = jogadores | sort(attribute="nome") %}
-    {% set lista_homens = [] %}
-    {% for jogador in homens %}
-      {% if jogador.sexo == "M" and "masculino" in jogador.categorias %}
-        {% set _ = lista_homens.append(jogador) %}
-      {% endif %}
+  <ul class="list-group list-group-flush">
+    {% for jogador in jogadores if 'masculino' in jogador.categorias %}
+      <li class="list-group-item py-0 px-2 d-flex align-items-center" style="line-height: 1.2;">
+        <span class="me-2 fw-bold text-white" style="width: 25px;">{{ loop.index }}.</span>
+        <span>{{ jogador.nome }}</span>
+      </li>
     {% endfor %}
-    {% set metade = (lista_homens | length // 2) + (lista_homens | length % 2) %}
-
-    <div class="col-6">
-      <ul class="list-group list-group-flush">
-        {% for jogador in lista_homens[:metade] %}
-          <li class="list-group-item py-0 px-2 d-flex align-items-center" style="line-height: 1.2;">
-            <span class="me-2 fw-bold text-white" style="width: 25px;">{{ loop.index }}.</span>
-            <span>{{ jogador.nome }}</span>
-          </li>
-        {% endfor %}
-      </ul>
-    </div>
-
-    <div class="col-6">
-      <ul class="list-group list-group-flush">
-        {% for jogador in lista_homens[metade:] %}
-          <li class="list-group-item py-0 px-2 d-flex align-items-center" style="line-height: 1.2;">
-            <span class="me-2 fw-bold text-white" style="width: 25px;">{{ loop.index + metade }}.</span>
-            <span>{{ jogador.nome }}</span>
-          </li>
-        {% endfor %}
-      </ul>
-    </div>
-  </div>
+  </ul>
 </div>
 
 {% if chaves %}
@@ -54,24 +29,25 @@
     <div class="glass-card text-center">
       <h2 class="display-6 fw-bold mb-4">🏆 Grupo {{ grupo }}</h2>
 
-      {% for dupla1, dupla2 in confrontos %}
+      {% for confronto in confrontos %}
         <div class="matchup d-flex justify-content-between align-items-center mb-4">
           <div class="d-flex flex-column justify-content-center w-45 text-center dupla">
-            <div>{{ dupla1[0].nome }}</div>
-            <div>{{ dupla1[1].nome }}</div>
+            <div>{{ confronto.dupla1[0].nome if confronto.dupla1|length > 0 else "" }}</div>
+            <div>{{ confronto.dupla1[1].nome if confronto.dupla1|length > 1 else "" }}</div>
           </div>
-          <div class="d-flex align-items-center justify-content-center w-10">
+          <div class="d-flex align-items-center justify-content-center w-10 flex-column">
             <div class="versus">🆚</div>
+            <div class="mt-1 text-white fw-bold small">Quadra {{ confronto.quadra }}</div>
           </div>
           <div class="d-flex flex-column justify-content-center w-45 text-center dupla">
-            <div>{{ dupla2[0].nome }}</div>
-            <div>{{ dupla2[1].nome }}</div>
+            <div>{{ confronto.dupla2[0].nome if confronto.dupla2|length > 0 else "" }}</div>
+            <div>{{ confronto.dupla2[1].nome if confronto.dupla2|length > 1 else "" }}</div>
           </div>
         </div>
       {% endfor %}
     </div>
   {% endfor %}
 {% endif %}
-<a href="/" class="btn btn-glass mt-4">⬅ Voltar ao início</a>
+<a href="/" class="btn btn-glass mt-4">⬅ Voltar ao Início</a>
 <div style="height: 70px;"></div>
 {% endblock %}

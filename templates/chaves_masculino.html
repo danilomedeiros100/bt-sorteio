@@ -26,22 +26,31 @@
 
 {% if chaves %}
   {% for grupo, confrontos in chaves.items() %}
-    <div class="glass-card text-center">
-      <h2 class="display-6 fw-bold mb-4">🏆 Grupo {{ grupo }}</h2>
-
+    <div class="glass-card text-center mb-4">
+      <h2 class="mb-3">Grupo {{ grupo }}</h2>
       {% for confronto in confrontos %}
         <div class="matchup d-flex justify-content-between align-items-center mb-4">
-          <div class="d-flex flex-column justify-content-center w-45 text-center dupla">
-            <div>{{ confronto.dupla1[0].nome if confronto.dupla1|length > 0 else "" }}</div>
-            <div>{{ confronto.dupla1[1].nome if confronto.dupla1|length > 1 else "" }}</div>
+          <div class="d-flex flex-column justify-content-center w-45 text-center dupla
+          {% if confronto.vencedor == 'dupla1' %}bg-success bg-opacity-50 text-white rounded-3{% elif confronto.resultado %}bg-danger bg-opacity-25 rounded-3{% endif %}">
+            <div>{{ confronto.dupla1[0].nome }}</div>
+            <div>{{ confronto.dupla1[1].nome }}</div>
           </div>
-          <div class="d-flex align-items-center justify-content-center w-10 flex-column">
-            <div class="versus">🆚</div>
+          <div class="d-flex flex-column align-items-center justify-content-center w-10 text-center">
+            <div class="versus text-white small d-flex align-items-center justify-content-center gap-1">
+              {% if confronto.resultado %}
+                <span>{{ confronto.resultado[0] }}</span>
+                <span>🆚</span>
+                <span>{{ confronto.resultado[1] }}</span>
+              {% else %}
+                🆚
+              {% endif %}
+            </div>
             <div class="mt-1 text-white fw-bold small">Quadra {{ confronto.quadra }}</div>
           </div>
-          <div class="d-flex flex-column justify-content-center w-45 text-center dupla">
-            <div>{{ confronto.dupla2[0].nome if confronto.dupla2|length > 0 else "" }}</div>
-            <div>{{ confronto.dupla2[1].nome if confronto.dupla2|length > 1 else "" }}</div>
+          <div class="d-flex flex-column justify-content-center w-45 text-center dupla
+          {% if confronto.vencedor == 'dupla2' %}bg-success bg-opacity-50 text-white rounded-3{% elif confronto.resultado %}bg-danger bg-opacity-25 rounded-3{% endif %}">
+            <div>{{ confronto.dupla2[0].nome }}</div>
+            <div>{{ confronto.dupla2[1].nome }}</div>
           </div>
         </div>
       {% endfor %}

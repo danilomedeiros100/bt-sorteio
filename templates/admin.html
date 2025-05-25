@@ -7,7 +7,9 @@
   <div class="d-grid gap-3 col-6 mx-auto">
     <a href="{{ url_for('painel') }}" class="btn btn-primary btn-lg">📊 Gerenciar Categorias</a>
     <a href="{{ url_for('presenca') }}" class="btn btn-success btn-lg">✅ Confirmar Presença</a>
-    <a href="{{ url_for('painel_resultados', categoria='mista') }}" class="btn btn-warning btn-lg">📝 Resultados Mista</a>
+<!--    <a href="{{ url_for('painel_resultados', categoria='mista') }}" class="btn btn-warning btn-lg">📝 Resultados Mista</a>-->
+    <a href="{{ url_for('painel_resultados', categoria='masculino') }}" class="btn btn-warning btn-lg">📝 Resultados Masculino</a>
+    <a href="{{ url_for('painel_resultados', categoria='feminino') }}" class="btn btn-info btn-lg">📝 Resultados Feminino</a>
     <a href="{{ url_for('index') }}" class="btn btn-outline-light btn-lg">🏠 Página Inicial</a>
   </div>
 </div>

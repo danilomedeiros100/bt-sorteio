@@ -241,7 +241,6 @@
     "nome": "Raul",
     "sexo": "M",
     "categorias": [
-      "mista",
       "masculino"
     ],
     "confirmado": true
@@ -287,7 +286,7 @@
     "categorias": [
       "mista"
     ],
-    "confirmado": false
+    "confirmado": true
   },
   {
     "nome": "Wellington",

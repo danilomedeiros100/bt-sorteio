@@ -2,6 +2,7 @@
 {% block title %}Chaves Feminino{% endblock %}
 
 {% block content %}
+{% set eliminatorias = confrontos %}
 <h1 class="text-center display-5 fw-bold mb-4">🎾♀️ Categoria Feminino</h1>
 
 {% if not chaves %}
@@ -82,6 +83,85 @@
         </div>
       {% endfor %}
     </div>
+  {% endfor %}
+  {% if ranking %}
+    {% set grupos = ranking | groupby('grupo') %}
+    {% for grupo, duplas in grupos %}
+      <div class="glass-card mt-4">
+        <h2 class="text-center">🏅 Ranking - Grupo {{ grupo }}</h2>
+        <table class="table table-hover text-white align-middle mb-0">
+          <thead>
+            <tr class="text-light">
+              <th>#</th>
+              <th class="text-start">Dupla</th>
+              <th class="text-center">Vitórias</th>
+              <th class="text-center">Sets</th>
+              <th class="text-center">Games</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for dupla in duplas %}
+            <tr>
+              <td class="fw-bold">{{ dupla.posicao }}</td>
+              <td class="text-start">{{ dupla.nome }}</td>
+              <td class="text-center">{{ dupla.vitorias }}</td>
+              <td class="text-center">{{ dupla.saldo_sets }}</td>
+              <td class="text-center">{{ dupla.saldo_games }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% endfor %}
+  {% endif %}
+  {% set fases_ordenadas = ['Semifinal 1', 'Semifinal 2', 'Final'] %}
+  {% for fase in fases_ordenadas %}
+    {% set jogos = eliminatorias | selectattr('partida', 'equalto', fase) | list %}
+    {% if jogos and jogos | length > 0 %}
+      <div class="glass-card mt-4">
+        <h2 class="text-center mb-3">{{ fase }}</h2>
+        {% for confronto in jogos %}
+        <div class="matchup d-flex justify-content-between align-items-center mb-4">
+          <div class="d-flex flex-column justify-content-center w-45 text-center dupla {% if confronto.vencedor == 'dupla1' %}bg-success bg-opacity-50 text-white rounded-3{% elif confronto.resultado %}bg-danger bg-opacity-25 rounded-3{% endif %}">
+            {% if confronto.dupla1 is iterable and confronto.dupla1 is not string %}
+              <div>{{ confronto.dupla1[0] }}</div>
+              <div>{{ confronto.dupla1[1] }}</div>
+            {% elif ' e ' in confronto.dupla1 %}
+              {% set nomes1 = confronto.dupla1.split(' e ') %}
+              <div>{{ nomes1[0] }}</div>
+              <div>{{ nomes1[1] }}</div>
+            {% else %}
+              <div>{{ confronto.dupla1 }}</div>
+            {% endif %}
+          </div>
+          <div class="d-flex align-items-center justify-content-center w-10 flex-column">
+            <div class="versus text-white small d-flex align-items-center justify-content-center">
+              {% if confronto.resultado %}
+                <span>{{ confronto.resultado[0] }}</span>
+                <span class="mx-1">🆚</span>
+                <span>{{ confronto.resultado[1] }}</span>
+              {% else %}
+                🆚
+              {% endif %}
+            </div>
+            <div class="mt-1 text-white fw-bold small text-center">Quadra {{ confronto.quadra }}</div>
+          </div>
+          <div class="d-flex flex-column justify-content-center w-45 text-center dupla {% if confronto.vencedor == 'dupla2' %}bg-success bg-opacity-50 text-white rounded-3{% elif confronto.resultado %}bg-danger bg-opacity-25 rounded-3{% endif %}">
+            {% if confronto.dupla2 is iterable and confronto.dupla2 is not string %}
+              <div>{{ confronto.dupla2[0] }}</div>
+              <div>{{ confronto.dupla2[1] }}</div>
+            {% elif ' e ' in confronto.dupla2 %}
+              {% set nomes2 = confronto.dupla2.split(' e ') %}
+              <div>{{ nomes2[0] }}</div>
+              <div>{{ nomes2[1] }}</div>
+            {% else %}
+              <div>{{ confronto.dupla2 }}</div>
+            {% endif %}
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    {% endif %}
   {% endfor %}
 {% endif %}
 <a href="/" class="btn btn-glass mt-4">⬅ Voltar ao início</a>

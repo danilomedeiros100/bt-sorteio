@@ -132,8 +132,8 @@
           <td class="text-center">{{ dupla.saldo_sets }}</td>
           <td class="text-center">{{ dupla.saldo_games }}</td>
           <td class="text-center">
-            {% if dupla.posicao <= 6 %}Quartas de final
-            {% elif dupla.posicao <= 10 %}Repescagem
+            {% if loop.index <= 6 %}Quartas de final
+            {% elif loop.index <= 10 %}Repescagem
             {% else %}—
             {% endif %}
           </td>

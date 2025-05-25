@@ -165,22 +165,26 @@ def sortear_categoria(categoria):
                     grupos[j["grupo"]].append(j)
             classificados = []
             for grupo_duplas in grupos.values():
-                classificados.extend(calcular_saldo_e_classificar(grupo_duplas)[:2])
+                grupo_ordenado = calcular_saldo_e_classificar(grupo_duplas)
+                grupo_ordenado = aplicar_confronto_direto(grupo_ordenado)
+                classificados.extend(grupo_ordenado[:2])
             return classificados
 
-        # NOVA LÓGICA: aplica corretamente critérios de desempate e confronto direto
+        # Seleciona os dois melhores de cada grupo (ordem natural de grupos e posições)
         classificados_10 = selecionar_2_por_grupo(jogadores_stats)
         classificados_10 = aplicar_confronto_direto(classificados_10)
-        ranking_completo = calcular_saldo_e_classificar(classificados_10)
-        diretos = ranking_completo[:6]
-        repescagem = ranking_completo[6:]
+        # NÃO reordene globalmente, mantenha ordem por grupo para montagem dos confrontos!
+        # Montagem dos confrontos com a ordem dos classificados por grupo e posição
+        diretos = classificados_10[:6]
+        repescagem = classificados_10[6:]
 
         confrontos = []
         # Repescagem (4 duplas, em 2 jogos)
-        confrontos += [
-            {"partida": "Repescagem 1", "dupla1": repescagem[0]["nome"], "dupla2": repescagem[3]["nome"], "quadra": 1},
-            {"partida": "Repescagem 2", "dupla1": repescagem[1]["nome"], "dupla2": repescagem[2]["nome"], "quadra": 2},
-        ]
+        if len(repescagem) >= 4:
+            confrontos += [
+                {"partida": "Repescagem 1", "dupla1": repescagem[0]["nome"], "dupla2": repescagem[3]["nome"], "quadra": 1},
+                {"partida": "Repescagem 2", "dupla1": repescagem[1]["nome"], "dupla2": repescagem[2]["nome"], "quadra": 2},
+            ]
         # Quartas de final (6 diretos + 2 vencedores repescagem)
         confrontos += [
             {"partida": "Quartas 1", "dupla1": diretos[0]["nome"], "dupla2": "Vencedor Repescagem 2", "quadra": 1},
@@ -208,6 +212,106 @@ def sortear_categoria(categoria):
             "quadra": 3
         }
         confrontos.extend([semifinal1, semifinal2, final])
+        data["confrontos"] = confrontos
+
+    elif categoria == "masculino":
+        jogadores_stats = calcular_estatisticas_por_jogador(data)
+
+        # associar grupo a cada dupla
+        for chave, jogos in chaves.items():
+            for jogo in jogos:
+                dupla1_nome = " e ".join([j["nome"] if isinstance(j, dict) else j for j in jogo[0]])
+                dupla2_nome = " e ".join([j["nome"] if isinstance(j, dict) else j for j in jogo[1]])
+                for dupla_nome in [dupla1_nome, dupla2_nome]:
+                    for j in jogadores_stats:
+                        if j["nome"] == dupla_nome:
+                            j["grupo"] = chave
+
+        # Substituição: manter ordem dos classificados separadamente por grupo, sem misturar
+        classificados_por_grupo = defaultdict(list)
+        for j in jogadores_stats:
+            if "grupo" in j:
+                classificados_por_grupo[j["grupo"]].append(j)
+
+        grupo_classificados = []
+        for grupo in sorted(classificados_por_grupo.keys()):
+            grupo_ordenado = aplicar_confronto_direto(calcular_saldo_e_classificar(classificados_por_grupo[grupo]))
+            grupo_classificados.append(grupo_ordenado[:2])  # apenas os 2 melhores
+
+        # garantir a ordem: grupo A depois grupo B
+        grupo_A = grupo_classificados[0]
+        grupo_B = grupo_classificados[1]
+
+        confrontos = [
+            {
+                "partida": "Semifinal 1",
+                "dupla1": grupo_A[0]["nome"],
+                "dupla2": grupo_B[1]["nome"],
+                "quadra": 1
+            },
+            {
+                "partida": "Semifinal 2",
+                "dupla1": grupo_B[0]["nome"],
+                "dupla2": grupo_A[1]["nome"],
+                "quadra": 2
+            },
+            {
+                "partida": "Final",
+                "dupla1": "Vencedor Semifinal 1",
+                "dupla2": "Vencedor Semifinal 2",
+                "quadra": 3
+            }
+        ]
+        data["confrontos"] = confrontos
+
+    elif categoria == "feminino":
+        jogadores_stats = calcular_estatisticas_por_jogador(data)
+
+        # associar grupo a cada dupla
+        for chave, jogos in chaves.items():
+            for jogo in jogos:
+                dupla1_nome = " e ".join([j["nome"] if isinstance(j, dict) else j for j in jogo[0]])
+                dupla2_nome = " e ".join([j["nome"] if isinstance(j, dict) else j for j in jogo[1]])
+                for dupla_nome in [dupla1_nome, dupla2_nome]:
+                    for j in jogadores_stats:
+                        if j["nome"] == dupla_nome:
+                            j["grupo"] = chave
+
+        # Substituição: manter ordem dos classificados separadamente por grupo, sem misturar
+        classificados_por_grupo = defaultdict(list)
+        for j in jogadores_stats:
+            if "grupo" in j:
+                classificados_por_grupo[j["grupo"]].append(j)
+
+        grupo_classificados = []
+        for grupo in sorted(classificados_por_grupo.keys()):
+            grupo_ordenado = aplicar_confronto_direto(calcular_saldo_e_classificar(classificados_por_grupo[grupo]))
+            grupo_classificados.append(grupo_ordenado[:2])  # apenas os 2 melhores
+
+        # garantir a ordem: grupo A depois grupo B
+        grupo_A = grupo_classificados[0]
+        grupo_B = grupo_classificados[1]
+
+        confrontos = [
+            {
+                "partida": "Semifinal 1",
+                "dupla1": grupo_A[0]["nome"],
+                "dupla2": grupo_B[1]["nome"],
+                "quadra": 1
+            },
+            {
+                "partida": "Semifinal 2",
+                "dupla1": grupo_B[0]["nome"],
+                "dupla2": grupo_A[1]["nome"],
+                "quadra": 2
+            },
+            {
+                "partida": "Final",
+                "dupla1": "Vencedor Semifinal 1",
+                "dupla2": "Vencedor Semifinal 2",
+                "quadra": 3
+            }
+        ]
         data["confrontos"] = confrontos
 
     with open(f"data/sorteio_{categoria}.json", "w", encoding="utf-8") as f:
@@ -292,10 +396,9 @@ def chaves_categoria(categoria):
                     confronto["resultado"] = jogo[3].get("resultado", [0, 0])
                     confronto["vencedor"] = jogo[3].get("vencedor")
                 chaves_convertidas[chave].append(confronto)
-        confrontos = []
+        confrontos = data.get("confrontos", [])
         ranking = []
-        if categoria == "mista" and "confrontos" in data:
-            confrontos = data["confrontos"]
+        if categoria == "mista":
             jogadores_stats = calcular_estatisticas_por_jogador(data)
 
             # associar grupo a cada dupla
@@ -308,20 +411,8 @@ def chaves_categoria(categoria):
                             if j["nome"] == dupla_nome:
                                 j["grupo"] = chave
 
-            def selecionar_2_por_grupo(jogadores_stats):
-                grupos = defaultdict(list)
-                for j in jogadores_stats:
-                    if "grupo" in j:
-                        grupos[j["grupo"]].append(j)
-                classificados = []
-                for grupo_duplas in grupos.values():
-                    classificados.extend(calcular_saldo_e_classificar(grupo_duplas)[:2])
-                return classificados
-
-            # NOVA LÓGICA: aplica corretamente critérios de desempate e confronto direto
-            classificados_10 = selecionar_2_por_grupo(jogadores_stats)
-            classificados_10 = aplicar_confronto_direto(classificados_10)
-            ranking_completo = calcular_saldo_e_classificar(classificados_10)
+            # Exibir ranking de todos os atletas (não apenas os 10 classificados)
+            ranking_completo = aplicar_confronto_direto(calcular_saldo_e_classificar(jogadores_stats))
 
             ranking = [{
                 "posicao": i + 1,
@@ -330,6 +421,68 @@ def chaves_categoria(categoria):
                 "saldo_sets": dupla["saldo_sets"],
                 "saldo_games": dupla["saldo_games"]
             } for i, dupla in enumerate(ranking_completo)]
+            # Garante confrontos para mista
+            confrontos = data.get("confrontos", [])
+
+        elif categoria == "masculino":
+            jogadores_stats = calcular_estatisticas_por_jogador(data)
+
+            for chave, jogos in data["chaves"].items():
+                for jogo in jogos:
+                    dupla1_nome = " e ".join([j["nome"] if isinstance(j, dict) else j for j in jogo[0]])
+                    dupla2_nome = " e ".join([j["nome"] if isinstance(j, dict) else j for j in jogo[1]])
+                    for dupla_nome in [dupla1_nome, dupla2_nome]:
+                        for j in jogadores_stats:
+                            if j["nome"] == dupla_nome:
+                                j["grupo"] = chave
+
+            ranking_completo = aplicar_confronto_direto(calcular_saldo_e_classificar(jogadores_stats))
+            ranking = [{
+                "posicao": i + 1,
+                "nome": dupla["nome"],
+                "vitorias": dupla["vitorias"],
+                "saldo_sets": dupla["saldo_sets"],
+                "saldo_games": dupla["saldo_games"],
+                "grupo": dupla.get("grupo", "-")
+            } for i, dupla in enumerate(ranking_completo)]
+            confrontos = data.get("confrontos", [])
+
+        elif categoria == "feminino":
+            jogadores_stats = calcular_estatisticas_por_jogador(data)
+
+            for chave, jogos in data["chaves"].items():
+                for jogo in jogos:
+                    dupla1_nome = " e ".join([j["nome"] if isinstance(j, dict) else j for j in jogo[0]])
+                    dupla2_nome = " e ".join([j["nome"] if isinstance(j, dict) else j for j in jogo[1]])
+                    for dupla_nome in [dupla1_nome, dupla2_nome]:
+                        for j in jogadores_stats:
+                            if j["nome"] == dupla_nome:
+                                j["grupo"] = chave
+
+            classificados_por_grupo = defaultdict(list)
+            for j in jogadores_stats:
+                if "grupo" in j:
+                    classificados_por_grupo[j["grupo"]].append(j)
+
+            grupo_classificados = []
+            for grupo in sorted(classificados_por_grupo.keys()):
+                grupo_ordenado = aplicar_confronto_direto(calcular_saldo_e_classificar(classificados_por_grupo[grupo]))
+                grupo_classificados.append(grupo_ordenado[:2])  # apenas os 2 melhores
+
+            grupo_A = grupo_classificados[0]
+            grupo_B = grupo_classificados[1]
+
+            ranking_completo = aplicar_confronto_direto(calcular_saldo_e_classificar(jogadores_stats))
+            ranking = [{
+                "posicao": i + 1,
+                "nome": dupla["nome"],
+                "vitorias": dupla["vitorias"],
+                "saldo_sets": dupla["saldo_sets"],
+                "saldo_games": dupla["saldo_games"],
+                "grupo": dupla.get("grupo", "-")
+            } for i, dupla in enumerate(ranking_completo)]
+
+            confrontos = data.get("confrontos", [])
 
         return render_template(
             f"chaves_{categoria}.html",
@@ -339,7 +492,8 @@ def chaves_categoria(categoria):
             confrontos=confrontos,
             ranking=ranking
         )
-    return render_template(f"chaves_{categoria}.html", jogadores=jogadores, chaves={}, categoria=categoria)
+    # Ensure confrontos is passed as an empty list if not present
+    return render_template(f"chaves_{categoria}.html", jogadores=jogadores, chaves={}, categoria=categoria, confrontos=[], ranking=[])
 
 @app.route("/")
 def index():
@@ -493,16 +647,18 @@ def salvar_resultados(categoria):
                         }
                         data["confrontos"].extend([semi1, semi2])
 
-            # Geração automática da final após semifinais
+            # Geração automática da final após semifinais (para qualquer categoria)
             if "Semifinal" in confronto["partida"]:
                 semifinais = [c for c in data.get("confrontos", []) if "Semifinal" in c.get("partida", "")]
                 if all("vencedor" in c for c in semifinais):
                     final_ja_gerado = any(c.get("partida") == "Final" for c in data["confrontos"])
                     if not final_ja_gerado:
+                        dupla1 = semifinais[0]["dupla1"] if semifinais[0]["vencedor"] == "dupla1" else semifinais[0]["dupla2"]
+                        dupla2 = semifinais[1]["dupla1"] if semifinais[1]["vencedor"] == "dupla1" else semifinais[1]["dupla2"]
                         final = {
                             "partida": "Final",
-                            "dupla1": semifinais[0]["dupla1"] if semifinais[0]["vencedor"] == "dupla1" else semifinais[0]["dupla2"],
-                            "dupla2": semifinais[1]["dupla1"] if semifinais[1]["vencedor"] == "dupla1" else semifinais[1]["dupla2"],
+                            "dupla1": dupla1,
+                            "dupla2": dupla2,
                             "quadra": 3
                         }
                         data["confrontos"].append(final)
@@ -563,6 +719,9 @@ def salvar_resultados(categoria):
 
 # Funções para critérios de desempate e classificação
 def calcular_saldo_e_classificar(jogadores):
+    """
+    Calcula saldo de sets/games e classifica as duplas conforme critérios de desempate.
+    """
     classificados = []
     for j in jogadores:
         vitorias = j.get("vitorias", 0)
@@ -587,6 +746,7 @@ def calcular_saldo_e_classificar(jogadores):
         -x["saldo_sets"],
         -x["saldo_games"]
     ))
+    classificados = aplicar_confronto_direto(classificados)
     return classificados
 
 def aplicar_confronto_direto(duplas):

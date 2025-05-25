@@ -1,0 +1,734 @@
+{
+  "chaves": {
+    "A": [
+      [
+        [
+          {
+            "nome": "Bruna",
+            "sexo": "F",
+            "categorias": [
+              "mista",
+              "feminino"
+            ],
+            "confirmado": true
+          },
+          {
+            "nome": "Paula Aquino",
+            "sexo": "F",
+            "categorias": [
+              "feminino"
+            ],
+            "confirmado": true
+          }
+        ],
+        [
+          {
+            "nome": "Alline Reis",
+            "sexo": "F",
+            "categorias": [
+              "mista",
+              "feminino"
+            ],
+            "confirmado": true
+          },
+          {
+            "nome": "Deninha",
+            "sexo": "F",
+            "categorias": [
+              "mista",
+              "feminino"
+            ],
+            "confirmado": true
+          }
+        ],
+        2,
+        {
+          "resultado": [
+            6,
+            5
+          ],
+          "vencedor": "dupla1"
+        }
+      ],
+      [
+        [
+          {
+            "nome": "Dani Cantarelli",
+            "sexo": "F",
+            "categorias": [
+              "mista",
+              "feminino"
+            ],
+            "confirmado": true
+          },
+          {
+            "nome": "Adriana Carla",
+            "sexo": "F",
+            "categorias": [
+              "mista",
+              "feminino"
+            ],
+            "confirmado": true
+          }
+        ],
+        [
+          {
+            "nome": "Beatriz",
+            "sexo": "F",
+            "categorias": [
+              "mista",
+              "feminino"
+            ],
+            "confirmado": true
+          },
+          {
+            "nome": "Ilka",
+            "sexo": "F",
+            "categorias": [
+              "mista",
+              "feminino"
+            ],
+            "confirmado": true
+          }
+        ],
+        4,
+        {
+          "resultado": [
+            6,
+            5
+          ],
+          "vencedor": "dupla1"
+        }
+      ],
+      [
+        [
+          {
+            "nome": "Bruna",
+            "sexo": "F",
+            "categorias": [
+              "mista",
+              "feminino"
+            ],
+            "confirmado": true
+          },
+          {
+            "nome": "Paula Aquino",
+            "sexo": "F",
+            "categorias": [
+              "feminino"
+            ],
+            "confirmado": true
+          }
+        ],
+        [
+          {
+            "nome": "Dani Cantarelli",
+            "sexo": "F",
+            "categorias": [
+              "mista",
+              "feminino"
+            ],
+            "confirmado": true
+          },
+          {
+            "nome": "Adriana Carla",
+            "sexo": "F",
+            "categorias": [
+              "mista",
+              "feminino"
+            ],
+            "confirmado": true
+          }
+        ],
+        2,
+        {
+          "resultado": [
+            6,
+            5
+          ],
+          "vencedor": "dupla1"
+        }
+      ],
+      [
+        [
+          {
+            "nome": "Alline Reis",
+            "sexo": "F",
+            "categorias": [
+              "mista",
+              "feminino"
+            ],
+            "confirmado": true
+          },
+          {
+            "nome": "Deninha",
+            "sexo": "F",
+            "categorias": [
+              "mista",
+              "feminino"
+            ],
+            "confirmado": true
+          }
+        ],
+        [
+          {
+            "nome": "Beatriz",
+            "sexo": "F",
+            "categorias": [
+              "mista",
+              "feminino"
+            ],
+            "confirmado": true
+          },
+          {
+            "nome": "Ilka",
+            "sexo": "F",
+            "categorias": [
+              "mista",
+              "feminino"
+            ],
+            "confirmado": true
+          }
+        ],
+        4,
+        {
+          "resultado": [
+            6,
+            5
+          ],
+          "vencedor": "dupla1"
+        }
+      ]
+    ],
+    "B": [
+      [
+        [
+          {
+            "nome": "Rafa Felix",
+            "sexo": "F",
+            "categorias": [
+              "mista",
+              "feminino"
+            ],
+            "confirmado": true
+          },
+          {
+            "nome": "Rayane",
+            "sexo": "F",
+            "categorias": [
+              "mista",
+              "feminino"
+            ],
+            "confirmado": true
+          }
+        ],
+        [
+          {
+            "nome": "Rita",
+            "sexo": "F",
+            "categorias": [
+              "mista",
+              "feminino"
+            ],
+            "confirmado": true
+          },
+          {
+            "nome": "Lorena",
+            "sexo": "F",
+            "categorias": [
+              "mista",
+              "feminino"
+            ],
+            "confirmado": true
+          }
+        ],
+        4,
+        {
+          "resultado": [
+            6,
+            5
+          ],
+          "vencedor": "dupla1"
+        }
+      ],
+      [
+        [
+          {
+            "nome": "Cecília",
+            "sexo": "F",
+            "categorias": [
+              "feminino"
+            ],
+            "confirmado": true
+          },
+          {
+            "nome": "Pamela",
+            "sexo": "F",
+            "categorias": [
+              "mista",
+              "feminino"
+            ],
+            "confirmado": true
+          }
+        ],
+        [
+          {
+            "nome": "Lorrany",
+            "sexo": "F",
+            "categorias": [
+              "mista",
+              "feminino"
+            ],
+            "confirmado": true
+          },
+          {
+            "nome": "Irly",
+            "sexo": "F",
+            "categorias": [
+              "mista",
+              "feminino"
+            ],
+            "confirmado": true
+          }
+        ],
+        6,
+        {
+          "resultado": [
+            6,
+            5
+          ],
+          "vencedor": "dupla1"
+        }
+      ],
+      [
+        [
+          {
+            "nome": "Rafa Felix",
+            "sexo": "F",
+            "categorias": [
+              "mista",
+              "feminino"
+            ],
+            "confirmado": true
+          },
+          {
+            "nome": "Rayane",
+            "sexo": "F",
+            "categorias": [
+              "mista",
+              "feminino"
+            ],
+            "confirmado": true
+          }
+        ],
+        [
+          {
+            "nome": "Cecília",
+            "sexo": "F",
+            "categorias": [
+              "feminino"
+            ],
+            "confirmado": true
+          },
+          {
+            "nome": "Pamela",
+            "sexo": "F",
+            "categorias": [
+              "mista",
+              "feminino"
+            ],
+            "confirmado": true
+          }
+        ],
+        4,
+        {
+          "resultado": [
+            6,
+            5
+          ],
+          "vencedor": "dupla1"
+        }
+      ],
+      [
+        [
+          {
+            "nome": "Rita",
+            "sexo": "F",
+            "categorias": [
+              "mista",
+              "feminino"
+            ],
+            "confirmado": true
+          },
+          {
+            "nome": "Lorena",
+            "sexo": "F",
+            "categorias": [
+              "mista",
+              "feminino"
+            ],
+            "confirmado": true
+          }
+        ],
+        [
+          {
+            "nome": "Lorrany",
+            "sexo": "F",
+            "categorias": [
+              "mista",
+              "feminino"
+            ],
+            "confirmado": true
+          },
+          {
+            "nome": "Irly",
+            "sexo": "F",
+            "categorias": [
+              "mista",
+              "feminino"
+            ],
+            "confirmado": true
+          }
+        ],
+        6,
+        {
+          "resultado": [
+            6,
+            5
+          ],
+          "vencedor": "dupla1"
+        }
+      ]
+    ]
+  },
+  "jogadores": [
+    {
+      "nome": "Adriana Carla",
+      "sexo": "F",
+      "categorias": [
+        "mista",
+        "feminino"
+      ],
+      "confirmado": true
+    },
+    {
+      "nome": "Alline Reis",
+      "sexo": "F",
+      "categorias": [
+        "mista",
+        "feminino"
+      ],
+      "confirmado": true
+    },
+    {
+      "nome": "Arthur",
+      "sexo": "M",
+      "categorias": [
+        "mista",
+        "masculino"
+      ],
+      "confirmado": true
+    },
+    {
+      "nome": "Beatriz",
+      "sexo": "F",
+      "categorias": [
+        "mista",
+        "feminino"
+      ],
+      "confirmado": true
+    },
+    {
+      "nome": "Bruna",
+      "sexo": "F",
+      "categorias": [
+        "mista",
+        "feminino"
+      ],
+      "confirmado": true
+    },
+    {
+      "nome": "Bruno Rolim",
+      "sexo": "M",
+      "categorias": [
+        "masculino"
+      ],
+      "confirmado": true
+    },
+    {
+      "nome": "Cecília",
+      "sexo": "F",
+      "categorias": [
+        "feminino"
+      ],
+      "confirmado": true
+    },
+    {
+      "nome": "Dani Cantarelli",
+      "sexo": "F",
+      "categorias": [
+        "mista",
+        "feminino"
+      ],
+      "confirmado": true
+    },
+    {
+      "nome": "Danilo Medeiros",
+      "sexo": "M",
+      "categorias": [
+        "mista",
+        "masculino"
+      ],
+      "confirmado": true
+    },
+    {
+      "nome": "David",
+      "sexo": "M",
+      "categorias": [
+        "mista",
+        "masculino"
+      ],
+      "confirmado": true
+    },
+    {
+      "nome": "Deninha",
+      "sexo": "F",
+      "categorias": [
+        "mista",
+        "feminino"
+      ],
+      "confirmado": true
+    },
+    {
+      "nome": "Edgard",
+      "sexo": "M",
+      "categorias": [
+        "mista",
+        "masculino"
+      ],
+      "confirmado": true
+    },
+    {
+      "nome": "Evilásio",
+      "sexo": "M",
+      "categorias": [
+        "mista",
+        "masculino"
+      ],
+      "confirmado": true
+    },
+    {
+      "nome": "Francisco",
+      "sexo": "M",
+      "categorias": [
+        "mista",
+        "masculino"
+      ],
+      "confirmado": true
+    },
+    {
+      "nome": "Ilka",
+      "sexo": "F",
+      "categorias": [
+        "mista",
+        "feminino"
+      ],
+      "confirmado": true
+    },
+    {
+      "nome": "Irly",
+      "sexo": "F",
+      "categorias": [
+        "mista",
+        "feminino"
+      ],
+      "confirmado": true
+    },
+    {
+      "nome": "João",
+      "sexo": "M",
+      "categorias": [
+        "mista",
+        "masculino"
+      ],
+      "confirmado": true
+    },
+    {
+      "nome": "Jonathan",
+      "sexo": "M",
+      "categorias": [
+        "mista"
+      ],
+      "confirmado": true
+    },
+    {
+      "nome": "Lorena",
+      "sexo": "F",
+      "categorias": [
+        "mista",
+        "feminino"
+      ],
+      "confirmado": true
+    },
+    {
+      "nome": "Lorrany",
+      "sexo": "F",
+      "categorias": [
+        "mista",
+        "feminino"
+      ],
+      "confirmado": true
+    },
+    {
+      "nome": "Lucas",
+      "sexo": "M",
+      "categorias": [
+        "mista",
+        "masculino"
+      ],
+      "confirmado": true
+    },
+    {
+      "nome": "Marcelo",
+      "sexo": "M",
+      "categorias": [
+        "mista",
+        "masculino"
+      ],
+      "confirmado": true
+    },
+    {
+      "nome": "Neudson",
+      "sexo": "M",
+      "categorias": [
+        "mista",
+        "masculino"
+      ],
+      "confirmado": true
+    },
+    {
+      "nome": "Pamela",
+      "sexo": "F",
+      "categorias": [
+        "mista",
+        "feminino"
+      ],
+      "confirmado": true
+    },
+    {
+      "nome": "Paula Aquino",
+      "sexo": "F",
+      "categorias": [
+        "feminino"
+      ],
+      "confirmado": true
+    },
+    {
+      "nome": "Rafa Felix",
+      "sexo": "F",
+      "categorias": [
+        "mista",
+        "feminino"
+      ],
+      "confirmado": true
+    },
+    {
+      "nome": "Raianne",
+      "sexo": "F",
+      "categorias": [
+        "mista"
+      ],
+      "confirmado": true
+    },
+    {
+      "nome": "Raul",
+      "sexo": "M",
+      "categorias": [
+        "masculino"
+      ],
+      "confirmado": true
+    },
+    {
+      "nome": "Rayane",
+      "sexo": "F",
+      "categorias": [
+        "mista",
+        "feminino"
+      ],
+      "confirmado": true
+    },
+    {
+      "nome": "Ricardo",
+      "sexo": "M",
+      "categorias": [
+        "mista",
+        "masculino"
+      ],
+      "confirmado": true
+    },
+    {
+      "nome": "Rita",
+      "sexo": "F",
+      "categorias": [
+        "mista",
+        "feminino"
+      ],
+      "confirmado": true
+    },
+    {
+      "nome": "Sérgio",
+      "sexo": "M",
+      "categorias": [
+        "mista"
+      ],
+      "confirmado": true
+    },
+    {
+      "nome": "Thallys",
+      "sexo": "M",
+      "categorias": [
+        "mista"
+      ],
+      "confirmado": true
+    },
+    {
+      "nome": "Wellington",
+      "sexo": "M",
+      "categorias": [
+        "mista",
+        "masculino"
+      ],
+      "confirmado": true
+    }
+  ],
+  "confrontos": [
+    {
+      "partida": "Semifinal 1",
+      "dupla1": "Bruna e Paula Aquino",
+      "dupla2": "Rita e Lorena",
+      "quadra": 1,
+      "resultado": [
+        6,
+        4
+      ],
+      "vencedor": "dupla1"
+    },
+    {
+      "partida": "Semifinal 2",
+      "dupla1": "Rafa Felix e Rayane",
+      "dupla2": "Alline Reis e Deninha",
+      "quadra": 2,
+      "resultado": [
+        6,
+        4
+      ],
+      "vencedor": "dupla1"
+    },
+    {
+      "partida": "Final",
+      "dupla1": "Bruna e Paula Aquino",
+      "dupla2": "Rafa Felix e Rayane",
+      "quadra": 3
+    }
+  ]
+}

@@ -23,27 +23,39 @@
     /* Ajustes específicos do Bootstrap para integrar com o tema */
     body {
       font-family: 'Poppins', sans-serif;
+      color: var(--color-text);
     }
     
     .container {
       max-width: 1200px;
     }
     
+    /* Forçar cor de texto clara em todos os elementos */
+    * {
+      color: inherit;
+    }
+    
+    /* Garantir legibilidade em elementos Bootstrap */
+    .badge, .btn, .alert, .card, .nav, .navbar {
+      color: var(--color-text);
+    }
+    
     /* Integração de tabelas Bootstrap */
     .table {
-      color: var(--color-text);
+      color: var(--color-text) !important;
     }
     
     .table > :not(caption) > * > * {
       background-color: transparent;
       border-bottom-color: rgba(255, 255, 255, 0.1);
+      color: var(--color-text) !important;
     }
     
     /* Select customizado */
     select.form-select {
       background-color: rgba(255, 255, 255, 0.08);
       border: 1px solid rgba(255, 255, 255, 0.1);
-      color: var(--color-text);
+      color: var(--color-text) !important;
       padding: 12px;
       border-radius: 8px;
     }
@@ -52,19 +64,19 @@
       background-color: rgba(255, 255, 255, 0.12);
       border-color: var(--color-primary);
       box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.2);
-      color: var(--color-text);
+      color: var(--color-text) !important;
     }
     
     select.form-select option {
       background-color: #2c5364;
-      color: var(--color-text);
+      color: var(--color-text) !important;
     }
     
     /* Input customizado */
     input.form-control {
       background-color: rgba(255, 255, 255, 0.08);
       border: 1px solid rgba(255, 255, 255, 0.1);
-      color: var(--color-text);
+      color: var(--color-text) !important;
       border-radius: 8px;
     }
     
@@ -72,11 +84,21 @@
       background-color: rgba(255, 255, 255, 0.12);
       border-color: var(--color-primary);
       box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.2);
-      color: var(--color-text);
+      color: var(--color-text) !important;
     }
     
     input.form-control::placeholder {
       color: rgba(255, 255, 255, 0.4);
+    }
+    
+    /* Sobrescrever cores escuras do Bootstrap */
+    .text-dark {
+      color: var(--color-text) !important;
+    }
+    
+    /* Labels e forms */
+    label, .form-label, .form-check-label {
+      color: var(--color-text) !important;
     }
   </style>
 </head>

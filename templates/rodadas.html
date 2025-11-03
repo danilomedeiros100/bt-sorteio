@@ -126,20 +126,20 @@
             {% endif %}
             
             <!-- Dupla 1 -->
-            <div class="matchup-dupla {% if confronto.resultado.finalizado %}{% if confronto.resultado.games_dupla1 > confronto.resultado.games_dupla2 %}winner{% else %}loser{% endif %}{% endif %}">
-              <span class="jogador-nome" data-jogador="{{ confronto.dupla1.jogador1 }}">{{ confronto.dupla1.jogador1 }}</span>
-              <span class="text-muted mx-1">&</span>
-              <span class="jogador-nome" data-jogador="{{ confronto.dupla1.jogador2 }}">{{ confronto.dupla1.jogador2 }}</span>
+            <div class="matchup-dupla {% if confronto.resultado.finalizado %}{% if confronto.resultado.games_dupla1 > confronto.resultado.games_dupla2 %}winner{% else %}loser{% endif %}{% endif %}" style="color: var(--color-text);">
+              <span class="jogador-nome" data-jogador="{{ confronto.dupla1.jogador1 }}" style="color: var(--color-text);">{{ confronto.dupla1.jogador1 }}</span>
+              <span class="mx-1" style="color: rgba(255,255,255,0.5);">&</span>
+              <span class="jogador-nome" data-jogador="{{ confronto.dupla1.jogador2 }}" style="color: var(--color-text);">{{ confronto.dupla1.jogador2 }}</span>
             </div>
             
             <!-- VS -->
             <div class="matchup-vs">VS</div>
             
             <!-- Dupla 2 -->
-            <div class="matchup-dupla {% if confronto.resultado.finalizado %}{% if confronto.resultado.games_dupla2 > confronto.resultado.games_dupla1 %}winner{% else %}loser{% endif %}{% endif %}">
-              <span class="jogador-nome" data-jogador="{{ confronto.dupla2.jogador1 }}">{{ confronto.dupla2.jogador1 }}</span>
-              <span class="text-muted mx-1">&</span>
-              <span class="jogador-nome" data-jogador="{{ confronto.dupla2.jogador2 }}">{{ confronto.dupla2.jogador2 }}</span>
+            <div class="matchup-dupla {% if confronto.resultado.finalizado %}{% if confronto.resultado.games_dupla2 > confronto.resultado.games_dupla1 %}winner{% else %}loser{% endif %}{% endif %}" style="color: var(--color-text);">
+              <span class="jogador-nome" data-jogador="{{ confronto.dupla2.jogador1 }}" style="color: var(--color-text);">{{ confronto.dupla2.jogador1 }}</span>
+              <span class="mx-1" style="color: rgba(255,255,255,0.5);">&</span>
+              <span class="jogador-nome" data-jogador="{{ confronto.dupla2.jogador2 }}" style="color: var(--color-text);">{{ confronto.dupla2.jogador2 }}</span>
             </div>
             
             <!-- Placar Dupla 2 -->

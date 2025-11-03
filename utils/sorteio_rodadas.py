@@ -34,42 +34,19 @@ def validar_participantes(homens: List[str], mulheres: List[str]) -> Tuple[bool,
     return True, "OK"
 
 
-def calcular_numero_rodadas_ideal(total_participantes: int) -> int:
-    """
-    Calcula o número ideal de rodadas baseado no total de participantes
-    Regra: suficiente para garantir distribuição justa
-    
-    Para 12-19 participantes: 4 rodadas (todos jogam ~4 vezes)
-    Para 20 participantes: 5 rodadas
-    Para 21+ participantes: 6 rodadas
-    
-    NOTA: 4 rodadas funciona melhor para números ímpares/desbalanceados
-    """
-    if total_participantes <= 19:
-        return 4  # Mais eficiente para distribuir
-    elif total_participantes == 20:
-        return 5
-    else:
-        return 6
-
 def gerar_5_rodadas(homens: List[str], mulheres: List[str]) -> Dict:
     """
-    Gera rodadas com duplas mistas FLEXÍVEL
-    - Adapta número de rodadas conforme participantes
-    - GARANTE que todos joguem o mesmo número de vezes (ou muito próximo)
-    - PERMITE repetição de duplas para garantir distribuição justa
+    Gera 5 rodadas com duplas mistas GARANTINDO que nenhuma dupla se repete
+    e DISTRIBUINDO descansos de forma equilibrada
     
     Algoritmo:
-    1. Calcula número ideal de rodadas
-    2. Prioriza quem já jogou MENOS para garantir distribuição justa
-    3. Permite repetição de duplas quando necessário
+    1. Para cada rodada, forma duplas que ainda não foram formadas
+    2. Usa tracking de duplas já usadas e descansos já dados
+    3. Garante distribuição equilibrada de descansos
     """
     valido, mensagem = validar_participantes(homens, mulheres)
     if not valido:
         return {"erro": mensagem}
-    
-    total_participantes = len(homens) + len(mulheres)
-    num_rodadas = calcular_numero_rodadas_ideal(total_participantes)
     
     # Embaralha para aleatoriedade
     homens_shuffled = homens.copy()
@@ -77,14 +54,14 @@ def gerar_5_rodadas(homens: List[str], mulheres: List[str]) -> Dict:
     random.shuffle(homens_shuffled)
     random.shuffle(mulheres_shuffled)
     
-    # Tracking de quantos jogos cada pessoa já fez
-    jogos_por_pessoa = defaultdict(int)  # Quantos jogos cada pessoa já fez
+    # Tracking de quem já jogou junto
+    duplas_usadas = set()  # Set de tuplas (homem, mulher)
     descansos_por_pessoa = defaultdict(int)  # Quantos descansos cada um já teve
     
     rodadas_geradas = []
     
     # Para cada rodada
-    for rodada_num in range(num_rodadas):
+    for rodada_num in range(5):
         # Decide quem vai descansar NESTA rodada antes de formar duplas
         # Prioriza quem já descansou mais para distribuir equitativamente
         
@@ -142,37 +119,36 @@ def gerar_5_rodadas(homens: List[str], mulheres: List[str]) -> Dict:
         
         duplas_rodada = []
         
-        # MODIFICADO: Prioriza quem já jogou MENOS para garantir 5 jogos para todos
-        # Ordena por quem já jogou menos (prioridade)
-        homens_disponiveis.sort(key=lambda h: jogos_por_pessoa[h])
-        mulheres_disponiveis.sort(key=lambda m: jogos_por_pessoa[m])
-        
-        # Forma duplas priorizando quem precisa jogar mais
-        # Permite repetição de duplas se necessário
-        idx_h = 0
-        idx_m = 0
-        
-        while idx_h < len(homens_disponiveis) and idx_m < len(mulheres_disponiveis):
-            h = homens_disponiveis[idx_h]
-            m = mulheres_disponiveis[idx_m]
+        # Forma duplas evitando repetições
+        while homens_disponiveis and mulheres_disponiveis:
+            h = homens_disponiveis[0]
             
-            # Forma a dupla (permitindo repetição)
-            duplas_rodada.append((h, m))
-            jogos_por_pessoa[h] += 1
-            jogos_por_pessoa[m] += 1
-            idx_h += 1
-            idx_m += 1
-        
-        # Se sobraram pessoas, elas descansam
-        if idx_h < len(homens_disponiveis):
-            for h in homens_disponiveis[idx_h:]:
+            # Procura mulher que ainda não formou dupla com ele
+            m_encontrada = None
+            for m in mulheres_disponiveis:
+                dupla_key = (h, m)
+                if dupla_key not in duplas_usadas:
+                    m_encontrada = m
+                    break
+            
+            if m_encontrada:
+                # Forma a dupla
+                dupla_key = (h, m_encontrada)
+                duplas_usadas.add(dupla_key)
+                duplas_rodada.append((h, m_encontrada))
+                
+                # Remove dos disponíveis
+                homens_disponiveis.remove(h)
+                mulheres_disponiveis.remove(m_encontrada)
+            else:
+                # Se não encontrou, adiciona ao descanso e tenta próximo
+                # Isso pode acontecer se já usou todas as possibilidades
                 descansando.append(h)
-        if idx_m < len(mulheres_disponiveis):
-            for m in mulheres_disponiveis[idx_m:]:
-                descansando.append(m)
+                homens_disponiveis.remove(h)
         
-        # Remove duplicatas
-        descansando = list(set(descansando))
+        # Quem sobrou (caso raro) descansa
+        descansando.extend(homens_disponiveis)
+        descansando.extend(mulheres_disponiveis)
         
         # Atualiza contador de descansos
         for pessoa in descansando:
@@ -219,7 +195,7 @@ def gerar_5_rodadas(homens: List[str], mulheres: List[str]) -> Dict:
         })
     
     return {
-        "total_rodadas": num_rodadas,
+        "total_rodadas": 5,
         "rodadas": rodadas_geradas
     }
 

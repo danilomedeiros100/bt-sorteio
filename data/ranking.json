@@ -1,0 +1,127 @@
+{
+  "ultima_atualizacao": "2025-11-03T10:14:41.083191",
+  "masculino": [
+    {
+      "nome": "Francisco",
+      "vitorias": 1,
+      "derrotas": 0,
+      "games_feitos": 6,
+      "games_sofridos": 1,
+      "jogos_realizados": 1,
+      "saldo_games": 5,
+      "percentual_vitorias": 100.0
+    },
+    {
+      "nome": "Edgard",
+      "vitorias": 1,
+      "derrotas": 0,
+      "games_feitos": 6,
+      "games_sofridos": 3,
+      "jogos_realizados": 1,
+      "saldo_games": 3,
+      "percentual_vitorias": 100.0
+    },
+    {
+      "nome": "David",
+      "vitorias": 1,
+      "derrotas": 0,
+      "games_feitos": 6,
+      "games_sofridos": 3,
+      "jogos_realizados": 1,
+      "saldo_games": 3,
+      "percentual_vitorias": 100.0
+    },
+    {
+      "nome": "Davi",
+      "vitorias": 0,
+      "derrotas": 1,
+      "games_feitos": 3,
+      "games_sofridos": 6,
+      "jogos_realizados": 1,
+      "saldo_games": -3,
+      "percentual_vitorias": 0.0
+    },
+    {
+      "nome": "Reinaldo",
+      "vitorias": 0,
+      "derrotas": 1,
+      "games_feitos": 3,
+      "games_sofridos": 6,
+      "jogos_realizados": 1,
+      "saldo_games": -3,
+      "percentual_vitorias": 0.0
+    },
+    {
+      "nome": "Marcelo",
+      "vitorias": 0,
+      "derrotas": 1,
+      "games_feitos": 1,
+      "games_sofridos": 6,
+      "jogos_realizados": 1,
+      "saldo_games": -5,
+      "percentual_vitorias": 0.0
+    }
+  ],
+  "feminino": [
+    {
+      "nome": "Sil",
+      "vitorias": 1,
+      "derrotas": 0,
+      "games_feitos": 6,
+      "games_sofridos": 1,
+      "jogos_realizados": 1,
+      "saldo_games": 5,
+      "percentual_vitorias": 100.0
+    },
+    {
+      "nome": "Irly",
+      "vitorias": 1,
+      "derrotas": 0,
+      "games_feitos": 6,
+      "games_sofridos": 3,
+      "jogos_realizados": 1,
+      "saldo_games": 3,
+      "percentual_vitorias": 100.0
+    },
+    {
+      "nome": "Deninha",
+      "vitorias": 1,
+      "derrotas": 0,
+      "games_feitos": 6,
+      "games_sofridos": 3,
+      "jogos_realizados": 1,
+      "saldo_games": 3,
+      "percentual_vitorias": 100.0
+    },
+    {
+      "nome": "Dani",
+      "vitorias": 0,
+      "derrotas": 1,
+      "games_feitos": 3,
+      "games_sofridos": 6,
+      "jogos_realizados": 1,
+      "saldo_games": -3,
+      "percentual_vitorias": 0.0
+    },
+    {
+      "nome": "Rita",
+      "vitorias": 0,
+      "derrotas": 1,
+      "games_feitos": 3,
+      "games_sofridos": 6,
+      "jogos_realizados": 1,
+      "saldo_games": -3,
+      "percentual_vitorias": 0.0
+    },
+    {
+      "nome": "Priscila",
+      "vitorias": 0,
+      "derrotas": 1,
+      "games_feitos": 1,
+      "games_sofridos": 6,
+      "jogos_realizados": 1,
+      "saldo_games": -5,
+      "percentual_vitorias": 0.0
+    }
+  ]
+}

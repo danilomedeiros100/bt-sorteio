@@ -167,10 +167,28 @@ document.querySelectorAll('.resultado-form').forEach(form => {
         btn.disabled = false;
         btn.innerHTML = originalText;
       } else {
-        btn.innerHTML = '<i class="bi bi-check-circle me-2"></i> Salvo!';
+        // Atualizar visual sem recarregar
+        btn.innerHTML = '<i class="bi bi-check-circle me-2"></i> Salvo com Sucesso!';
+        btn.classList.remove('btn-success');
+        btn.style.background = 'var(--color-success)';
+        btn.style.cursor = 'default';
+        
+        // Desabilitar inputs após salvar
+        form.querySelectorAll('input[type="number"]').forEach(input => {
+          input.style.background = 'rgba(6, 214, 160, 0.2)';
+          input.style.borderColor = 'var(--color-success)';
+        });
+        
+        // Feedback visual
+        const matchupContainer = form.closest('.matchup-container');
+        matchupContainer.style.background = 'rgba(6, 214, 160, 0.1)';
+        matchupContainer.style.borderLeft = '4px solid var(--color-success)';
+        
+        // Mostrar mensagem de sucesso
         setTimeout(() => {
-          location.reload();
-        }, 800);
+          btn.innerHTML = '<i class="bi bi-pencil me-2"></i> Atualizar Resultado';
+          btn.disabled = false;
+        }, 2000);
       }
     } catch (error) {
       alert('❌ Erro ao salvar resultado!');

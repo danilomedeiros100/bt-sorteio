@@ -41,23 +41,31 @@
 </div>
 
 <!-- Filtro de Categoria -->
-<div class="glass-card mb-4 slide-in" style="animation-delay: 0.05s;">
-  <h3 class="text-center mb-3" style="color: var(--color-text); font-size: 1.3rem;">
+<div class="glass-card mb-4 slide-in" style="animation-delay: 0.05s; background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.9)); border: 2px solid var(--color-primary); box-shadow: 0 8px 32px rgba(0, 123, 255, 0.2);">
+  <h3 class="text-center mb-3" style="color: #1a1a2e; font-size: 1.4rem; font-weight: 700;">
     <i class="bi bi-funnel-fill me-2" style="color: var(--color-primary);"></i>
     Filtrar por Categoria
   </h3>
   <div class="row justify-content-center">
     <div class="col-md-6">
-      <select id="filtroCategoria" class="form-select form-select-lg">
+      <select id="filtroCategoria" class="form-select form-select-lg" style="
+        background: white !important; 
+        color: #1a1a2e !important; 
+        border: 2px solid var(--color-primary) !important; 
+        font-weight: 600 !important;
+        font-size: 1.1rem !important;
+        padding: 12px 16px !important;
+        box-shadow: 0 4px 12px rgba(0, 123, 255, 0.15) !important;
+      ">
         <option value="todos">👥 Todos (Masculino e Feminino)</option>
         <option value="masculino">👨 Apenas Masculino</option>
         <option value="feminino">👩 Apenas Feminino</option>
       </select>
     </div>
   </div>
-  <p class="text-center text-muted mt-2 mb-0">
+  <p class="text-center mt-3 mb-0" style="color: #555; font-weight: 500;">
     <small>
-      <i class="bi bi-info-circle me-1"></i>
+      <i class="bi bi-info-circle me-1" style="color: var(--color-primary);"></i>
       Escolha uma categoria para visualizar o ranking e pódio
     </small>
   </p>

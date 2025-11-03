@@ -1,0 +1,307 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+"""
+Algoritmo de Sorteio de 5 Rodadas com Duplas Mistas
+Sistema que GARANTE que nenhuma dupla se repete
+Versão 2.0 - Algoritmo de Matching Otimizado
+"""
+
+import random
+from typing import List, Dict, Tuple, Optional
+from collections import defaultdict
+import itertools
+
+
+def validar_participantes(homens: List[str], mulheres: List[str]) -> Tuple[bool, str]:
+    """
+    Valida se é possível gerar 5 rodadas com os participantes
+    """
+    total_h = len(homens)
+    total_m = len(mulheres)
+    
+    if total_h < 3:
+        return False, "Mínimo de 3 homens necessário"
+    if total_m < 3:
+        return False, "Mínimo de 3 mulheres necessário"
+    
+    if total_h > 20 or total_m > 20:
+        return False, "Máximo recomendado: 20 jogadores por gênero"
+    
+    diferenca = abs(total_h - total_m)
+    if diferenca > 6:
+        return False, f"Diferença muito grande entre H e M ({diferenca}). Máximo recomendado: 6"
+    
+    return True, "OK"
+
+
+def gerar_5_rodadas(homens: List[str], mulheres: List[str]) -> Dict:
+    """
+    Gera 5 rodadas com duplas mistas GARANTINDO que nenhuma dupla se repete
+    e DISTRIBUINDO descansos de forma equilibrada
+    
+    Algoritmo:
+    1. Para cada rodada, forma duplas que ainda não foram formadas
+    2. Usa tracking de duplas já usadas e descansos já dados
+    3. Garante distribuição equilibrada de descansos
+    """
+    valido, mensagem = validar_participantes(homens, mulheres)
+    if not valido:
+        return {"erro": mensagem}
+    
+    # Embaralha para aleatoriedade
+    homens_shuffled = homens.copy()
+    mulheres_shuffled = mulheres.copy()
+    random.shuffle(homens_shuffled)
+    random.shuffle(mulheres_shuffled)
+    
+    # Tracking de quem já jogou junto
+    duplas_usadas = set()  # Set de tuplas (homem, mulher)
+    descansos_por_pessoa = defaultdict(int)  # Quantos descansos cada um já teve
+    
+    rodadas_geradas = []
+    
+    # Para cada rodada
+    for rodada_num in range(5):
+        # Decide quem vai descansar NESTA rodada antes de formar duplas
+        # Prioriza quem já descansou mais para distribuir equitativamente
+        
+        # Cria pool de possíveis descansantes
+        homens_pool = homens_shuffled.copy()
+        mulheres_pool = mulheres_shuffled.copy()
+        
+        # Quantos vão descansar? (diferença entre H e M)
+        diferenca = len(homens_pool) - len(mulheres_pool)
+        
+        descansando = []
+        
+        # Se há diferença, define quem descansa rotando
+        if diferenca > 0:  # Mais homens que mulheres
+            # Agrupa por número de descansos
+            descansos_grupos = defaultdict(list)
+            for h in homens_pool:
+                descansos_grupos[descansos_por_pessoa[h]].append(h)
+            
+            # Pega quem descansou MENOS (para equilibrar)
+            num_descansar = diferenca
+            for num_desc in sorted(descansos_grupos.keys()):  # Ordem crescente!
+                candidatos = descansos_grupos[num_desc]
+                random.shuffle(candidatos)
+                quantos_pegar = min(num_descansar, len(candidatos))
+                descansando.extend(candidatos[:quantos_pegar])
+                num_descansar -= quantos_pegar
+                if num_descansar == 0:
+                    break
+                    
+        elif diferenca < 0:  # Mais mulheres que homens
+            # Agrupa por número de descansos
+            descansos_grupos = defaultdict(list)
+            for m in mulheres_pool:
+                descansos_grupos[descansos_por_pessoa[m]].append(m)
+            
+            # Pega quem descansou MENOS (para equilibrar)
+            num_descansar = -diferenca
+            for num_desc in sorted(descansos_grupos.keys()):  # Ordem crescente!
+                candidatas = descansos_grupos[num_desc]
+                random.shuffle(candidatas)
+                quantos_pegar = min(num_descansar, len(candidatas))
+                descansando.extend(candidatas[:quantos_pegar])
+                num_descansar -= quantos_pegar
+                if num_descansar == 0:
+                    break
+        
+        # Agora forma duplas com quem VAI JOGAR
+        homens_disponiveis = [h for h in homens_shuffled if h not in descansando]
+        mulheres_disponiveis = [m for m in mulheres_shuffled if m not in descansando]
+        
+        # Embaralha para aleatoriedade
+        random.shuffle(homens_disponiveis)
+        random.shuffle(mulheres_disponiveis)
+        
+        duplas_rodada = []
+        
+        # Forma duplas evitando repetições
+        while homens_disponiveis and mulheres_disponiveis:
+            h = homens_disponiveis[0]
+            
+            # Procura mulher que ainda não formou dupla com ele
+            m_encontrada = None
+            for m in mulheres_disponiveis:
+                dupla_key = (h, m)
+                if dupla_key not in duplas_usadas:
+                    m_encontrada = m
+                    break
+            
+            if m_encontrada:
+                # Forma a dupla
+                dupla_key = (h, m_encontrada)
+                duplas_usadas.add(dupla_key)
+                duplas_rodada.append((h, m_encontrada))
+                
+                # Remove dos disponíveis
+                homens_disponiveis.remove(h)
+                mulheres_disponiveis.remove(m_encontrada)
+            else:
+                # Se não encontrou, adiciona ao descanso e tenta próximo
+                # Isso pode acontecer se já usou todas as possibilidades
+                descansando.append(h)
+                homens_disponiveis.remove(h)
+        
+        # Quem sobrou (caso raro) descansa
+        descansando.extend(homens_disponiveis)
+        descansando.extend(mulheres_disponiveis)
+        
+        # Atualiza contador de descansos
+        for pessoa in descansando:
+            descansos_por_pessoa[pessoa] += 1
+        
+        # Cria confrontos (duplas jogam entre si)
+        confrontos = []
+        metade = len(duplas_rodada) // 2
+        
+        for i in range(metade):
+            dupla1 = duplas_rodada[i]
+            dupla2_idx = metade + i
+            
+            if dupla2_idx < len(duplas_rodada):
+                dupla2 = duplas_rodada[dupla2_idx]
+                
+                confronto = {
+                    "quadra": i + 1,
+                    "dupla1": {
+                        "jogador1": dupla1[0],
+                        "jogador2": dupla1[1]
+                    },
+                    "dupla2": {
+                        "jogador1": dupla2[0],
+                        "jogador2": dupla2[1]
+                    },
+                    "resultado": {
+                        "games_dupla1": 0,
+                        "games_dupla2": 0,
+                        "finalizado": False
+                    }
+                }
+                confrontos.append(confronto)
+        
+        # Se número ímpar de duplas, última fica sem adversário
+        if len(duplas_rodada) % 2 == 1:
+            # Pode adicionar lógica aqui se necessário
+            pass
+        
+        rodadas_geradas.append({
+            "numero": rodada_num + 1,
+            "confrontos": confrontos,
+            "descansando": list(set(descansando))
+        })
+    
+    return {
+        "total_rodadas": 5,
+        "rodadas": rodadas_geradas
+    }
+
+
+def calcular_ranking_individual(rodadas: List[Dict]) -> List[Dict]:
+    """
+    Calcula o ranking individual baseado nos resultados das rodadas
+    """
+    stats = {}
+    
+    for rodada in rodadas:
+        for confronto in rodada.get("confrontos", []):
+            resultado = confronto.get("resultado", {})
+            
+            if not resultado.get("finalizado", False):
+                continue
+            
+            dupla1 = confronto["dupla1"]
+            dupla2 = confronto["dupla2"]
+            games_d1 = resultado.get("games_dupla1", 0)
+            games_d2 = resultado.get("games_dupla2", 0)
+            
+            venceu_dupla1 = games_d1 > games_d2
+            
+            for jogador in [dupla1["jogador1"], dupla1["jogador2"]]:
+                if jogador not in stats:
+                    stats[jogador] = {
+                        "nome": jogador,
+                        "vitorias": 0,
+                        "derrotas": 0,
+                        "games_feitos": 0,
+                        "games_sofridos": 0,
+                        "jogos_realizados": 0
+                    }
+                
+                stats[jogador]["jogos_realizados"] += 1
+                stats[jogador]["games_feitos"] += games_d1
+                stats[jogador]["games_sofridos"] += games_d2
+                
+                if venceu_dupla1:
+                    stats[jogador]["vitorias"] += 1
+                else:
+                    stats[jogador]["derrotas"] += 1
+            
+            for jogador in [dupla2["jogador1"], dupla2["jogador2"]]:
+                if jogador not in stats:
+                    stats[jogador] = {
+                        "nome": jogador,
+                        "vitorias": 0,
+                        "derrotas": 0,
+                        "games_feitos": 0,
+                        "games_sofridos": 0,
+                        "jogos_realizados": 0
+                    }
+                
+                stats[jogador]["jogos_realizados"] += 1
+                stats[jogador]["games_feitos"] += games_d2
+                stats[jogador]["games_sofridos"] += games_d1
+                
+                if not venceu_dupla1:
+                    stats[jogador]["vitorias"] += 1
+                else:
+                    stats[jogador]["derrotas"] += 1
+    
+    for jogador, stat in stats.items():
+        stat["saldo_games"] = stat["games_feitos"] - stat["games_sofridos"]
+        
+        if stat["jogos_realizados"] > 0:
+            stat["percentual_vitorias"] = round(
+                (stat["vitorias"] / stat["jogos_realizados"]) * 100, 1
+            )
+        else:
+            stat["percentual_vitorias"] = 0.0
+    
+    ranking_ordenado = sorted(
+        stats.values(),
+        key=lambda x: (
+            -x["vitorias"],          # 1º: Mais vitórias = melhor
+            -x["saldo_games"],       # 2º: Maior saldo = melhor
+            -x["games_feitos"],      # 3º: Mais games feitos = melhor
+            x["games_sofridos"]      # 4º: Menos games sofridos = melhor (ordem crescente)
+        )
+    )
+    
+    return ranking_ordenado
+
+
+def separar_ranking_por_genero(ranking: List[Dict], jogadores_data: List[Dict]) -> Dict:
+    """
+    Separa o ranking em masculino e feminino
+    """
+    sexo_map = {j["nome"]: j["sexo"] for j in jogadores_data}
+    
+    masculino = []
+    feminino = []
+    
+    for jogador_stat in ranking:
+        nome = jogador_stat["nome"]
+        sexo = sexo_map.get(nome, "M")
+        
+        if sexo == "M":
+            masculino.append(jogador_stat)
+        else:
+            feminino.append(jogador_stat)
+    
+    return {
+        "masculino": masculino,
+        "feminino": feminino
+    }

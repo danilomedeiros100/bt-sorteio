@@ -1,359 +1,174 @@
-def criar_grupos_duplas(duplas):
-    # Distribui duplas em grupos de 3 ou 4 tentando balancear ao máximo
-    total = len(duplas)
-    grupos_tamanhos = []
-    while total > 0:
-        if total % 3 == 0 or total == 3:
-            grupos_tamanhos.append(3)
-            total -= 3
-        elif total % 4 == 0:
-            grupos_tamanhos.append(4)
-            total -= 4
-        elif total >= 7:
-            grupos_tamanhos.append(3)
-            total -= 3
-        else:
-            grupos_tamanhos.append(total)
-            break
-    grupos = []
-    inicio = 0
-    for tamanho in grupos_tamanhos:
-        grupos.append(duplas[inicio:inicio + tamanho])
-        inicio += tamanho
-    return grupos
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+"""
+Sistema de Torneio de Beach Tennis - 5 Rodadas com Duplas Mistas
+Desenvolvido para BT Mania
+"""
+
 from flask import Flask, render_template, redirect, url_for, request, jsonify
 import json
 import os
-import random
-from collections import defaultdict
 import hashlib
+from datetime import datetime
+from utils.sorteio_rodadas import (
+    gerar_5_rodadas,
+    validar_participantes,
+    calcular_ranking_individual,
+    separar_ranking_por_genero
+)
 
 app = Flask(__name__)
+
+# Arquivos de dados
 DATA_FILE = os.path.join("data", "jogadores.json")
+RODADAS_FILE = "data/rodadas.json"
+RANKING_FILE = "data/ranking.json"
+VISITAS_FILE = "data/visitas.json"
+
+
+# ============================================================================
+# FUNÇÕES AUXILIARES - JOGADORES
+# ============================================================================
 
 def carregar_jogadores():
+    """Carrega jogadores do arquivo JSON"""
     try:
         with open(DATA_FILE, "r", encoding="utf-8") as f:
             jogadores = json.load(f)
             for j in jogadores:
                 if "confirmado" not in j:
                     j["confirmado"] = False
+                if "categorias" not in j:
+                    j["categorias"] = ["mista"]
             return jogadores
     except FileNotFoundError:
         return []
 
 
-VISITAS_FILE = "data/visitas.json"
+def salvar_jogadores(jogadores):
+    """Salva jogadores no arquivo JSON"""
+    with open(DATA_FILE, "w", encoding="utf-8") as f:
+        json.dump(jogadores, f, ensure_ascii=False, indent=2)
 
 
-def criar_duplas(jogadores, categoria):
-    jogadores = [j for j in jogadores if j.get("confirmado")]
-    if categoria == "mista":
-        homens = [j for j in jogadores if "mista" in j["categorias"] and j["sexo"] == "M"]
-        mulheres = [j for j in jogadores if "mista" in j["categorias"] and j["sexo"] == "F"]
-        random.shuffle(homens)
-        random.shuffle(mulheres)
-        return list(zip(homens, mulheres))
-    else:
-        grupo = [j for j in jogadores if categoria in j["categorias"] and j["sexo"].lower().startswith(categoria[0])]
-        random.shuffle(grupo)
-        return [tuple(grupo[i:i + 2]) for i in range(0, len(grupo) - 1, 2) if len(grupo[i:i + 2]) == 2]
+# ============================================================================
+# FUNÇÕES AUXILIARES - RODADAS E RANKING
+# ============================================================================
 
-def gerar_chaves(duplas, categoria=None):
-    chaves = {}
-    random.shuffle(duplas)
-    grupos = criar_grupos_duplas(duplas)
-
-    if categoria == "masculino":
-        quadras_disponiveis = [1, 3, 5]
-    elif categoria == "feminino":
-        quadras_disponiveis = [2, 4, 6]
-    else:
-        quadras_disponiveis = list(range(1, 7))
-
-    for idx, grupo in enumerate(grupos):
-        chave = chr(ord("A") + idx)
-        confrontos = []
-        quadra = quadras_disponiveis[idx % len(quadras_disponiveis)]
-        quadra2 = quadras_disponiveis[(idx + 1) % len(quadras_disponiveis)]
-        if len(grupo) == 3:
-            confrontos = [
-                (grupo[0], grupo[1], quadra),
-                (grupo[0], grupo[2], quadra),
-                (grupo[1], grupo[2], quadra)
-            ]
-        elif len(grupo) == 4:
-            confrontos = [
-                (grupo[0], grupo[1], quadra),
-                (grupo[2], grupo[3], quadra2),
-                (grupo[0], grupo[2], quadra),
-                (grupo[1], grupo[3], quadra2)
-            ]
-        chaves[chave] = confrontos
-    return chaves
-
-def get_status():
-    return {
-        "mista": {"realizado": os.path.exists("data/sorteio_mista.json")},
-        "masculino": {"realizado": os.path.exists("data/sorteio_masculino.json")},
-        "feminino": {"realizado": os.path.exists("data/sorteio_feminino.json")}
-    }
+def carregar_rodadas():
+    """Carrega as rodadas do arquivo JSON"""
+    try:
+        with open(RODADAS_FILE, "r", encoding="utf-8") as f:
+            return json.load(f)
+    except FileNotFoundError:
+        return None
 
 
-@app.route("/painel")
-def painel():
+def salvar_rodadas(dados):
+    """Salva as rodadas no arquivo JSON"""
+    with open(RODADAS_FILE, "w", encoding="utf-8") as f:
+        json.dump(dados, f, ensure_ascii=False, indent=2)
+
+
+def carregar_ranking():
+    """Carrega o ranking do arquivo JSON"""
+    try:
+        with open(RANKING_FILE, "r", encoding="utf-8") as f:
+            return json.load(f)
+    except FileNotFoundError:
+        return None
+
+
+def salvar_ranking(dados):
+    """Salva o ranking no arquivo JSON"""
+    with open(RANKING_FILE, "w", encoding="utf-8") as f:
+        json.dump(dados, f, ensure_ascii=False, indent=2)
+
+
+# ============================================================================
+# MIDDLEWARE - CONTADOR DE VISITAS
+# ============================================================================
+
+@app.before_request
+def registrar_visita_global():
+    """Registra visitas únicas por IP"""
+    try:
+        ip = request.remote_addr
+        user_hash = hashlib.md5(ip.encode()).hexdigest()
+        
+        try:
+            with open(VISITAS_FILE, "r", encoding="utf-8") as f:
+                content = f.read().strip()
+                ips = json.loads(content) if content else []
+        except (FileNotFoundError, json.JSONDecodeError):
+            ips = []
+
+        if user_hash not in ips:
+            ips.append(user_hash)
+            with open(VISITAS_FILE, "w", encoding="utf-8") as f:
+                json.dump(ips, f)
+    except:
+        pass  # Silenciosamente ignora erros
+
+
+# ============================================================================
+# ROTAS - PÁGINA INICIAL
+# ============================================================================
+
+@app.route("/")
+def index():
+    """Página inicial do torneio"""
     total_visitas = 0
     try:
-        with open("data/visitas.json", "r", encoding="utf-8") as f:
+        with open(VISITAS_FILE, "r", encoding="utf-8") as f:
             content = f.read().strip()
             visitas = json.loads(content) if content else []
             total_visitas = len(visitas)
     except (FileNotFoundError, json.JSONDecodeError):
         pass
+    
+    return render_template("index.html", total_visitas=total_visitas)
 
-    return render_template("painel.html", status=get_status(), total_visitas=total_visitas)
+
+# ============================================================================
+# ROTAS - GESTÃO DE JOGADORES
+# ============================================================================
 
 @app.route("/presenca")
 def presenca():
+    """Página de confirmação de presença e cadastro"""
     jogadores = sorted(carregar_jogadores(), key=lambda j: j["nome"])
     categorias = {
-        "mista_m": len([j for j in jogadores if j["confirmado"] and "mista" in j["categorias"] and j["sexo"] == "M"]),
-        "mista_f": len([j for j in jogadores if j["confirmado"] and "mista" in j["categorias"] and j["sexo"] == "F"]),
-        "masculino": len([j for j in jogadores if j["confirmado"] and "masculino" in j["categorias"]]),
-        "feminino": len([j for j in jogadores if j["confirmado"] and "feminino" in j["categorias"]])
+        "mista_m": len([j for j in jogadores if j["confirmado"] and j["sexo"] == "M"]),
+        "mista_f": len([j for j in jogadores if j["confirmado"] and j["sexo"] == "F"]),
+        "masculino": len([j for j in jogadores if j["confirmado"] and j["sexo"] == "M"]),
+        "feminino": len([j for j in jogadores if j["confirmado"] and j["sexo"] == "F"])
     }
     return render_template("presenca.html", jogadores=jogadores, categorias=categorias)
 
+
 @app.route("/confirmar_presenca", methods=["POST"])
 def confirmar_presenca():
+    """API para confirmar presença de jogadores"""
     jogadores = carregar_jogadores()
     confirmados = request.json.get("confirmado", [])
+    
     for j in jogadores:
         j["confirmado"] = j["nome"] in confirmados
-    with open(DATA_FILE, "w", encoding="utf-8") as f:
-        json.dump(jogadores, f, ensure_ascii=False, indent=2)
+    
+    salvar_jogadores(jogadores)
     return {"status": "ok"}
 
-@app.route("/sortear/<categoria>", methods=["POST"])
-def sortear_categoria(categoria):
-    jogadores = [j for j in carregar_jogadores() if j.get("confirmado")]
-    duplas = criar_duplas(jogadores, categoria)
-    chaves = gerar_chaves(duplas, categoria)
-
-    data = {
-        "chaves": chaves,
-        "jogadores": jogadores
-    }
-
-    # Sorteio especial para mista: Ranking dos 10 melhores, 6 vão direto, 4 repescagem, quartas, mas NÃO semifinais/final!
-    if categoria == "mista":
-        jogadores_stats = calcular_estatisticas_por_jogador(data)
-        # associar grupo a cada dupla
-        for chave, jogos in chaves.items():
-            for jogo in jogos:
-                dupla1_nome = " e ".join([j["nome"] if isinstance(j, dict) else j for j in jogo[0]])
-                dupla2_nome = " e ".join([j["nome"] if isinstance(j, dict) else j for j in jogo[1]])
-                for dupla_nome in [dupla1_nome, dupla2_nome]:
-                    for j in jogadores_stats:
-                        if j["nome"] == dupla_nome:
-                            j["grupo"] = chave
-
-        def selecionar_2_por_grupo(jogadores_stats):
-            grupos = defaultdict(list)
-            for j in jogadores_stats:
-                if "grupo" in j:
-                    grupos[j["grupo"]].append(j)
-            classificados = []
-            for grupo_duplas in grupos.values():
-                grupo_ordenado = calcular_saldo_e_classificar(grupo_duplas)
-                grupo_ordenado = aplicar_confronto_direto(grupo_ordenado)
-                classificados.extend(grupo_ordenado[:2])
-            return classificados
-
-        # Seleciona os dois melhores de cada grupo (ordem natural de grupos e posições)
-        classificados_10 = selecionar_2_por_grupo(jogadores_stats)
-        classificados_10 = aplicar_confronto_direto(classificados_10)
-        # NÃO reordene globalmente, mantenha ordem por grupo para montagem dos confrontos!
-        # Montagem dos confrontos com a ordem dos classificados por grupo e posição
-        diretos = classificados_10[:6]
-        repescagem = classificados_10[6:]
-
-        confrontos = []
-        # Repescagem (4 duplas, em 2 jogos)
-        if len(repescagem) >= 4:
-            confrontos += [
-                {"partida": "Repescagem 1", "dupla1": repescagem[0]["nome"], "dupla2": repescagem[3]["nome"], "quadra": 1},
-                {"partida": "Repescagem 2", "dupla1": repescagem[1]["nome"], "dupla2": repescagem[2]["nome"], "quadra": 2},
-            ]
-        # Quartas de final (6 diretos + 2 vencedores repescagem)
-        confrontos += [
-            {"partida": "Quartas 1", "dupla1": diretos[0]["nome"], "dupla2": "Vencedor Repescagem 2", "quadra": 1},
-            {"partida": "Quartas 2", "dupla1": diretos[1]["nome"], "dupla2": "Vencedor Repescagem 1", "quadra": 2},
-            {"partida": "Quartas 3", "dupla1": diretos[2]["nome"], "dupla2": diretos[5]["nome"], "quadra": 3},
-            {"partida": "Quartas 4", "dupla1": diretos[3]["nome"], "dupla2": diretos[4]["nome"], "quadra": 4},
-        ]
-        # Incluir também semifinais e final com nomes fictícios
-        semifinal1 = {
-            "partida": "Semifinal 1",
-            "dupla1": "Vencedor Quartas 1",
-            "dupla2": "Vencedor Quartas 4",
-            "quadra": 1
-        }
-        semifinal2 = {
-            "partida": "Semifinal 2",
-            "dupla1": "Vencedor Quartas 2",
-            "dupla2": "Vencedor Quartas 3",
-            "quadra": 2
-        }
-        final = {
-            "partida": "Final",
-            "dupla1": "Vencedor Semifinal 1",
-            "dupla2": "Vencedor Semifinal 2",
-            "quadra": 3
-        }
-        confrontos.extend([semifinal1, semifinal2, final])
-        data["confrontos"] = confrontos
-
-    elif categoria == "masculino":
-        jogadores_stats = calcular_estatisticas_por_jogador(data)
-
-        # associar grupo a cada dupla
-        for chave, jogos in chaves.items():
-            for jogo in jogos:
-                dupla1_nome = " e ".join([j["nome"] if isinstance(j, dict) else j for j in jogo[0]])
-                dupla2_nome = " e ".join([j["nome"] if isinstance(j, dict) else j for j in jogo[1]])
-                for dupla_nome in [dupla1_nome, dupla2_nome]:
-                    for j in jogadores_stats:
-                        if j["nome"] == dupla_nome:
-                            j["grupo"] = chave
-
-        # Substituição: manter ordem dos classificados separadamente por grupo, sem misturar
-        classificados_por_grupo = defaultdict(list)
-        for j in jogadores_stats:
-            if "grupo" in j:
-                classificados_por_grupo[j["grupo"]].append(j)
-
-        grupo_classificados = []
-        for grupo in sorted(classificados_por_grupo.keys()):
-            grupo_ordenado = aplicar_confronto_direto(calcular_saldo_e_classificar(classificados_por_grupo[grupo]))
-            grupo_classificados.append(grupo_ordenado[:2])  # apenas os 2 melhores
-
-        # garantir a ordem: grupo A depois grupo B
-        grupo_A = grupo_classificados[0]
-        grupo_B = grupo_classificados[1]
-
-        confrontos = [
-            {
-                "partida": "Semifinal 1",
-                "dupla1": grupo_A[0]["nome"],
-                "dupla2": grupo_B[1]["nome"],
-                "quadra": 1
-            },
-            {
-                "partida": "Semifinal 2",
-                "dupla1": grupo_B[0]["nome"],
-                "dupla2": grupo_A[1]["nome"],
-                "quadra": 2
-            },
-            {
-                "partida": "Final",
-                "dupla1": "Vencedor Semifinal 1",
-                "dupla2": "Vencedor Semifinal 2",
-                "quadra": 3
-            }
-        ]
-        data["confrontos"] = confrontos
-
-    elif categoria == "feminino":
-        jogadores_stats = calcular_estatisticas_por_jogador(data)
-
-        # associar grupo a cada dupla
-        for chave, jogos in chaves.items():
-            for jogo in jogos:
-                dupla1_nome = " e ".join([j["nome"] if isinstance(j, dict) else j for j in jogo[0]])
-                dupla2_nome = " e ".join([j["nome"] if isinstance(j, dict) else j for j in jogo[1]])
-                for dupla_nome in [dupla1_nome, dupla2_nome]:
-                    for j in jogadores_stats:
-                        if j["nome"] == dupla_nome:
-                            j["grupo"] = chave
-
-        # Substituição: manter ordem dos classificados separadamente por grupo, sem misturar
-        classificados_por_grupo = defaultdict(list)
-        for j in jogadores_stats:
-            if "grupo" in j:
-                classificados_por_grupo[j["grupo"]].append(j)
-
-        grupo_classificados = []
-        for grupo in sorted(classificados_por_grupo.keys()):
-            grupo_ordenado = aplicar_confronto_direto(calcular_saldo_e_classificar(classificados_por_grupo[grupo]))
-            grupo_classificados.append(grupo_ordenado[:2])  # apenas os 2 melhores
-
-        # garantir a ordem: grupo A depois grupo B
-        grupo_A = grupo_classificados[0]
-        grupo_B = grupo_classificados[1]
-
-        confrontos = [
-            {
-                "partida": "Semifinal 1",
-                "dupla1": grupo_A[0]["nome"],
-                "dupla2": grupo_B[1]["nome"],
-                "quadra": 1
-            },
-            {
-                "partida": "Semifinal 2",
-                "dupla1": grupo_B[0]["nome"],
-                "dupla2": grupo_A[1]["nome"],
-                "quadra": 2
-            },
-            {
-                "partida": "Final",
-                "dupla1": "Vencedor Semifinal 1",
-                "dupla2": "Vencedor Semifinal 2",
-                "quadra": 3
-            }
-        ]
-        data["confrontos"] = confrontos
-
-    with open(f"data/sorteio_{categoria}.json", "w", encoding="utf-8") as f:
-        json.dump(data, f, ensure_ascii=False, indent=2)
-
-    return redirect(url_for("painel"))
-
-@app.route("/resetar/<categoria>")
-def resetar_categoria(categoria):
-    path = f"data/sorteio_{categoria}.json"
-    if os.path.exists(path):
-        os.remove(path)
-    return redirect(url_for("painel"))
-
-@app.route("/excluir_jogador", methods=["POST"])
-def excluir_jogador():
-    try:
-        data = request.get_json(force=True)
-        nome = data.get("nome")
-
-        if not nome:
-            return jsonify({'status': 'erro', 'mensagem': 'Nome não fornecido'}), 400
-
-        jogadores = carregar_jogadores()
-        jogadores_filtrados = [j for j in jogadores if j["nome"] != nome]
-
-        with open(DATA_FILE, "w", encoding="utf-8") as f:
-            json.dump(jogadores_filtrados, f, indent=2, ensure_ascii=False)
-
-        return jsonify({'status': 'ok'})
-
-    except Exception as e:
-        return jsonify({'status': 'erro', 'mensagem': str(e)}), 500
 
 @app.route("/adicionar_ou_editar_jogador", methods=["POST"])
 def adicionar_ou_editar_jogador():
+    """API para adicionar ou editar jogador"""
     data = request.get_json()
     nome = data.get("nome", "").strip()
     sexo = data.get("sexo")
-    categorias = data.get("categorias", [])
+    categorias = data.get("categorias", ["mista"])
 
-    if not nome or not sexo or not categorias:
+    if not nome or not sexo:
         return {"status": "erro", "mensagem": "Dados incompletos"}, 400
 
     jogadores = carregar_jogadores()
@@ -370,482 +185,293 @@ def adicionar_ou_editar_jogador():
             "confirmado": False
         })
 
-    with open(DATA_FILE, "w", encoding="utf-8") as f:
-        json.dump(jogadores, f, ensure_ascii=False, indent=2)
-
+    salvar_jogadores(jogadores)
     return {"status": "ok"}
 
-@app.route("/chaves/<categoria>")
-def chaves_categoria(categoria):
-    path = f"data/sorteio_{categoria}.json"
-    jogadores = [j for j in carregar_jogadores() if j.get("confirmado")]
-    if os.path.exists(path):
-        with open(path, "r", encoding="utf-8") as f:
-            data = json.load(f)
-        # Reestruturando confrontos para exibir no HTML, incluindo placar e vencedor se houver
-        chaves_convertidas = {}
-        for chave, jogos in data["chaves"].items():
-            chaves_convertidas[chave] = []
-            for jogo in jogos:
-                confronto = {
-                    "dupla1": jogo[0],
-                    "dupla2": jogo[1],
-                    "quadra": jogo[2]
-                }
-                if len(jogo) > 3:
-                    confronto["resultado"] = jogo[3].get("resultado", [0, 0])
-                    confronto["vencedor"] = jogo[3].get("vencedor")
-                chaves_convertidas[chave].append(confronto)
-        confrontos = data.get("confrontos", [])
-        ranking = []
-        if categoria == "mista":
-            jogadores_stats = calcular_estatisticas_por_jogador(data)
 
-            # associar grupo a cada dupla
-            for chave, jogos in data["chaves"].items():
-                for jogo in jogos:
-                    dupla1_nome = " e ".join([j["nome"] if isinstance(j, dict) else j for j in jogo[0]])
-                    dupla2_nome = " e ".join([j["nome"] if isinstance(j, dict) else j for j in jogo[1]])
-                    for dupla_nome in [dupla1_nome, dupla2_nome]:
-                        for j in jogadores_stats:
-                            if j["nome"] == dupla_nome:
-                                j["grupo"] = chave
-
-            # Exibir ranking de todos os atletas (não apenas os 10 classificados)
-            ranking_completo = aplicar_confronto_direto(calcular_saldo_e_classificar(jogadores_stats))
-
-            ranking = [{
-                "posicao": i + 1,
-                "nome": dupla["nome"],
-                "vitorias": dupla["vitorias"],
-                "saldo_sets": dupla["saldo_sets"],
-                "saldo_games": dupla["saldo_games"]
-            } for i, dupla in enumerate(ranking_completo)]
-            # Garante confrontos para mista
-            confrontos = data.get("confrontos", [])
-
-        elif categoria == "masculino":
-            jogadores_stats = calcular_estatisticas_por_jogador(data)
-
-            for chave, jogos in data["chaves"].items():
-                for jogo in jogos:
-                    dupla1_nome = " e ".join([j["nome"] if isinstance(j, dict) else j for j in jogo[0]])
-                    dupla2_nome = " e ".join([j["nome"] if isinstance(j, dict) else j for j in jogo[1]])
-                    for dupla_nome in [dupla1_nome, dupla2_nome]:
-                        for j in jogadores_stats:
-                            if j["nome"] == dupla_nome:
-                                j["grupo"] = chave
-
-            ranking_completo = aplicar_confronto_direto(calcular_saldo_e_classificar(jogadores_stats))
-            ranking = [{
-                "posicao": i + 1,
-                "nome": dupla["nome"],
-                "vitorias": dupla["vitorias"],
-                "saldo_sets": dupla["saldo_sets"],
-                "saldo_games": dupla["saldo_games"],
-                "grupo": dupla.get("grupo", "-")
-            } for i, dupla in enumerate(ranking_completo)]
-            confrontos = data.get("confrontos", [])
-
-        elif categoria == "feminino":
-            jogadores_stats = calcular_estatisticas_por_jogador(data)
-
-            for chave, jogos in data["chaves"].items():
-                for jogo in jogos:
-                    dupla1_nome = " e ".join([j["nome"] if isinstance(j, dict) else j for j in jogo[0]])
-                    dupla2_nome = " e ".join([j["nome"] if isinstance(j, dict) else j for j in jogo[1]])
-                    for dupla_nome in [dupla1_nome, dupla2_nome]:
-                        for j in jogadores_stats:
-                            if j["nome"] == dupla_nome:
-                                j["grupo"] = chave
-
-            classificados_por_grupo = defaultdict(list)
-            for j in jogadores_stats:
-                if "grupo" in j:
-                    classificados_por_grupo[j["grupo"]].append(j)
-
-            grupo_classificados = []
-            for grupo in sorted(classificados_por_grupo.keys()):
-                grupo_ordenado = aplicar_confronto_direto(calcular_saldo_e_classificar(classificados_por_grupo[grupo]))
-                grupo_classificados.append(grupo_ordenado[:2])  # apenas os 2 melhores
-
-            grupo_A = grupo_classificados[0]
-            grupo_B = grupo_classificados[1]
-
-            ranking_completo = aplicar_confronto_direto(calcular_saldo_e_classificar(jogadores_stats))
-            ranking = [{
-                "posicao": i + 1,
-                "nome": dupla["nome"],
-                "vitorias": dupla["vitorias"],
-                "saldo_sets": dupla["saldo_sets"],
-                "saldo_games": dupla["saldo_games"],
-                "grupo": dupla.get("grupo", "-")
-            } for i, dupla in enumerate(ranking_completo)]
-
-            confrontos = data.get("confrontos", [])
-
-        return render_template(
-            f"chaves_{categoria}.html",
-            jogadores=data["jogadores"],
-            chaves=chaves_convertidas,
-            categoria=categoria,
-            confrontos=confrontos,
-            ranking=ranking
-        )
-    # Ensure confrontos is passed as an empty list if not present
-    return render_template(f"chaves_{categoria}.html", jogadores=jogadores, chaves={}, categoria=categoria, confrontos=[], ranking=[])
-
-@app.route("/")
-def index():
-    total_visitas = 0
+@app.route("/excluir_jogador", methods=["POST"])
+def excluir_jogador():
+    """API para excluir jogador"""
     try:
-        with open("data/visitas.json", "r", encoding="utf-8") as f:
-            content = f.read().strip()
-            visitas = json.loads(content) if content else []
-            total_visitas = len(visitas)
-    except (FileNotFoundError, json.JSONDecodeError):
-        pass
-    return render_template("index.html", total_visitas=total_visitas)
+        data = request.get_json(force=True)
+        nome = data.get("nome")
 
-@app.before_request
-def registrar_visita_global():
-    try:
-        ip = request.remote_addr
-        user_hash = hashlib.md5(ip.encode()).hexdigest()
-        with open(VISITAS_FILE, "r", encoding="utf-8") as f:
-            content = f.read().strip()
-            ips = json.loads(content) if content else []
-    except (FileNotFoundError, json.JSONDecodeError):
-        ips = []
+        if not nome:
+            return jsonify({'status': 'erro', 'mensagem': 'Nome não fornecido'}), 400
 
-    if user_hash not in ips:
-        ips.append(user_hash)
-        with open(VISITAS_FILE, "w", encoding="utf-8") as f:
-            json.dump(ips, f)
+        jogadores = carregar_jogadores()
+        jogadores_filtrados = [j for j in jogadores if j["nome"] != nome]
+
+        salvar_jogadores(jogadores_filtrados)
+        return jsonify({'status': 'ok'})
+
+    except Exception as e:
+        return jsonify({'status': 'erro', 'mensagem': str(e)}), 500
 
 
-# Rota para exibir confrontos da fase de grupos com campos para input de games
-@app.route("/painel_resultados/<categoria>")
-def painel_resultados(categoria):
-    path = f"data/sorteio_{categoria}.json"
-    if not os.path.exists(path):
-        return f"Sorteio da categoria {categoria} não encontrado", 404
+# ============================================================================
+# ROTAS - SISTEMA DE 5 RODADAS
+# ============================================================================
 
-    with open(path, "r", encoding="utf-8") as f:
-        data = json.load(f)
-
-    chaves_convertidas = {}
-    for chave, jogos in data.get("chaves", {}).items():
-        chaves_convertidas[chave] = []
-        for jogo in jogos:
-            dupla1 = [j["nome"] if isinstance(j, dict) else j for j in jogo[0]]
-            dupla2 = [j["nome"] if isinstance(j, dict) else j for j in jogo[1]]
-            confronto = {
-                "dupla1": dupla1,
-                "dupla2": dupla2,
-                "quadra": jogo[2],
-            }
-            if len(jogo) > 3:
-                confronto["resultado"] = jogo[3].get("resultado", [0, 0])
-                confronto["vencedor"] = jogo[3].get("vencedor")
-            chaves_convertidas[chave].append(confronto)
-
-    eliminatoria_convertida = defaultdict(list)
-
-    for confronto in data.get("confrontos", []):
-        if not all(key in confronto for key in ("partida", "dupla1", "dupla2", "quadra")):
-            continue
-
-        fase = confronto["partida"]
-        if fase.startswith("Repescagem"):
-            chave = "Repescagem"
-        elif fase.startswith("Quartas"):
-            chave = "Quartas de Final"
-        elif fase.startswith("Semifinal"):
-            chave = "Semifinais"
-        elif fase == "Final":
-            chave = "Final"
-        else:
-            continue
-
-        item = {
-            "dupla1": confronto["dupla1"],
-            "dupla2": confronto["dupla2"],
-            "quadra": confronto["quadra"],
-            "partida": confronto["partida"],
-            "resultado": confronto.get("resultado", [0, 0]),
-            "vencedor": confronto.get("vencedor")
-        }
-        eliminatoria_convertida[chave].append(item)
-
-    return render_template(
-        "painel_resultados.html",
-        categoria=categoria,
-        chaves=chaves_convertidas,
-        eliminatoria=eliminatoria_convertida
-    )
-
-
-
-@app.route("/salvar_resultados/<categoria>", methods=["POST"])
-def salvar_resultados(categoria):
-    def salvar_resultados_interno(data, grupo, fase, index, g1, g2):
-        if grupo:
-            confronto = data["chaves"][grupo][index]
-            if len(confronto) == 3:
-                confronto.append({})
-            confronto[3]["resultado"] = [g1, g2]
-            confronto[3]["vencedor"] = "dupla1" if g1 > g2 else "dupla2"
-        elif fase:
-            dupla1_req = request.form.get("dupla1")
-            dupla2_req = request.form.get("dupla2")
-            fase_confrontos = [
-                c for c in data.get("confrontos", [])
-                if c.get("partida") == fase and (
-                    (c.get("dupla1") == dupla1_req and c.get("dupla2") == dupla2_req) or
-                    (c.get("dupla1") == dupla2_req and c.get("dupla2") == dupla1_req)
-                )
-            ]
-            if not fase_confrontos:
-                return "Confronto não encontrado", 404
-            confronto = fase_confrontos[0]
-            for i, c in enumerate(data["confrontos"]):
-                if c.get("partida") == fase and (
-                    (c.get("dupla1") == confronto["dupla1"] and c.get("dupla2") == confronto["dupla2"]) or
-                    (c.get("dupla1") == confronto["dupla2"] and c.get("dupla2") == confronto["dupla1"])
-                ):
-                    data["confrontos"][i]["resultado"] = [g1, g2]
-                    data["confrontos"][i]["vencedor"] = "dupla1" if g1 > g2 else "dupla2"
-                    nome_vencedor = confronto["dupla1"] if g1 > g2 else confronto["dupla2"]
-                    partida_id = confronto["partida"]
-                    for proximo in data["confrontos"]:
-                        if proximo.get("dupla1") == f"Vencedor {partida_id}":
-                            proximo["dupla1"] = nome_vencedor
-                        if proximo.get("dupla2") == f"Vencedor {partida_id}":
-                            proximo["dupla2"] = nome_vencedor
-                    break
-            else:
-                return "Confronto não encontrado", 404
-
-            # Geração automática de semifinais após quartas
-            if "Quartas" in confronto["partida"]:
-                quartas = [c for c in data.get("confrontos", []) if "Quartas" in c.get("partida", "")]
-                if all("vencedor" in c for c in quartas):
-                    semifinal_ja_gerada = any("Semifinal" in c.get("partida", "") for c in data["confrontos"])
-                    if not semifinal_ja_gerada:
-                        semi1 = {
-                            "partida": "Semifinal 1",
-                            "dupla1": quartas[0]["dupla1"] if quartas[0]["vencedor"] == "dupla1" else quartas[0]["dupla2"],
-                            "dupla2": quartas[3]["dupla1"] if quartas[3]["vencedor"] == "dupla1" else quartas[3]["dupla2"],
-                            "quadra": 1
-                        }
-                        semi2 = {
-                            "partida": "Semifinal 2",
-                            "dupla1": quartas[1]["dupla1"] if quartas[1]["vencedor"] == "dupla1" else quartas[1]["dupla2"],
-                            "dupla2": quartas[2]["dupla1"] if quartas[2]["vencedor"] == "dupla1" else quartas[2]["dupla2"],
-                            "quadra": 2
-                        }
-                        data["confrontos"].extend([semi1, semi2])
-
-            # Geração automática da final após semifinais (para qualquer categoria)
-            if "Semifinal" in confronto["partida"]:
-                semifinais = [c for c in data.get("confrontos", []) if "Semifinal" in c.get("partida", "")]
-                if all("vencedor" in c for c in semifinais):
-                    final_ja_gerado = any(c.get("partida") == "Final" for c in data["confrontos"])
-                    if not final_ja_gerado:
-                        dupla1 = semifinais[0]["dupla1"] if semifinais[0]["vencedor"] == "dupla1" else semifinais[0]["dupla2"]
-                        dupla2 = semifinais[1]["dupla1"] if semifinais[1]["vencedor"] == "dupla1" else semifinais[1]["dupla2"]
-                        final = {
-                            "partida": "Final",
-                            "dupla1": dupla1,
-                            "dupla2": dupla2,
-                            "quadra": 3
-                        }
-                        data["confrontos"].append(final)
-        else:
-            return "Identificação de confronto ausente", 400
-        return data
-
-    path = f"data/sorteio_{categoria}.json"
-    if not os.path.exists(path):
-        return "Arquivo de sorteio não encontrado", 404
-
-    grupo = request.form.get("grupo")
-    fase = request.form.get("fase") or request.form.get("partida")
-
-    with open(path, "r", encoding="utf-8") as f:
-        data = json.load(f)
-
-    if grupo:
-        try:
-            index = int(request.form.get("index"))
-            g1 = int(request.form.get("games_1"))
-            g2 = int(request.form.get("games_2"))
-        except (TypeError, ValueError):
-            return "Dados inválidos", 400
-        # lógica de fase de grupos permanece como está
-        try:
-            result = salvar_resultados_interno(data, grupo, None, index, g1, g2)
-            if isinstance(result, tuple):  # caso retorne erro
-                return result
-        except (KeyError, IndexError):
-            return "Confronto não encontrado", 404
-    elif fase:
-        dupla1 = request.form.get("dupla1")
-        dupla2 = request.form.get("dupla2")
-        try:
-            g1 = int(request.form.get("games_1"))
-            g2 = int(request.form.get("games_2"))
-        except (TypeError, ValueError):
-            return "Dados inválidos", 400
-        # lógica da fase eliminatória permanece como está
-        try:
-            result = salvar_resultados_interno(data, None, fase, None, g1, g2)
-            if isinstance(result, tuple):  # caso retorne erro
-                return result
-        except (KeyError, IndexError):
-            return "Confronto não encontrado", 404
-    else:
-        return "Identificação de confronto ausente", 400
-
-    with open(path, "w", encoding="utf-8") as f:
-        json.dump(data, f, ensure_ascii=False, indent=2)
-
-    if request.headers.get("X-Requested-With") == "XMLHttpRequest":
-        return jsonify({"status": "ok"})
-
-    return redirect(url_for("painel_resultados", categoria=categoria))
-
-
-# Funções para critérios de desempate e classificação
-def calcular_saldo_e_classificar(jogadores):
-    """
-    Calcula saldo de sets/games e classifica as duplas conforme critérios de desempate.
-    """
-    classificados = []
-    for j in jogadores:
-        vitorias = j.get("vitorias", 0)
-        sets_v = j.get("sets_vencidos", 0)
-        sets_p = j.get("sets_perdidos", 0)
-        games_v = j.get("games_vencidos", 0)
-        games_p = j.get("games_perdidos", 0)
-        saldo_sets = sets_v - sets_p
-        saldo_games = games_v - games_p
-        j.update({
-            "saldo_sets": saldo_sets,
-            "saldo_games": saldo_games,
-            "sets_vencidos": sets_v,
-            "sets_perdidos": sets_p,
-            "games_vencidos": games_v,
-            "games_perdidos": games_p
-        })
-        classificados.append(j)
-
-    classificados = sorted(classificados, key=lambda x: (
-        -x["vitorias"],
-        -x["saldo_sets"],
-        -x["saldo_games"]
-    ))
-    classificados = aplicar_confronto_direto(classificados)
-    return classificados
-
-def aplicar_confronto_direto(duplas):
-    i = 0
-    while i < len(duplas) - 1:
-        d1 = duplas[i]
-        d2 = duplas[i + 1]
-        if (d1["vitorias"] == d2["vitorias"] and
-            d1["saldo_sets"] == d2["saldo_sets"] and
-            d1["saldo_games"] == d2["saldo_games"]):
-            confronto = d1.get("confrontos", {}).get(d2["nome"])
-            if confronto == "derrota":
-                duplas[i], duplas[i + 1] = duplas[i + 1], duplas[i]
-        i += 1
-    return duplas
-
-def selecionar_8_melhores(jogadores):
-    classificados = calcular_saldo_e_classificar(jogadores)
-    classificados = aplicar_confronto_direto(classificados)
-    return classificados[:8]
-
-def calcular_estatisticas_por_jogador(data):
-    estatisticas = defaultdict(lambda: {
-        "nome": "",
+@app.route("/gerar-rodadas", methods=["POST"])
+def rota_gerar_rodadas():
+    """Gera as 5 rodadas com duplas mistas"""
+    jogadores = carregar_jogadores()
+    confirmados = [j for j in jogadores if j.get("confirmado")]
+    
+    # Separa por gênero
+    homens = [j["nome"] for j in confirmados if j["sexo"] == "M"]
+    mulheres = [j["nome"] for j in confirmados if j["sexo"] == "F"]
+    
+    # Valida
+    valido, mensagem = validar_participantes(homens, mulheres)
+    if not valido:
+        return jsonify({"erro": mensagem}), 400
+    
+    # Gera rodadas
+    resultado = gerar_5_rodadas(homens, mulheres)
+    
+    if "erro" in resultado:
+        return jsonify({"erro": resultado["erro"]}), 400
+    
+    # Adiciona metadados
+    dados_completos = {
+        "data_sorteio": datetime.now().isoformat(),
+        "total_homens": len(homens),
+        "total_mulheres": len(mulheres),
+        "total_rodadas": resultado["total_rodadas"],
+        "rodadas": resultado["rodadas"]
+    }
+    
+    # Salva
+    salvar_rodadas(dados_completos)
+    
+    # Inicializa ranking com jogadores confirmados (todos com 0)
+    masculino = sorted([{
+        "nome": nome,
         "vitorias": 0,
-        "sets_vencidos": 0,
-        "sets_perdidos": 0,
-        "games_vencidos": 0,
-        "games_perdidos": 0,
-        "confrontos": {}
-    })
-
-    for chave, jogos in data.get("chaves", {}).items():
-        for jogo in jogos:
-            dupla1 = jogo[0]
-            dupla2 = jogo[1]
-            resultado = jogo[3]["resultado"] if len(jogo) > 3 and "resultado" in jogo[3] else [0, 0]
-
-            nome1 = " e ".join([j["nome"] if isinstance(j, dict) else j for j in dupla1])
-            nome2 = " e ".join([j["nome"] if isinstance(j, dict) else j for j in dupla2])
-
-            estatisticas[nome1]["nome"] = nome1
-            estatisticas[nome2]["nome"] = nome2
-
-            estatisticas[nome1]["games_vencidos"] += resultado[0]
-            estatisticas[nome1]["games_perdidos"] += resultado[1]
-            estatisticas[nome2]["games_vencidos"] += resultado[1]
-            estatisticas[nome2]["games_perdidos"] += resultado[0]
-
-            if resultado[0] > resultado[1]:
-                estatisticas[nome1]["vitorias"] += 1
-                estatisticas[nome1]["sets_vencidos"] += 1
-                estatisticas[nome2]["sets_perdidos"] += 1
-                estatisticas[nome1]["confrontos"][nome2] = "vitoria"
-                estatisticas[nome2]["confrontos"][nome1] = "derrota"
-            elif resultado[1] > resultado[0]:
-                estatisticas[nome2]["vitorias"] += 1
-                estatisticas[nome2]["sets_vencidos"] += 1
-                estatisticas[nome1]["sets_perdidos"] += 1
-                estatisticas[nome2]["confrontos"][nome1] = "vitoria"
-                estatisticas[nome1]["confrontos"][nome2] = "derrota"
-
-    return list(estatisticas.values())
-
-@app.route("/fase2/misto")
-def fase2_misto():
-    path = "data/sorteio_mista.json"
-    if not os.path.exists(path):
-        return "Sorteio da fase de grupos do misto não encontrado", 404
-
-    with open(path, "r", encoding="utf-8") as f:
-        data = json.load(f)
-
-    jogadores = calcular_estatisticas_por_jogador(data)
-    classificados = selecionar_8_melhores(jogadores)
-
-    confrontos = []
-    pares = [(0, 7), (1, 6), (2, 5), (3, 4)]
-    for i, (a, b) in enumerate(pares):
-        dupla1 = classificados[a]["nome"]
-        dupla2 = classificados[b]["nome"]
-        confrontos.append({
-            "partida": f"Jogo {i+1}",
-            "dupla1": dupla1,
-            "dupla2": dupla2,
-            "quadra": i + 1
-        })
-
-    ranking = [{"posicao": i+1, "nome": dupla["nome"], "vitorias": dupla["vitorias"],
-                "saldo_sets": dupla["saldo_sets"], "saldo_games": dupla["saldo_games"]}
-               for i, dupla in enumerate(classificados)]
-
-    return render_template("fase2_misto.html", confrontos=confrontos, ranking=ranking)
+        "derrotas": 0,
+        "percentual_vitorias": 0,
+        "saldo_games": 0,
+        "games_feitos": 0,
+        "games_sofridos": 0
+    } for nome in homens], key=lambda x: x["nome"])
+    
+    feminino = sorted([{
+        "nome": nome,
+        "vitorias": 0,
+        "derrotas": 0,
+        "percentual_vitorias": 0,
+        "saldo_games": 0,
+        "games_feitos": 0,
+        "games_sofridos": 0
+    } for nome in mulheres], key=lambda x: x["nome"])
+    
+    ranking_inicial = {
+        "ultima_atualizacao": datetime.now().isoformat(),
+        "masculino": masculino,
+        "feminino": feminino
+    }
+    salvar_ranking(ranking_inicial)
+    
+    return jsonify({"status": "ok", "total_rodadas": resultado["total_rodadas"]})
 
 
-# Rota administrativa
+@app.route("/rodadas")
+def rota_ver_rodadas():
+    """Visualiza todas as rodadas geradas"""
+    dados_rodadas = carregar_rodadas()
+    
+    if not dados_rodadas:
+        return render_template("rodadas.html", rodadas=None)
+    
+    return render_template("rodadas.html", rodadas=dados_rodadas)
+
+
+@app.route("/resetar-rodadas")
+def rota_resetar_rodadas():
+    """Remove as rodadas e ranking gerados"""
+    if os.path.exists(RODADAS_FILE):
+        os.remove(RODADAS_FILE)
+    if os.path.exists(RANKING_FILE):
+        os.remove(RANKING_FILE)
+    
+    return redirect(url_for("presenca"))
+
+
+# ============================================================================
+# ROTAS - REGISTRO DE RESULTADOS
+# ============================================================================
+
+@app.route("/registro-resultados")
+def rota_registro_resultados():
+    """Página para registrar resultados dos jogos"""
+    dados_rodadas = carregar_rodadas()
+    
+    if not dados_rodadas:
+        return redirect(url_for("presenca"))
+    
+    return render_template("registro_resultados.html", dados=dados_rodadas)
+
+
+@app.route("/salvar-resultado", methods=["POST"])
+def rota_salvar_resultado():
+    """Salva o resultado de um confronto"""
+    dados_rodadas = carregar_rodadas()
+    
+    if not dados_rodadas:
+        return jsonify({"erro": "Rodadas não encontradas"}), 404
+    
+    # Extrai dados do formulário
+    rodada_num = int(request.form.get("rodada"))
+    confronto_idx = int(request.form.get("confronto"))
+    games_d1 = int(request.form.get("games_dupla1"))
+    games_d2 = int(request.form.get("games_dupla2"))
+    
+    # Valida o placar
+    if games_d1 < 0 or games_d2 < 0:
+        return jsonify({"erro": "Placar inválido"}), 400
+    
+    # Beach Tennis: mínimo de 6 games para ganhar (ou 7 no tiebreak)
+    if games_d1 < 6 and games_d2 < 6:
+        return jsonify({"erro": "Placar inválido. Mínimo de 6 games para vencer"}), 400
+    
+    # Atualiza o confronto
+    rodada = dados_rodadas["rodadas"][rodada_num - 1]
+    confronto = rodada["confrontos"][confronto_idx]
+    
+    confronto["resultado"]["games_dupla1"] = games_d1
+    confronto["resultado"]["games_dupla2"] = games_d2
+    confronto["resultado"]["finalizado"] = True
+    
+    # Salva rodadas atualizadas
+    salvar_rodadas(dados_rodadas)
+    
+    # Recalcula o ranking
+    ranking = calcular_ranking_individual(dados_rodadas["rodadas"])
+    ranking_separado = separar_ranking_por_genero(ranking, carregar_jogadores())
+    
+    dados_ranking = {
+        "ultima_atualizacao": datetime.now().isoformat(),
+        "masculino": ranking_separado["masculino"],
+        "feminino": ranking_separado["feminino"]
+    }
+    
+    salvar_ranking(dados_ranking)
+    
+    return jsonify({"status": "ok"})
+
+
+# ============================================================================
+# ROTAS - RANKING
+# ============================================================================
+
+@app.route("/ranking")
+def rota_ranking_individual():
+    """Exibe o ranking"""
+    ranking = carregar_ranking()
+    
+    # Verifica se o ranking existe e tem dados
+    tem_dados_ranking = ranking and ranking.get("masculino") and len(ranking.get("masculino", [])) > 0
+    
+    if not tem_dados_ranking:
+        # Se não tem ranking ou está vazio, tenta gerar baseado nas rodadas
+        dados_rodadas = carregar_rodadas()
+        if dados_rodadas:
+            ranking_calc = calcular_ranking_individual(dados_rodadas["rodadas"])
+            ranking_sep = separar_ranking_por_genero(ranking_calc, carregar_jogadores())
+            
+            # Se o cálculo retornou dados, usa ele
+            if ranking_sep["masculino"] or ranking_sep["feminino"]:
+                ranking = {
+                    "ultima_atualizacao": datetime.now().isoformat(),
+                    "masculino": ranking_sep["masculino"],
+                    "feminino": ranking_sep["feminino"]
+                }
+            else:
+                # Se não tem resultados ainda, mostra jogadores confirmados em ordem alfabética
+                jogadores = carregar_jogadores()
+                confirmados = [j for j in jogadores if j.get("confirmado")]
+                
+                masculino = sorted([{
+                    "nome": j["nome"],
+                    "vitorias": 0,
+                    "derrotas": 0,
+                    "percentual_vitorias": 0,
+                    "saldo_games": 0,
+                    "games_feitos": 0,
+                    "games_sofridos": 0
+                } for j in confirmados if j["sexo"] == "M"], key=lambda x: x["nome"])
+                
+                feminino = sorted([{
+                    "nome": j["nome"],
+                    "vitorias": 0,
+                    "derrotas": 0,
+                    "percentual_vitorias": 0,
+                    "saldo_games": 0,
+                    "games_feitos": 0,
+                    "games_sofridos": 0
+                } for j in confirmados if j["sexo"] == "F"], key=lambda x: x["nome"])
+                
+                ranking = {
+                    "ultima_atualizacao": datetime.now().isoformat(),
+                    "masculino": masculino,
+                    "feminino": feminino
+                }
+        else:
+            # Se não tem rodadas ainda, mostra jogadores confirmados em ordem alfabética
+            jogadores = carregar_jogadores()
+            confirmados = [j for j in jogadores if j.get("confirmado")]
+            
+            masculino = sorted([{
+                "nome": j["nome"],
+                "vitorias": 0,
+                "derrotas": 0,
+                "percentual_vitorias": 0,
+                "saldo_games": 0,
+                "games_feitos": 0,
+                "games_sofridos": 0
+            } for j in confirmados if j["sexo"] == "M"], key=lambda x: x["nome"])
+            
+            feminino = sorted([{
+                "nome": j["nome"],
+                "vitorias": 0,
+                "derrotas": 0,
+                "percentual_vitorias": 0,
+                "saldo_games": 0,
+                "games_feitos": 0,
+                "games_sofridos": 0
+            } for j in confirmados if j["sexo"] == "F"], key=lambda x: x["nome"])
+            
+            ranking = {
+                "ultima_atualizacao": datetime.now().isoformat(),
+                "masculino": masculino,
+                "feminino": feminino
+            }
+    
+    return render_template("ranking_individual.html", ranking=ranking)
+
+
+# Rota de redirecionamento para compatibilidade
+@app.route("/ranking-individual")
+def rota_ranking_individual_old():
+    """Redirecionamento da URL antiga para a nova"""
+    return redirect(url_for("rota_ranking_individual"))
+
+
+# ============================================================================
+# ROTAS - ADMINISTRAÇÃO
+# ============================================================================
+
 @app.route("/admin")
 def admin():
+    """Painel administrativo"""
     return render_template("admin.html")
+
+
+# ============================================================================
+# INICIALIZAÇÃO
+# ============================================================================
 
 if __name__ == "__main__":
     app.run(debug=True)

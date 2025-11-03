@@ -1,0 +1,177 @@
+{% extends 'base.html' %}
+{% block title %}Ranking{% endblock %}
+
+{% block content %}
+<h1 class="text-center display-5 fw-bold mb-4">🏆 Ranking</h1>
+
+{% set tem_resultados = namespace(value=false) %}
+{% if ranking.masculino %}
+  {% for jogador in ranking.masculino %}
+    {% if jogador.vitorias > 0 or jogador.derrotas > 0 %}
+      {% set tem_resultados.value = true %}
+    {% endif %}
+  {% endfor %}
+{% endif %}
+
+<div class="glass-card text-center mb-4">
+  <p class="text-white mb-0">
+    <small>Última atualização: {{ ranking.ultima_atualizacao[:19] if ranking.ultima_atualizacao else 'N/A' }}</small>
+  </p>
+  {% if not tem_resultados.value %}
+    <p class="text-info mt-2 mb-0">
+      <strong>📋 Lista de Inscritos</strong> - Aguardando início do torneio
+    </p>
+  {% else %}
+    <p class="text-info mt-2 mb-0">
+      <strong>Critérios:</strong> 1º Vitórias | 2º Saldo de Games | 3º Games Feitos
+    </p>
+  {% endif %}
+</div>
+
+<!-- MASCULINO -->
+<div class="glass-card mb-4">
+  <h2 class="text-center mb-3">
+    👨 RANKING MASCULINO
+  </h2>
+  
+  {% if ranking.masculino and ranking.masculino|length > 0 %}
+    <div class="table-responsive">
+      <table class="table table-hover text-white align-middle">
+        <thead>
+          <tr class="text-light">
+            <th class="text-center">#</th>
+            <th>Jogador</th>
+            <th class="text-center">V</th>
+            <th class="text-center">D</th>
+            <th class="text-center">%</th>
+            <th class="text-center">Saldo</th>
+            <th class="text-center">GF</th>
+            <th class="text-center">GS</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for jogador in ranking.masculino %}
+            <tr class="{% if tem_resultados.value and loop.index <= 3 %}bg-warning bg-opacity-25{% endif %}">
+              <td class="text-center fw-bold">
+                {% if tem_resultados.value %}
+                  {% if loop.index == 1 %}🥇
+                  {% elif loop.index == 2 %}🥈
+                  {% elif loop.index == 3 %}🥉
+                  {% else %}{{ loop.index }}
+                  {% endif %}
+                {% else %}
+                  {{ loop.index }}
+                {% endif %}
+              </td>
+              <td class="fw-bold">{{ jogador.nome }}</td>
+              <td class="text-center text-success fw-bold">{{ jogador.vitorias }}</td>
+              <td class="text-center text-danger">{{ jogador.derrotas }}</td>
+              <td class="text-center">{{ jogador.percentual_vitorias }}%</td>
+              <td class="text-center fw-bold {% if jogador.saldo_games > 0 %}text-success{% elif jogador.saldo_games < 0 %}text-danger{% endif %}">
+                {{ '+' if jogador.saldo_games > 0 else '' }}{{ jogador.saldo_games }}
+              </td>
+              <td class="text-center">{{ jogador.games_feitos }}</td>
+              <td class="text-center">{{ jogador.games_sofridos }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% else %}
+    <p class="text-center text-white">Nenhum resultado registrado ainda.</p>
+  {% endif %}
+</div>
+
+<!-- FEMININO -->
+<div class="glass-card mb-4">
+  <h2 class="text-center mb-3">
+    👩 RANKING FEMININO
+  </h2>
+  
+  {% if ranking.feminino and ranking.feminino|length > 0 %}
+    <div class="table-responsive">
+      <table class="table table-hover text-white align-middle">
+        <thead>
+          <tr class="text-light">
+            <th class="text-center">#</th>
+            <th>Jogadora</th>
+            <th class="text-center">V</th>
+            <th class="text-center">D</th>
+            <th class="text-center">%</th>
+            <th class="text-center">Saldo</th>
+            <th class="text-center">GF</th>
+            <th class="text-center">GS</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for jogadora in ranking.feminino %}
+            <tr class="{% if tem_resultados.value and loop.index <= 3 %}bg-warning bg-opacity-25{% endif %}">
+              <td class="text-center fw-bold">
+                {% if tem_resultados.value %}
+                  {% if loop.index == 1 %}🥇
+                  {% elif loop.index == 2 %}🥈
+                  {% elif loop.index == 3 %}🥉
+                  {% else %}{{ loop.index }}
+                  {% endif %}
+                {% else %}
+                  {{ loop.index }}
+                {% endif %}
+              </td>
+              <td class="fw-bold">{{ jogadora.nome }}</td>
+              <td class="text-center text-success fw-bold">{{ jogadora.vitorias }}</td>
+              <td class="text-center text-danger">{{ jogadora.derrotas }}</td>
+              <td class="text-center">{{ jogadora.percentual_vitorias }}%</td>
+              <td class="text-center fw-bold {% if jogadora.saldo_games > 0 %}text-success{% elif jogadora.saldo_games < 0 %}text-danger{% endif %}">
+                {{ '+' if jogadora.saldo_games > 0 else '' }}{{ jogadora.saldo_games }}
+              </td>
+              <td class="text-center">{{ jogadora.games_feitos }}</td>
+              <td class="text-center">{{ jogadora.games_sofridos }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% else %}
+    <p class="text-center text-white">Nenhum resultado registrado ainda.</p>
+  {% endif %}
+</div>
+
+<!-- Legenda -->
+<div class="glass-card text-center mb-4">
+  <p class="text-white mb-1"><strong>Legenda:</strong></p>
+  <p class="text-white small mb-0">
+    V = Vitórias | D = Derrotas | % = Percentual de Vitórias | 
+    Saldo = Games Feitos - Games Sofridos | GF = Games Feitos | GS = Games Sofridos
+  </p>
+</div>
+
+<!-- Botões -->
+<div class="text-center mb-5">
+  <a href="{{ url_for('rota_ver_rodadas') }}" class="btn btn-glass">
+    📋 Ver Rodadas
+  </a>
+</div>
+
+<a href="{{ url_for('presenca') }}" class="btn btn-glass mt-4">⬅ Voltar</a>
+
+<div style="height: 70px;"></div>
+
+<script>
+// Auto-atualizar a cada 30 segundos
+setInterval(() => {
+  fetch('/ranking')
+    .then(res => res.text())
+    .then(html => {
+      // Extrai apenas a parte da tabela do HTML retornado
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(html, 'text/html');
+      
+      // Atualiza silenciosamente (pode adicionar lógica mais sofisticada)
+      console.log('Ranking verificado');
+    })
+    .catch(err => console.error('Erro ao atualizar:', err));
+}, 30000); // 30 segundos
+</script>
+
+{% endblock %}
+

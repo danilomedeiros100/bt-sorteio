@@ -1,21 +1,32 @@
 {% extends 'base.html' %}
-{% block title %}Início{% endblock %}
+{% block title %}Início - Torneio Beach Tennis{% endblock %}
 
 {% block content %}
   <div class="d-flex flex-column align-items-center justify-content-center" style="min-height: 80vh; gap: 2rem; padding-top: 2rem;">
 
     <!-- Logo no topo -->
     <img src="{{ url_for('static', filename='logo-btmania.png') }}" alt="Logo BT Mania"
-         class="img-fluid" style="max-height: 320px; margin-top: 20px;">
+         class="img-fluid" style="max-height: 576px; margin-top: 20px;">
 
-    <!-- Card de Categorias -->
+    <!-- Card Principal -->
     <div class="glass-card text-center w-100" style="max-width: 400px;">
-      <h2 class="text-white mb-4">Categorias do Torneio</h2>
+      <h2 class="text-white mb-4">🎾 Torneio BT Mania</h2>
+      <p class="text-white mb-4">Sistema de 5 Rodadas com Duplas Mistas</p>
 
-      <a href="{{ url_for('chaves_categoria', categoria='mista') }}" class="btn btn-glass text-uppercase mb-2 w-100">Duplas Mistas</a>
-      <a href="{{ url_for('chaves_categoria', categoria='masculino') }}" class="btn btn-glass text-uppercase mb-2 w-100">Masculino</a>
-      <a href="{{ url_for('chaves_categoria', categoria='feminino') }}" class="btn btn-glass text-uppercase w-100">Feminino</a>
+      <a href="{{ url_for('rota_ver_rodadas') }}" class="btn btn-glass text-uppercase mb-2 w-100">
+        📋 Ver Rodadas
+      </a>
+      <a href="{{ url_for('rota_ranking_individual') }}" class="btn btn-glass text-uppercase w-100">
+        🏆 Ranking
+      </a>
     </div>
+
+    <!-- Info de visitantes -->
+    {% if total_visitas > 0 %}
+    <div class="text-center text-white">
+      <small>👥 {{ total_visitas }} visitantes únicos</small>
+    </div>
+    {% endif %}
 
     <!-- Espaço para afastar do final da tela em mobile -->
     <div style="height: 60px;"></div>

@@ -31,7 +31,7 @@
               <div class="d-flex align-items-center">
   <input class="form-check-input me-2" type="checkbox" name="confirmado" value="{{ jogador.nome }}" id="jogador-{{ loop.index }}" {% if jogador.confirmado %}checked{% endif %}>
   <label class="form-check-label text-white" for="jogador-{{ loop.index }}">
-    {{ jogador.nome }} ({{ jogador.sexo }}) - {{ jogador.categorias | join(', ') }}
+    {{ jogador.nome }} ({{ jogador.sexo }})
   </label>
 </div>
             </div>
@@ -53,26 +53,11 @@
             <input type="text" class="form-control" id="nome" placeholder="Nome do jogador" required>
           </div>
           <div class="mb-3">
-            <select class="form-select" id="sexo" onchange="filtrarCategorias()" required>
-              <option value="">Sexo</option>
+            <select class="form-select" id="sexo" required>
+              <option value="">Selecione o Sexo</option>
               <option value="M">Masculino</option>
               <option value="F">Feminino</option>
             </select>
-          </div>
-          <div class="mb-3">
-            <label class="form-label text-white">Categorias</label><br>
-            <div class="form-check form-check-inline">
-              <input class="form-check-input" type="checkbox" id="cat-mista" value="mista">
-              <label class="form-check-label" for="cat-mista">Mista</label>
-            </div>
-            <div class="form-check form-check-inline">
-              <input class="form-check-input" type="checkbox" id="cat-masculino" value="masculino">
-              <label class="form-check-label" for="cat-masculino">Masculino</label>
-            </div>
-            <div class="form-check form-check-inline">
-              <input class="form-check-input" type="checkbox" id="cat-feminino" value="feminino">
-              <label class="form-check-label" for="cat-feminino">Feminino</label>
-            </div>
           </div>
           <div class="d-grid">
             <button type="submit" class="btn btn-glass">Salvar</button>
@@ -80,6 +65,16 @@
         </div>
       </div>
     </form>
+  </div>
+
+  <!-- Botão para Gerar Rodadas -->
+  <div class="glass-card text-center mt-4">
+    <h2 class="mb-3">🎲 Gerar Torneio de 5 Rodadas</h2>
+    <p class="text-white">Após confirmar todos os jogadores presentes, clique no botão abaixo para gerar as 5 rodadas automaticamente.</p>
+    <button onclick="gerarRodadas()" class="btn btn-glass" style="font-size: 1.5rem; padding: 20px;">
+      ⚡ GERAR 5 RODADAS
+    </button>
+    <div id="status-geracao" class="mt-3"></div>
   </div>
 </div>
 
@@ -93,12 +88,10 @@
         const label = cb.nextElementSibling.textContent.toLowerCase();
         const sexo = label.includes('(m)') ? 'M' : (label.includes('(f)') ? 'F' : '');
 
-        if (label.includes('mista')) {
-          if (sexo === 'M') mista_m++;
-          if (sexo === 'F') mista_f++;
-        }
-        if (label.includes('masculino') && sexo === 'M') masc++;
-        if (label.includes('feminino') && sexo === 'F') fem++;
+        if (sexo === 'M') mista_m++;
+        if (sexo === 'F') mista_f++;
+        masc = mista_m;
+        fem = mista_f;
       }
     });
 
@@ -109,45 +102,20 @@
     document.getElementById('cont-fem').textContent = fem;
   }
 
-  function filtrarCategorias() {
-    const sexo = document.getElementById("sexo").value;
-    const catMasc = document.getElementById("cat-masculino");
-    const catFem = document.getElementById("cat-feminino");
-
-    catMasc.disabled = false;
-    catFem.disabled = false;
-
-    if (sexo === "M") {
-      catFem.checked = false;
-      catFem.disabled = true;
-    } else if (sexo === "F") {
-      catMasc.checked = false;
-      catMasc.disabled = true;
-    }
-  }
-
   function salvarJogador(event) {
     event.preventDefault();
     const nome = document.getElementById("nome").value.trim();
     const sexo = document.getElementById("sexo").value;
-    const categorias = [];
-    if (document.getElementById("cat-mista").checked) categorias.push("mista");
-    if (document.getElementById("cat-masculino").checked) categorias.push("masculino");
-    if (document.getElementById("cat-feminino").checked) categorias.push("feminino");
 
     if (!nome || !sexo) {
       alert("Preencha o nome e o sexo.");
-      return;
-    }
-    if (categorias.length === 0) {
-      alert("Selecione pelo menos uma categoria.");
       return;
     }
 
     fetch("/adicionar_ou_editar_jogador", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ nome, sexo, categorias })
+      body: JSON.stringify({ nome, sexo, categorias: ["mista"] })
     })
     .then(res => res.json())
     .then(data => {
@@ -181,6 +149,31 @@
     });
   }
 
+  function gerarRodadas() {
+    const statusDiv = document.getElementById("status-geracao");
+    statusDiv.innerHTML = '<p class="text-white">⏳ Gerando rodadas...</p>';
+
+    fetch("/gerar-rodadas", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" }
+    })
+    .then(res => res.json())
+    .then(data => {
+      if (data.erro) {
+        statusDiv.innerHTML = `<p class="text-danger">❌ Erro: ${data.erro}</p>`;
+      } else {
+        statusDiv.innerHTML = `<p class="text-success">✅ ${data.total_rodadas} rodadas geradas com sucesso!</p>`;
+        setTimeout(() => {
+          window.location.href = "/rodadas";
+        }, 1500);
+      }
+    })
+    .catch(error => {
+      statusDiv.innerHTML = `<p class="text-danger">❌ Erro ao gerar rodadas</p>`;
+      console.error("Erro:", error);
+    });
+  }
+
   document.querySelectorAll('input[name="confirmado"]').forEach(cb => {
     cb.addEventListener('change', () => {
       const checkboxes = document.querySelectorAll('input[name="confirmado"]:checked');
@@ -197,7 +190,5 @@
       });
     });
   });
-
-  document.addEventListener('DOMContentLoaded', filtrarCategorias);
 </script>
 {% endblock %}

@@ -4,13 +4,34 @@
 {% block content %}
 <div class="container text-center mt-5">
   <h1 class="display-5 fw-bold mb-4">🎛️ Painel Administrativo</h1>
-  <div class="d-grid gap-3 col-6 mx-auto">
-    <a href="{{ url_for('painel') }}" class="btn btn-primary btn-lg">📊 Gerenciar Categorias</a>
-    <a href="{{ url_for('presenca') }}" class="btn btn-success btn-lg">✅ Confirmar Presença</a>
-<!--    <a href="{{ url_for('painel_resultados', categoria='mista') }}" class="btn btn-warning btn-lg">📝 Resultados Mista</a>-->
-    <a href="{{ url_for('painel_resultados', categoria='masculino') }}" class="btn btn-warning btn-lg">📝 Resultados Masculino</a>
-    <a href="{{ url_for('painel_resultados', categoria='feminino') }}" class="btn btn-info btn-lg">📝 Resultados Feminino</a>
-    <a href="{{ url_for('index') }}" class="btn btn-outline-light btn-lg">🏠 Página Inicial</a>
+  
+  <div class="glass-card">
+    <div class="d-grid gap-3 col-md-6 mx-auto">
+      <a href="{{ url_for('presenca') }}" class="btn btn-glass btn-lg">
+        👥 Gerenciar Jogadores
+      </a>
+      <a href="{{ url_for('rota_ver_rodadas') }}" class="btn btn-glass btn-lg">
+        📋 Ver Rodadas
+      </a>
+      <a href="{{ url_for('rota_registro_resultados') }}" class="btn btn-glass btn-lg">
+        📝 Registrar Resultados
+      </a>
+      <a href="{{ url_for('rota_ranking_individual') }}" class="btn btn-glass btn-lg">
+        🏆 Ver Ranking
+      </a>
+      <hr class="text-white my-4">
+      <a href="{{ url_for('rota_resetar_rodadas') }}" class="btn btn-danger btn-lg" onclick="return confirm('⚠️ Tem certeza? Isso apagará TODAS as rodadas e resultados!')">
+        🔄 Resetar Tudo
+      </a>
+      <a href="{{ url_for('index') }}" class="btn btn-outline-light btn-lg">
+        🏠 Página Inicial
+      </a>
+    </div>
+  </div>
+
+  <div class="mt-4 text-white">
+    <p><small>Sistema de 5 Rodadas com Duplas Mistas</small></p>
+    <p><small>BT Mania 🎾</small></p>
   </div>
 </div>
 {% endblock %}

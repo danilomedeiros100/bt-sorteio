@@ -40,9 +40,32 @@
   {% endif %}
 </div>
 
+<!-- Filtro de Categoria -->
+<div class="glass-card mb-4 slide-in" style="animation-delay: 0.05s;">
+  <h3 class="text-center mb-3" style="color: var(--color-text); font-size: 1.3rem;">
+    <i class="bi bi-funnel-fill me-2" style="color: var(--color-primary);"></i>
+    Filtrar por Categoria
+  </h3>
+  <div class="row justify-content-center">
+    <div class="col-md-6">
+      <select id="filtroCategoria" class="form-select form-select-lg">
+        <option value="todos">👥 Todos (Masculino e Feminino)</option>
+        <option value="masculino">👨 Apenas Masculino</option>
+        <option value="feminino">👩 Apenas Feminino</option>
+      </select>
+    </div>
+  </div>
+  <p class="text-center text-muted mt-2 mb-0">
+    <small>
+      <i class="bi bi-info-circle me-1"></i>
+      Escolha uma categoria para visualizar o ranking e pódio
+    </small>
+  </p>
+</div>
+
 <!-- Pódio de Destaque (apenas se houver resultados) -->
 {% if tem_resultados.value and ranking.masculino and ranking.masculino|length >= 3 %}
-<div class="glass-card mb-4 slide-in" style="animation-delay: 0.05s; background: linear-gradient(135deg, rgba(255, 215, 0, 0.1), rgba(212, 175, 55, 0.05));">
+<div class="glass-card mb-4 slide-in podio-container" style="animation-delay: 0.05s; background: linear-gradient(135deg, rgba(255, 215, 0, 0.1), rgba(212, 175, 55, 0.05));">
   <h3 class="text-center mb-4" style="color: #FFD700; font-size: 1.4rem;">
     <i class="bi bi-award-fill me-2"></i>
     🏆 PÓDIO PREMIADO 🏆
@@ -55,17 +78,17 @@
         <i class="bi bi-trophy-fill mb-2" style="color: #C0C0C0; font-size: 2rem;"></i>
         <h4 style="color: #C0C0C0; font-size: 1.3rem; margin-bottom: 8px;">2º LUGAR</h4>
         {% if ranking.masculino|length >= 2 %}
-          <p class="mb-1" style="font-size: 1.1rem; font-weight: 600;">
+          <p class="mb-1 podio-masculino" style="font-size: 1.1rem; font-weight: 600;">
             <i class="bi bi-person me-1"></i> {{ ranking.masculino[1].nome }}
           </p>
-          <small class="text-muted">Masculino - {{ ranking.masculino[1].vitorias }}V</small>
+          <small class="text-muted podio-masculino">Masculino - {{ ranking.masculino[1].vitorias }}V</small>
         {% endif %}
-        <hr style="border-color: rgba(192, 192, 192, 0.3); margin: 10px 0;">
+        <hr class="podio-separator" style="border-color: rgba(192, 192, 192, 0.3); margin: 10px 0;">
         {% if ranking.feminino|length >= 2 %}
-          <p class="mb-1 mt-2" style="font-size: 1.1rem; font-weight: 600;">
+          <p class="mb-1 mt-2 podio-feminino" style="font-size: 1.1rem; font-weight: 600;">
             <i class="bi bi-person me-1"></i> {{ ranking.feminino[1].nome }}
           </p>
-          <small class="text-muted">Feminino - {{ ranking.feminino[1].vitorias }}V</small>
+          <small class="text-muted podio-feminino">Feminino - {{ ranking.feminino[1].vitorias }}V</small>
         {% endif %}
       </div>
     </div>
@@ -76,19 +99,19 @@
         <i class="bi bi-trophy-fill mb-2" style="color: #FFD700; font-size: 3rem;"></i>
         <h4 style="color: #FFD700; font-size: 1.5rem; margin-bottom: 8px;">🥇 CAMPEÃO</h4>
         {% if ranking.masculino|length >= 1 %}
-          <p class="mb-1" style="font-size: 1.2rem; font-weight: 700;">
+          <p class="mb-1 podio-masculino" style="font-size: 1.2rem; font-weight: 700;">
             <i class="bi bi-person me-1"></i> {{ ranking.masculino[0].nome }}
             <i class="bi bi-star-fill ms-1" style="font-size: 0.9rem;"></i>
           </p>
-          <small class="text-muted">Masculino - {{ ranking.masculino[0].vitorias }}V</small>
+          <small class="text-muted podio-masculino">Masculino - {{ ranking.masculino[0].vitorias }}V</small>
         {% endif %}
-        <hr style="border-color: rgba(255, 215, 0, 0.4); margin: 10px 0;">
+        <hr class="podio-separator" style="border-color: rgba(255, 215, 0, 0.4); margin: 10px 0;">
         {% if ranking.feminino|length >= 1 %}
-          <p class="mb-1 mt-2" style="font-size: 1.2rem; font-weight: 700;">
+          <p class="mb-1 mt-2 podio-feminino" style="font-size: 1.2rem; font-weight: 700;">
             <i class="bi bi-person me-1"></i> {{ ranking.feminino[0].nome }}
             <i class="bi bi-star-fill ms-1" style="font-size: 0.9rem;"></i>
           </p>
-          <small class="text-muted">Feminino - {{ ranking.feminino[0].vitorias }}V</small>
+          <small class="text-muted podio-feminino">Feminino - {{ ranking.feminino[0].vitorias }}V</small>
         {% endif %}
       </div>
     </div>
@@ -99,17 +122,17 @@
         <i class="bi bi-trophy-fill mb-2" style="color: #CD7F32; font-size: 2rem;"></i>
         <h4 style="color: #CD7F32; font-size: 1.3rem; margin-bottom: 8px;">3º LUGAR</h4>
         {% if ranking.masculino|length >= 3 %}
-          <p class="mb-1" style="font-size: 1.1rem; font-weight: 600;">
+          <p class="mb-1 podio-masculino" style="font-size: 1.1rem; font-weight: 600;">
             <i class="bi bi-person me-1"></i> {{ ranking.masculino[2].nome }}
           </p>
-          <small class="text-muted">Masculino - {{ ranking.masculino[2].vitorias }}V</small>
+          <small class="text-muted podio-masculino">Masculino - {{ ranking.masculino[2].vitorias }}V</small>
         {% endif %}
-        <hr style="border-color: rgba(205, 127, 50, 0.3); margin: 10px 0;">
+        <hr class="podio-separator" style="border-color: rgba(205, 127, 50, 0.3); margin: 10px 0;">
         {% if ranking.feminino|length >= 3 %}
-          <p class="mb-1 mt-2" style="font-size: 1.1rem; font-weight: 600;">
+          <p class="mb-1 mt-2 podio-feminino" style="font-size: 1.1rem; font-weight: 600;">
             <i class="bi bi-person me-1"></i> {{ ranking.feminino[2].nome }}
           </p>
-          <small class="text-muted">Feminino - {{ ranking.feminino[2].vitorias }}V</small>
+          <small class="text-muted podio-feminino">Feminino - {{ ranking.feminino[2].vitorias }}V</small>
         {% endif %}
       </div>
     </div>
@@ -118,7 +141,7 @@
 {% endif %}
 
 <!-- MASCULINO -->
-<div class="glass-card mb-4 slide-in" style="animation-delay: 0.1s;">
+<div class="glass-card mb-4 slide-in ranking-masculino" style="animation-delay: 0.1s;">
   <h2 class="text-center mb-4" style="color: var(--color-primary); font-size: 1.6rem;">
     <i class="bi bi-person-fill me-2"></i>
     RANKING MASCULINO
@@ -181,7 +204,7 @@
 </div>
 
 <!-- FEMININO -->
-<div class="glass-card mb-4 slide-in" style="animation-delay: 0.2s;">
+<div class="glass-card mb-4 slide-in ranking-feminino" style="animation-delay: 0.2s;">
   <h2 class="text-center mb-4" style="color: var(--color-accent); font-size: 1.6rem;">
     <i class="bi bi-person-fill me-2"></i>
     RANKING FEMININO
@@ -271,6 +294,48 @@
 
 {% block scripts %}
 <script>
+// Filtro de categoria
+document.addEventListener('DOMContentLoaded', function() {
+  const filtroCategoria = document.getElementById('filtroCategoria');
+  
+  if (filtroCategoria) {
+    filtroCategoria.addEventListener('change', function() {
+      const categoria = this.value;
+      
+      const rankingMasculino = document.querySelector('.ranking-masculino');
+      const rankingFeminino = document.querySelector('.ranking-feminino');
+      const podioMasculino = document.querySelectorAll('.podio-masculino');
+      const podioFeminino = document.querySelectorAll('.podio-feminino');
+      const podioSeparators = document.querySelectorAll('.podio-separator');
+      
+      if (categoria === 'todos') {
+        // Mostrar tudo
+        if (rankingMasculino) rankingMasculino.style.display = '';
+        if (rankingFeminino) rankingFeminino.style.display = '';
+        podioMasculino.forEach(el => el.style.display = '');
+        podioFeminino.forEach(el => el.style.display = '');
+        podioSeparators.forEach(el => el.style.display = '');
+        
+      } else if (categoria === 'masculino') {
+        // Mostrar apenas masculino
+        if (rankingMasculino) rankingMasculino.style.display = '';
+        if (rankingFeminino) rankingFeminino.style.display = 'none';
+        podioMasculino.forEach(el => el.style.display = '');
+        podioFeminino.forEach(el => el.style.display = 'none');
+        podioSeparators.forEach(el => el.style.display = 'none');
+        
+      } else if (categoria === 'feminino') {
+        // Mostrar apenas feminino
+        if (rankingMasculino) rankingMasculino.style.display = 'none';
+        if (rankingFeminino) rankingFeminino.style.display = '';
+        podioMasculino.forEach(el => el.style.display = 'none');
+        podioFeminino.forEach(el => el.style.display = '');
+        podioSeparators.forEach(el => el.style.display = 'none');
+      }
+    });
+  }
+});
+
 // Auto-atualizar a cada 30 segundos
 setInterval(() => {
   fetch('/ranking')

@@ -66,9 +66,9 @@
             "jogador2": "Stephanie"
           },
           "resultado": {
-            "games_dupla1": 0,
+            "games_dupla1": 6,
             "games_dupla2": 0,
-            "finalizado": false
+            "finalizado": true
           }
         }
       ],
@@ -355,8 +355,8 @@
           },
           "resultado": {
             "games_dupla1": 0,
-            "games_dupla2": 0,
-            "finalizado": false
+            "games_dupla2": 6,
+            "finalizado": true
           }
         }
       ],

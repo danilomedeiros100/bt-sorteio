@@ -337,6 +337,44 @@ body {
   border: 1px solid rgba(212, 175, 55, 0.3);
 }
 
+/* Destaque individual para cada posição do pódio */
+.ranking-table .position-1 td {
+  background: linear-gradient(135deg, rgba(255, 215, 0, 0.25), rgba(212, 175, 55, 0.2));
+  border: 2px solid #FFD700;
+  box-shadow: 0 4px 12px rgba(255, 215, 0, 0.3);
+  font-weight: 600;
+}
+
+.ranking-table .position-2 td {
+  background: linear-gradient(135deg, rgba(192, 192, 192, 0.25), rgba(169, 169, 169, 0.2));
+  border: 2px solid #C0C0C0;
+  box-shadow: 0 4px 12px rgba(192, 192, 192, 0.3);
+  font-weight: 600;
+}
+
+.ranking-table .position-3 td {
+  background: linear-gradient(135deg, rgba(205, 127, 50, 0.25), rgba(184, 115, 51, 0.2));
+  border: 2px solid #CD7F32;
+  box-shadow: 0 4px 12px rgba(205, 127, 50, 0.3);
+  font-weight: 600;
+}
+
+/* Animação de pulso para o 1º lugar */
+@keyframes champion-pulse {
+  0%, 100% {
+    transform: scale(1);
+    box-shadow: 0 4px 12px rgba(255, 215, 0, 0.3);
+  }
+  50% {
+    transform: scale(1.02);
+    box-shadow: 0 6px 20px rgba(255, 215, 0, 0.5);
+  }
+}
+
+.ranking-table .position-1 {
+  animation: champion-pulse 2s ease-in-out infinite;
+}
+
 .ranking-position {
   font-size: 1.3rem;
   font-weight: 700;

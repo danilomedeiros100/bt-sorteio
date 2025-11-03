@@ -381,13 +381,14 @@ def rota_ranking_individual():
             ranking_calc = calcular_ranking_individual(dados_rodadas["rodadas"])
             ranking_sep = separar_ranking_por_genero(ranking_calc, carregar_jogadores())
             
-            # Se o cálculo retornou dados, usa ele
+            # Se o cálculo retornou dados, usa ele e salva
             if ranking_sep["masculino"] or ranking_sep["feminino"]:
                 ranking = {
                     "ultima_atualizacao": datetime.now().isoformat(),
                     "masculino": ranking_sep["masculino"],
                     "feminino": ranking_sep["feminino"]
                 }
+                salvar_ranking(ranking)  # Salva o ranking recalculado
             else:
                 # Se não tem resultados ainda, mostra jogadores confirmados em ordem alfabética
                 jogadores = carregar_jogadores()

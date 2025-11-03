@@ -203,9 +203,38 @@ def gerar_5_rodadas(homens: List[str], mulheres: List[str]) -> Dict:
 def calcular_ranking_individual(rodadas: List[Dict]) -> List[Dict]:
     """
     Calcula o ranking individual baseado nos resultados das rodadas
+    Inclui TODOS os jogadores, mesmo os que ainda não jogaram
     """
     stats = {}
     
+    # Primeiro, inicializa TODOS os jogadores que aparecem nas rodadas (jogando ou descansando)
+    todos_jogadores = set()
+    for rodada in rodadas:
+        # Adiciona jogadores dos confrontos
+        for confronto in rodada.get("confrontos", []):
+            dupla1 = confronto["dupla1"]
+            dupla2 = confronto["dupla2"]
+            todos_jogadores.add(dupla1["jogador1"])
+            todos_jogadores.add(dupla1["jogador2"])
+            todos_jogadores.add(dupla2["jogador1"])
+            todos_jogadores.add(dupla2["jogador2"])
+        
+        # Adiciona jogadores descansando
+        for jogador in rodada.get("descansando", []):
+            todos_jogadores.add(jogador)
+    
+    # Inicializa todos os jogadores com stats zerados
+    for jogador in todos_jogadores:
+        stats[jogador] = {
+            "nome": jogador,
+            "vitorias": 0,
+            "derrotas": 0,
+            "games_feitos": 0,
+            "games_sofridos": 0,
+            "jogos_realizados": 0
+        }
+    
+    # Agora processa os resultados finalizados
     for rodada in rodadas:
         for confronto in rodada.get("confrontos", []):
             resultado = confronto.get("resultado", {})
@@ -221,16 +250,6 @@ def calcular_ranking_individual(rodadas: List[Dict]) -> List[Dict]:
             venceu_dupla1 = games_d1 > games_d2
             
             for jogador in [dupla1["jogador1"], dupla1["jogador2"]]:
-                if jogador not in stats:
-                    stats[jogador] = {
-                        "nome": jogador,
-                        "vitorias": 0,
-                        "derrotas": 0,
-                        "games_feitos": 0,
-                        "games_sofridos": 0,
-                        "jogos_realizados": 0
-                    }
-                
                 stats[jogador]["jogos_realizados"] += 1
                 stats[jogador]["games_feitos"] += games_d1
                 stats[jogador]["games_sofridos"] += games_d2
@@ -241,16 +260,6 @@ def calcular_ranking_individual(rodadas: List[Dict]) -> List[Dict]:
                     stats[jogador]["derrotas"] += 1
             
             for jogador in [dupla2["jogador1"], dupla2["jogador2"]]:
-                if jogador not in stats:
-                    stats[jogador] = {
-                        "nome": jogador,
-                        "vitorias": 0,
-                        "derrotas": 0,
-                        "games_feitos": 0,
-                        "games_sofridos": 0,
-                        "jogos_realizados": 0
-                    }
-                
                 stats[jogador]["jogos_realizados"] += 1
                 stats[jogador]["games_feitos"] += games_d2
                 stats[jogador]["games_sofridos"] += games_d1

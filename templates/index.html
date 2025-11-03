@@ -2,35 +2,65 @@
 {% block title %}Início - Torneio Beach Tennis{% endblock %}
 
 {% block content %}
-  <div class="d-flex flex-column align-items-center justify-content-center" style="min-height: 80vh; gap: 2rem; padding-top: 2rem;">
-
-    <!-- Logo no topo -->
-    <img src="{{ url_for('static', filename='logo-btmania.png') }}" alt="Logo BT Mania"
-         class="img-fluid" style="max-height: 576px; margin-top: 20px;">
-
-    <!-- Card Principal -->
-    <div class="glass-card text-center w-100" style="max-width: 400px;">
-      <h2 class="text-white mb-4">🎾 Torneio BT Mania</h2>
-      <p class="text-white mb-4">Sistema de 5 Rodadas com Duplas Mistas</p>
-
-      <a href="{{ url_for('rota_ver_rodadas') }}" class="btn btn-glass text-uppercase mb-2 w-100">
-        📋 Ver Rodadas
-      </a>
-      <a href="{{ url_for('rota_ranking_individual') }}" class="btn btn-glass text-uppercase w-100">
-        🏆 Ranking
-      </a>
-    </div>
-
-    <!-- Info de visitantes -->
-    {% if total_visitas > 0 %}
-    <div class="text-center text-white">
-      <small>👥 {{ total_visitas }} visitantes únicos</small>
-    </div>
-    {% endif %}
-
-    <!-- Espaço para afastar do final da tela em mobile -->
-    <div style="height: 60px;"></div>
-
+<div class="fade-in" style="min-height: 80vh; display: flex; flex-direction: column; align-items: center; justify-content: center; padding-top: 40px;">
+  
+  <!-- Logo Principal -->
+  <div class="text-center mb-4">
+    <img src="{{ url_for('static', filename='logo-btmania.png') }}" 
+         alt="Logo BT Mania"
+         class="img-fluid logo"
+         style="max-height: 380px; filter: drop-shadow(0 8px 24px rgba(0, 0, 0, 0.4));">
   </div>
+  
+  <!-- Card Principal -->
+  <div class="glass-card text-center" style="max-width: 500px; width: 100%;">
+    <h1 class="app-title mb-2">
+      <i class="bi bi-trophy-fill" style="color: var(--color-accent);"></i>
+      Torneio BT Mania
+    </h1>
+    <p class="app-subtitle mb-4">Sistema de 5 Rodadas com Duplas Mistas</p>
+    
+    <div class="d-grid gap-3">
+      <a href="{{ url_for('rota_ver_rodadas') }}" class="btn-primary-custom btn-block">
+        <i class="bi bi-calendar-event me-2"></i>
+        Ver Rodadas
+      </a>
+      
+      <a href="{{ url_for('rota_ranking_individual') }}" class="btn-primary-custom btn-block btn-accent">
+        <i class="bi bi-bar-chart-fill me-2"></i>
+        Ranking
+      </a>
+    </div>
+  </div>
+  
+  <!-- Info de visitantes -->
+  {% if total_visitas > 0 %}
+  <div class="text-center mt-4 fade-in" style="animation-delay: 0.3s;">
+    <small class="text-muted">
+      <i class="bi bi-people-fill me-1"></i>
+      {{ total_visitas }} visitantes únicos
+    </small>
+  </div>
+  {% endif %}
+  
+  <!-- Espaçamento inferior -->
+  <div style="height: 80px;"></div>
+  
+</div>
 
+<style>
+  /* Animação extra para a logo */
+  .logo {
+    animation: logoFloat 3s ease-in-out infinite;
+  }
+  
+  @keyframes logoFloat {
+    0%, 100% {
+      transform: translateY(0px);
+    }
+    50% {
+      transform: translateY(-10px);
+    }
+  }
+</style>
 {% endblock %}

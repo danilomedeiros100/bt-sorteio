@@ -2,43 +2,61 @@
 {% block title %}5 Rodadas - Torneio{% endblock %}
 
 {% block content %}
-<h1 class="text-center display-5 fw-bold mb-4">🎾 5 Rodadas do Torneio</h1>
+<div class="fade-in">
+  
+<h1 class="text-center app-title mb-4">
+  <i class="bi bi-calendar3 me-2" style="color: var(--color-accent);"></i>
+  5 Rodadas do Torneio
+</h1>
 
 {% if not rodadas %}
   <div class="glass-card text-center">
-    <h2 class="mb-3">⚠️ Nenhuma Rodada Gerada</h2>
-    <p class="text-white">As rodadas ainda não foram geradas. Volte para a página de presenças e clique em "Gerar 5 Rodadas".</p>
-    <a href="{{ url_for('presenca') }}" class="btn btn-glass mt-3">⬅ Voltar para Presenças</a>
+    <i class="bi bi-exclamation-triangle" style="font-size: 3rem; color: var(--color-warning);"></i>
+    <h2 class="mt-3 mb-3">Nenhuma Rodada Gerada</h2>
+    <p class="text-muted">As rodadas ainda não foram geradas. Volte para a página de presenças e clique em "Gerar 5 Rodadas".</p>
+    <a href="{{ url_for('presenca') }}" class="btn-primary-custom mt-3">
+      <i class="bi bi-arrow-left me-2"></i>
+      Voltar para Presenças
+    </a>
   </div>
+  
 {% else %}
+  
   <!-- Info geral -->
-  <div class="glass-card text-center mb-4">
-    <p class="text-white fs-5 mb-2">
+  <div class="glass-card text-center mb-4 slide-in">
+    <p class="mb-2" style="font-size: 1.1rem;">
+      <i class="bi bi-calendar-check me-2" style="color: var(--color-accent);"></i>
       <strong>Torneio gerado em:</strong> {{ rodadas.data_sorteio[:10] }}
     </p>
-    <p class="text-white mb-0">
-      👨 <strong>{{ rodadas.total_homens }}</strong> homens | 
-      👩 <strong>{{ rodadas.total_mulheres }}</strong> mulheres | 
-      🎾 <strong>{{ rodadas.total_rodadas }}</strong> rodadas
+    <p class="mb-0" style="font-size: 1.1rem;">
+      <i class="bi bi-people-fill me-2" style="color: var(--color-primary);"></i>
+      <strong>{{ rodadas.total_homens }}</strong> homens | 
+      <strong>{{ rodadas.total_mulheres }}</strong> mulheres | 
+      <strong>{{ rodadas.total_rodadas }}</strong> rodadas
     </p>
   </div>
 
   <!-- Botões de ação -->
-  <div class="glass-card text-center mb-4">
-    <div class="d-flex gap-2 justify-content-center flex-wrap">
-      <a href="{{ url_for('rota_ranking_individual') }}" class="btn btn-glass">
-        🏆 Ver Ranking
-      </a>
-    </div>
+  <div class="glass-card text-center mb-4 slide-in" style="animation-delay: 0.1s;">
+    <a href="{{ url_for('rota_ranking_individual') }}" class="btn-primary-custom btn-accent">
+      <i class="bi bi-bar-chart-fill me-2"></i>
+      Ver Ranking
+    </a>
   </div>
 
   <!-- Filtro por Atleta -->
-  <div class="glass-card mb-4">
-    <h3 class="text-center text-white mb-3">🔍 Filtrar por Atleta</h3>
+  <div class="glass-card mb-4 slide-in" style="animation-delay: 0.2s;">
+    <h3 class="text-center mb-3" style="color: var(--color-text); font-size: 1.3rem;">
+      <i class="bi bi-funnel-fill me-2" style="color: var(--color-primary);"></i>
+      Filtrar por Atleta
+    </h3>
     <div class="row justify-content-center">
       <div class="col-md-6">
-        <select id="filtroAtleta" class="form-select form-select-lg" style="background-color: var(--cor-fundo); color: white; border: 2px solid var(--cor-primaria);">
-          <option value="">📋 Todos os Jogos</option>
+        <select id="filtroAtleta" class="form-select form-select-lg">
+          <option value="">
+            <i class="bi bi-list-ul"></i>
+            Todos os Jogos
+          </option>
           {% set todos_jogadores = [] %}
           {% for rodada in rodadas.rodadas %}
             {% for confronto in rodada.confrontos %}
@@ -71,67 +89,72 @@
         </select>
       </div>
     </div>
-    <p class="text-center text-white mt-2 mb-0">
-      <small>Selecione seu nome para ver apenas seus jogos</small>
+    <p class="text-center text-muted mt-2 mb-0">
+      <small>
+        <i class="bi bi-info-circle me-1"></i>
+        Selecione seu nome para ver apenas seus jogos
+      </small>
     </p>
   </div>
 
   <!-- Cada Rodada -->
   {% for rodada in rodadas.rodadas %}
-    <div class="glass-card mb-4 rodada-card">
-      <h2 class="text-center mb-3">
-        📍 RODADA {{ rodada.numero }}
+    <div class="glass-card mb-4 rodada-card slide-in" style="animation-delay: {{ 0.1 * loop.index }}s;">
+      <h2 class="text-center mb-4" style="color: var(--color-accent); font-size: 1.8rem;">
+        <i class="bi bi-circle-fill me-2" style="font-size: 0.8rem;"></i>
+        RODADA {{ rodada.numero }}
       </h2>
       
       <!-- Confrontos -->
       {% for confronto in rodada.confrontos %}
-        <div class="matchup mb-3 p-3 confronto-item" 
+        <div class="matchup-container confronto-item" 
              data-jogadores="{{ confronto.dupla1.jogador1 }},{{ confronto.dupla1.jogador2 }},{{ confronto.dupla2.jogador1 }},{{ confronto.dupla2.jogador2 }}">
+          
           <!-- Quadra -->
-          <div class="text-center mb-2">
-            <span class="badge" style="background-color: var(--cor-primaria); color: var(--cor-fundo); font-size: 1rem; padding: 8px 15px;">
+          <div class="matchup-quadra">
+            <span class="badge">
+              <i class="bi bi-geo-alt-fill me-1"></i>
               Quadra {{ confronto.quadra }}
             </span>
           </div>
           
-          <!-- Confronto na mesma linha com placares -->
-          <div class="d-flex flex-wrap align-items-center justify-content-center gap-2 text-white">
+          <!-- Confronto -->
+          <div class="matchup-content">
             <!-- Placar Dupla 1 -->
             {% if confronto.resultado.finalizado %}
-              <span class="fs-2 fw-bold text-white" style="min-width: 30px; text-align: center;">
-                {{ confronto.resultado.games_dupla1 }}
-              </span>
+              <span class="matchup-score">{{ confronto.resultado.games_dupla1 }}</span>
             {% endif %}
             
             <!-- Dupla 1 -->
-            <div class="{% if confronto.resultado.finalizado %}{% if confronto.resultado.games_dupla1 > confronto.resultado.games_dupla2 %}bg-success bg-opacity-50{% else %}bg-danger bg-opacity-25{% endif %} rounded px-3 py-2{% endif %}">
-              <strong class="jogador-nome" data-jogador="{{ confronto.dupla1.jogador1 }}">{{ confronto.dupla1.jogador1 }}</strong> & 
-              <strong class="jogador-nome" data-jogador="{{ confronto.dupla1.jogador2 }}">{{ confronto.dupla1.jogador2 }}</strong>
+            <div class="matchup-dupla {% if confronto.resultado.finalizado %}{% if confronto.resultado.games_dupla1 > confronto.resultado.games_dupla2 %}winner{% else %}loser{% endif %}{% endif %}">
+              <span class="jogador-nome" data-jogador="{{ confronto.dupla1.jogador1 }}">{{ confronto.dupla1.jogador1 }}</span>
+              <span class="text-muted mx-1">&</span>
+              <span class="jogador-nome" data-jogador="{{ confronto.dupla1.jogador2 }}">{{ confronto.dupla1.jogador2 }}</span>
             </div>
             
             <!-- VS -->
-            <div class="px-2">
-              <strong>VS</strong>
-            </div>
+            <div class="matchup-vs">VS</div>
             
             <!-- Dupla 2 -->
-            <div class="{% if confronto.resultado.finalizado %}{% if confronto.resultado.games_dupla2 > confronto.resultado.games_dupla1 %}bg-success bg-opacity-50{% else %}bg-danger bg-opacity-25{% endif %} rounded px-3 py-2{% endif %}">
-              <strong class="jogador-nome" data-jogador="{{ confronto.dupla2.jogador1 }}">{{ confronto.dupla2.jogador1 }}</strong> & 
-              <strong class="jogador-nome" data-jogador="{{ confronto.dupla2.jogador2 }}">{{ confronto.dupla2.jogador2 }}</strong>
+            <div class="matchup-dupla {% if confronto.resultado.finalizado %}{% if confronto.resultado.games_dupla2 > confronto.resultado.games_dupla1 %}winner{% else %}loser{% endif %}{% endif %}">
+              <span class="jogador-nome" data-jogador="{{ confronto.dupla2.jogador1 }}">{{ confronto.dupla2.jogador1 }}</span>
+              <span class="text-muted mx-1">&</span>
+              <span class="jogador-nome" data-jogador="{{ confronto.dupla2.jogador2 }}">{{ confronto.dupla2.jogador2 }}</span>
             </div>
             
             <!-- Placar Dupla 2 -->
             {% if confronto.resultado.finalizado %}
-              <span class="fs-2 fw-bold text-white" style="min-width: 30px; text-align: center;">
-                {{ confronto.resultado.games_dupla2 }}
-              </span>
+              <span class="matchup-score">{{ confronto.resultado.games_dupla2 }}</span>
             {% endif %}
           </div>
           
           <!-- Status -->
           {% if not confronto.resultado.finalizado %}
-            <div class="text-center mt-2">
-              <span class="badge bg-warning text-dark">⏳ Aguardando Resultado</span>
+            <div class="text-center mt-3">
+              <span class="badge-status badge-pending">
+                <i class="bi bi-clock me-1"></i>
+                Aguardando Resultado
+              </span>
             </div>
           {% endif %}
         </div>
@@ -139,25 +162,37 @@
       
       <!-- Jogadores descansando -->
       {% if rodada.descansando and rodada.descansando|length > 0 %}
-        <div class="alert alert-info text-center mt-3 descansando-item" data-descansando="{{ rodada.descansando | join(',') }}">
-          <strong>😴 Descansando:</strong> {{ rodada.descansando | join(', ') }}
+        <div class="alert-custom alert-info text-center mt-3 descansando-item" data-descansando="{{ rodada.descansando | join(',') }}">
+          <i class="bi bi-moon-stars-fill me-2" style="color: var(--color-primary);"></i>
+          <strong>Descansando:</strong> {{ rodada.descansando | join(', ') }}
         </div>
       {% endif %}
     </div>
   {% endfor %}
 
   <!-- Botões no final -->
-  <div class="text-center mb-5">
-    <a href="{{ url_for('rota_ranking_individual') }}" class="btn btn-glass" style="font-size: 1.3rem; padding: 15px 30px;">
-      🏆 Ver Ranking Atualizado
+  <div class="text-center mb-4">
+    <a href="{{ url_for('rota_ranking_individual') }}" class="btn-primary-custom btn-accent" style="font-size: 1.2rem; padding: 15px 40px;">
+      <i class="bi bi-bar-chart-fill me-2"></i>
+      Ver Ranking Atualizado
     </a>
   </div>
 
-  <a href="{{ url_for('presenca') }}" class="btn btn-glass mt-4">⬅ Voltar</a>
+  <div class="text-center mb-4">
+    <a href="{{ url_for('presenca') }}" class="btn-primary-custom">
+      <i class="bi bi-arrow-left me-2"></i>
+      Voltar
+    </a>
+  </div>
   
   <div style="height: 70px;"></div>
+  
 {% endif %}
 
+</div>
+{% endblock %}
+
+{% block scripts %}
 <script>
 document.addEventListener('DOMContentLoaded', function() {
   const filtroAtleta = document.getElementById('filtroAtleta');
@@ -168,10 +203,7 @@ document.addEventListener('DOMContentLoaded', function() {
       
       // Remove todos os destaques anteriores
       document.querySelectorAll('.jogador-nome').forEach(el => {
-        el.style.backgroundColor = '';
-        el.style.padding = '';
-        el.style.borderRadius = '';
-        el.style.color = '';
+        el.classList.remove('highlight-player');
       });
       
       if (atletaSelecionado === '') {
@@ -200,10 +232,7 @@ document.addEventListener('DOMContentLoaded', function() {
               // Destaca o atleta selecionado
               confronto.querySelectorAll('.jogador-nome').forEach(nomeEl => {
                 if (nomeEl.dataset.jogador === atletaSelecionado) {
-                  nomeEl.style.backgroundColor = '#ffc107';
-                  nomeEl.style.color = '#000';
-                  nomeEl.style.padding = '2px 8px';
-                  nomeEl.style.borderRadius = '4px';
+                  nomeEl.classList.add('highlight-player');
                 }
               });
             } else {
@@ -234,6 +263,4 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 });
 </script>
-
 {% endblock %}
-

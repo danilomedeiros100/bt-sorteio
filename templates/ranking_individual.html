@@ -1,8 +1,13 @@
 {% extends 'base.html' %}
-{% block title %}Ranking{% endblock %}
+{% block title %}Ranking - Torneio{% endblock %}
 
 {% block content %}
-<h1 class="text-center display-5 fw-bold mb-4">🏆 Ranking</h1>
+<div class="fade-in">
+
+<h1 class="text-center app-title mb-4">
+  <i class="bi bi-trophy-fill me-2" style="color: var(--color-accent);"></i>
+  Ranking
+</h1>
 
 {% set tem_resultados = namespace(value=false) %}
 {% if ranking.masculino %}
@@ -13,133 +18,138 @@
   {% endfor %}
 {% endif %}
 
-<div class="glass-card text-center mb-4">
-  <p class="text-white mb-0">
-    <small>Última atualização: {{ ranking.ultima_atualizacao[:19] if ranking.ultima_atualizacao else 'N/A' }}</small>
+<div class="glass-card text-center mb-4 slide-in">
+  <p class="mb-2">
+    <i class="bi bi-clock-history me-2" style="color: var(--color-primary);"></i>
+    <small class="text-muted">Última atualização: {{ ranking.ultima_atualizacao[:19] if ranking.ultima_atualizacao else 'N/A' }}</small>
   </p>
   {% if not tem_resultados.value %}
-    <p class="text-info mt-2 mb-0">
-      <strong>📋 Lista de Inscritos</strong> - Aguardando início do torneio
+    <p class="mt-3 mb-0" style="font-size: 1.1rem; color: var(--color-accent);">
+      <i class="bi bi-list-check me-2"></i>
+      <strong>Lista de Inscritos</strong> - Aguardando início do torneio
     </p>
   {% else %}
-    <p class="text-info mt-2 mb-0">
+    <p class="mt-3 mb-0 text-muted">
+      <i class="bi bi-info-circle me-2"></i>
       <strong>Critérios:</strong> 1º Vitórias | 2º Saldo de Games | 3º Games Feitos
     </p>
   {% endif %}
 </div>
 
 <!-- MASCULINO -->
-<div class="glass-card mb-4">
-  <h2 class="text-center mb-3">
-    👨 RANKING MASCULINO
+<div class="glass-card mb-4 slide-in" style="animation-delay: 0.1s;">
+  <h2 class="text-center mb-4" style="color: var(--color-primary); font-size: 1.6rem;">
+    <i class="bi bi-person-fill me-2"></i>
+    RANKING MASCULINO
   </h2>
   
   {% if ranking.masculino and ranking.masculino|length > 0 %}
     <div class="table-responsive">
-      <table class="table table-hover text-white align-middle">
+      <table class="ranking-table">
         <thead>
-          <tr class="text-light">
-            <th class="text-center">#</th>
-            <th>Jogador</th>
-            <th class="text-center">V</th>
-            <th class="text-center">D</th>
-            <th class="text-center">%</th>
-            <th class="text-center">Saldo</th>
-            <th class="text-center">GF</th>
-            <th class="text-center">GS</th>
+          <tr>
+            <th>#</th>
+            <th style="text-align: left;">Jogador</th>
+            <th><i class="bi bi-trophy"></i> V</th>
+            <th><i class="bi bi-x-circle"></i> D</th>
+            <th>%</th>
+            <th>Saldo</th>
+            <th>GF</th>
+            <th>GS</th>
           </tr>
         </thead>
         <tbody>
           {% for jogador in ranking.masculino %}
-            <tr class="{% if tem_resultados.value and loop.index <= 3 %}bg-warning bg-opacity-25{% endif %}">
-              <td class="text-center fw-bold">
+            <tr {% if tem_resultados.value and loop.index <= 3 %}class="top3"{% endif %}>
+              <td class="ranking-position">
                 {% if tem_resultados.value %}
-                  {% if loop.index == 1 %}🥇
-                  {% elif loop.index == 2 %}🥈
-                  {% elif loop.index == 3 %}🥉
+                  {% if loop.index == 1 %}<i class="bi bi-trophy-fill" style="color: #FFD700;"></i>
+                  {% elif loop.index == 2 %}<i class="bi bi-trophy-fill" style="color: #C0C0C0;"></i>
+                  {% elif loop.index == 3 %}<i class="bi bi-trophy-fill" style="color: #CD7F32;"></i>
                   {% else %}{{ loop.index }}
                   {% endif %}
                 {% else %}
                   {{ loop.index }}
                 {% endif %}
               </td>
-              <td class="fw-bold">{{ jogador.nome }}</td>
-              <td class="text-center text-success fw-bold">{{ jogador.vitorias }}</td>
-              <td class="text-center text-danger">{{ jogador.derrotas }}</td>
-              <td class="text-center">{{ jogador.percentual_vitorias }}%</td>
-              <td class="text-center fw-bold {% if jogador.saldo_games > 0 %}text-success{% elif jogador.saldo_games < 0 %}text-danger{% endif %}">
+              <td style="text-align: left; font-weight: 600;">{{ jogador.nome }}</td>
+              <td style="color: var(--color-success); font-weight: 600;">{{ jogador.vitorias }}</td>
+              <td style="color: var(--color-danger);">{{ jogador.derrotas }}</td>
+              <td>{{ jogador.percentual_vitorias }}%</td>
+              <td style="font-weight: 600; {% if jogador.saldo_games > 0 %}color: var(--color-success);{% elif jogador.saldo_games < 0 %}color: var(--color-danger);{% endif %}">
                 {{ '+' if jogador.saldo_games > 0 else '' }}{{ jogador.saldo_games }}
               </td>
-              <td class="text-center">{{ jogador.games_feitos }}</td>
-              <td class="text-center">{{ jogador.games_sofridos }}</td>
+              <td>{{ jogador.games_feitos }}</td>
+              <td>{{ jogador.games_sofridos }}</td>
             </tr>
           {% endfor %}
         </tbody>
       </table>
     </div>
   {% else %}
-    <p class="text-center text-white">Nenhum resultado registrado ainda.</p>
+    <p class="text-center text-muted">Nenhum resultado registrado ainda.</p>
   {% endif %}
 </div>
 
 <!-- FEMININO -->
-<div class="glass-card mb-4">
-  <h2 class="text-center mb-3">
-    👩 RANKING FEMININO
+<div class="glass-card mb-4 slide-in" style="animation-delay: 0.2s;">
+  <h2 class="text-center mb-4" style="color: var(--color-accent); font-size: 1.6rem;">
+    <i class="bi bi-person-fill me-2"></i>
+    RANKING FEMININO
   </h2>
   
   {% if ranking.feminino and ranking.feminino|length > 0 %}
     <div class="table-responsive">
-      <table class="table table-hover text-white align-middle">
+      <table class="ranking-table">
         <thead>
-          <tr class="text-light">
-            <th class="text-center">#</th>
-            <th>Jogadora</th>
-            <th class="text-center">V</th>
-            <th class="text-center">D</th>
-            <th class="text-center">%</th>
-            <th class="text-center">Saldo</th>
-            <th class="text-center">GF</th>
-            <th class="text-center">GS</th>
+          <tr>
+            <th>#</th>
+            <th style="text-align: left;">Jogadora</th>
+            <th><i class="bi bi-trophy"></i> V</th>
+            <th><i class="bi bi-x-circle"></i> D</th>
+            <th>%</th>
+            <th>Saldo</th>
+            <th>GF</th>
+            <th>GS</th>
           </tr>
         </thead>
         <tbody>
           {% for jogadora in ranking.feminino %}
-            <tr class="{% if tem_resultados.value and loop.index <= 3 %}bg-warning bg-opacity-25{% endif %}">
-              <td class="text-center fw-bold">
+            <tr {% if tem_resultados.value and loop.index <= 3 %}class="top3"{% endif %}>
+              <td class="ranking-position">
                 {% if tem_resultados.value %}
-                  {% if loop.index == 1 %}🥇
-                  {% elif loop.index == 2 %}🥈
-                  {% elif loop.index == 3 %}🥉
+                  {% if loop.index == 1 %}<i class="bi bi-trophy-fill" style="color: #FFD700;"></i>
+                  {% elif loop.index == 2 %}<i class="bi bi-trophy-fill" style="color: #C0C0C0;"></i>
+                  {% elif loop.index == 3 %}<i class="bi bi-trophy-fill" style="color: #CD7F32;"></i>
                   {% else %}{{ loop.index }}
                   {% endif %}
                 {% else %}
                   {{ loop.index }}
                 {% endif %}
               </td>
-              <td class="fw-bold">{{ jogadora.nome }}</td>
-              <td class="text-center text-success fw-bold">{{ jogadora.vitorias }}</td>
-              <td class="text-center text-danger">{{ jogadora.derrotas }}</td>
-              <td class="text-center">{{ jogadora.percentual_vitorias }}%</td>
-              <td class="text-center fw-bold {% if jogadora.saldo_games > 0 %}text-success{% elif jogadora.saldo_games < 0 %}text-danger{% endif %}">
+              <td style="text-align: left; font-weight: 600;">{{ jogadora.nome }}</td>
+              <td style="color: var(--color-success); font-weight: 600;">{{ jogadora.vitorias }}</td>
+              <td style="color: var(--color-danger);">{{ jogadora.derrotas }}</td>
+              <td>{{ jogadora.percentual_vitorias }}%</td>
+              <td style="font-weight: 600; {% if jogadora.saldo_games > 0 %}color: var(--color-success);{% elif jogadora.saldo_games < 0 %}color: var(--color-danger);{% endif %}">
                 {{ '+' if jogadora.saldo_games > 0 else '' }}{{ jogadora.saldo_games }}
               </td>
-              <td class="text-center">{{ jogadora.games_feitos }}</td>
-              <td class="text-center">{{ jogadora.games_sofridos }}</td>
+              <td>{{ jogadora.games_feitos }}</td>
+              <td>{{ jogadora.games_sofridos }}</td>
             </tr>
           {% endfor %}
         </tbody>
       </table>
     </div>
   {% else %}
-    <p class="text-center text-white">Nenhum resultado registrado ainda.</p>
+    <p class="text-center text-muted">Nenhum resultado registrado ainda.</p>
   {% endif %}
 </div>
 
 <!-- Legenda -->
-<div class="glass-card text-center mb-4">
-  <p class="text-white mb-1"><strong>Legenda:</strong></p>
-  <p class="text-white small mb-0">
+<div class="glass-card text-center mb-4 slide-in" style="animation-delay: 0.3s;">
+  <p class="mb-1"><strong>Legenda:</strong></p>
+  <p class="text-muted small mb-0">
     V = Vitórias | D = Derrotas | % = Percentual de Vitórias | 
     Saldo = Games Feitos - Games Sofridos | GF = Games Feitos | GS = Games Sofridos
   </p>
@@ -147,31 +157,34 @@
 
 <!-- Botões -->
 <div class="text-center mb-5">
-  <a href="{{ url_for('rota_ver_rodadas') }}" class="btn btn-glass">
-    📋 Ver Rodadas
+  <a href="{{ url_for('rota_ver_rodadas') }}" class="btn-primary-custom">
+    <i class="bi bi-calendar-event me-2"></i>
+    Ver Rodadas
   </a>
 </div>
 
-<a href="{{ url_for('presenca') }}" class="btn btn-glass mt-4">⬅ Voltar</a>
+<div class="text-center mb-5">
+  <a href="{{ url_for('presenca') }}" class="btn-primary-custom">
+    <i class="bi bi-arrow-left me-2"></i>
+    Voltar
+  </a>
+</div>
 
 <div style="height: 70px;"></div>
 
+</div>
+{% endblock %}
+
+{% block scripts %}
 <script>
 // Auto-atualizar a cada 30 segundos
 setInterval(() => {
   fetch('/ranking')
     .then(res => res.text())
     .then(html => {
-      // Extrai apenas a parte da tabela do HTML retornado
-      const parser = new DOMParser();
-      const doc = parser.parseFromString(html, 'text/html');
-      
-      // Atualiza silenciosamente (pode adicionar lógica mais sofisticada)
       console.log('Ranking verificado');
     })
     .catch(err => console.error('Erro ao atualizar:', err));
 }, 30000); // 30 segundos
 </script>
-
 {% endblock %}
-

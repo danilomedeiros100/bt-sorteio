@@ -79,50 +79,81 @@ def gerar_5_rodadas_round_robin(homens: List[str], mulheres: List[str]) -> Dict:
     # Embaralha todas as duplas para distribuição aleatória
     random.shuffle(todas_duplas)
     
-    # ========== PASSO 2: CRIA CONFRONTOS 2×2 ==========
+    # ========== PASSO 2: CRIA CONFRONTOS 2×2 (COM VALIDAÇÃO) ==========
     total_duplas = len(todas_duplas)
     confrontos_totais = []
+    duplas_usadas_confronto = set()
     
-    # Cria confrontos de 2 em 2
-    for i in range(0, total_duplas - 1, 2):
-        dupla1 = todas_duplas[i]
-        dupla2 = todas_duplas[i + 1]
+    # Função auxiliar para verificar se duplas compartilham jogadores
+    def compartilha_jogadores(dupla1, dupla2):
+        """Verifica se duas duplas têm algum jogador em comum"""
+        set1 = {dupla1[0], dupla1[1]}
+        set2 = {dupla2[0], dupla2[1]}
+        return len(set1 & set2) > 0
+    
+    # Cria confrontos garantindo que nenhum jogador apareça em ambas as duplas
+    for i in range(len(todas_duplas)):
+        if i in duplas_usadas_confronto:
+            continue
         
-        confronto = {
-            "dupla1": {
-                "jogador1": dupla1[0],
-                "jogador2": dupla1[1]
-            },
-            "dupla2": {
-                "jogador1": dupla2[0],
-                "jogador2": dupla2[1]
-            },
-            "resultado": {
-                "games_dupla1": 0,
-                "games_dupla2": 0,
-                "finalizado": False
+        dupla1 = todas_duplas[i]
+        dupla2_encontrada = None
+        dupla2_idx = None
+        
+        # Procura uma dupla2 que NÃO compartilhe jogadores com dupla1
+        for j in range(i + 1, len(todas_duplas)):
+            if j in duplas_usadas_confronto:
+                continue
+            
+            dupla_candidata = todas_duplas[j]
+            
+            # Verifica se NÃO compartilham jogadores
+            if not compartilha_jogadores(dupla1, dupla_candidata):
+                dupla2_encontrada = dupla_candidata
+                dupla2_idx = j
+                break
+        
+        # Se encontrou uma dupla válida, cria o confronto
+        if dupla2_encontrada:
+            confronto = {
+                "dupla1": {
+                    "jogador1": dupla1[0],
+                    "jogador2": dupla1[1]
+                },
+                "dupla2": {
+                    "jogador1": dupla2_encontrada[0],
+                    "jogador2": dupla2_encontrada[1]
+                },
+                "resultado": {
+                    "games_dupla1": 0,
+                    "games_dupla2": 0,
+                    "finalizado": False
+                }
             }
-        }
-        confrontos_totais.append(confronto)
+            confrontos_totais.append(confronto)
+            duplas_usadas_confronto.add(i)
+            duplas_usadas_confronto.add(dupla2_idx)
     
-    # Se sobrou 1 dupla (número ímpar), cria confronto BYE
-    if total_duplas % 2 == 1:
-        ultima_dupla = todas_duplas[-1]
-        confronto_bye = {
-            "dupla1": {
-                "jogador1": ultima_dupla[0],
-                "jogador2": ultima_dupla[1]
-            },
-            "dupla2": None,  # Sem adversário
-            "resultado": {
-                "games_dupla1": 0,
-                "games_dupla2": 0,
-                "finalizado": False
-            },
-            "tipo": "bye",
-            "obs": "Dupla sem adversário (conta como jogo realizado)"
-        }
-        confrontos_totais.append(confronto_bye)
+    # Se sobrou dupla não usada, cria confronto BYE
+    duplas_sobrando = [todas_duplas[idx] for idx in range(len(todas_duplas)) if idx not in duplas_usadas_confronto]
+    
+    if duplas_sobrando:
+        for dupla_bye in duplas_sobrando:
+            confronto_bye = {
+                "dupla1": {
+                    "jogador1": dupla_bye[0],
+                    "jogador2": dupla_bye[1]
+                },
+                "dupla2": None,  # Sem adversário
+                "resultado": {
+                    "games_dupla1": 0,
+                    "games_dupla2": 0,
+                    "finalizado": False
+                },
+                "tipo": "bye",
+                "obs": "Dupla sem adversário (conta como jogo realizado)"
+            }
+            confrontos_totais.append(confronto_bye)
     
     # ========== PASSO 3: DISTRIBUI EM 5 RODADAS APROXIMADAS ==========
     total_confrontos = len(confrontos_totais)

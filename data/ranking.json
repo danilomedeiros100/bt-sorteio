@@ -1,5 +1,5 @@
 {
-  "ultima_atualizacao": "2025-11-03T10:26:52.797665",
+  "ultima_atualizacao": "2025-11-03T15:16:22.863803",
   "masculino": [
     {
       "nome": "Danilo",
@@ -75,6 +75,15 @@
     },
     {
       "nome": "Reinaldo",
+      "vitorias": 0,
+      "derrotas": 0,
+      "percentual_vitorias": 0,
+      "saldo_games": 0,
+      "games_feitos": 0,
+      "games_sofridos": 0
+    },
+    {
+      "nome": "Sérgio Moura",
       "vitorias": 0,
       "derrotas": 0,
       "percentual_vitorias": 0,
@@ -166,7 +175,7 @@
       "games_sofridos": 0
     },
     {
-      "nome": "Stephanie",
+      "nome": "Silvaneide",
       "vitorias": 0,
       "derrotas": 0,
       "percentual_vitorias": 0,

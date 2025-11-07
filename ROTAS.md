@@ -483,3 +483,4 @@ python app.py
 **Projeto**: BT-Sorteio - Sistema de Gerenciamento de Torneios de Beach Tennis  
 **Versão**: 1.0
 
+

@@ -80,9 +80,6 @@ def gerar_5_rodadas_round_robin(homens: List[str], mulheres: List[str]) -> Dict:
     random.shuffle(todas_duplas)
     
     # ========== PASSO 2: CRIA CONFRONTOS 2×2 (COM VALIDAÇÃO) ==========
-    total_duplas = len(todas_duplas)
-    confrontos_totais = []
-    duplas_usadas_confronto = set()
     
     # Função auxiliar para verificar se duplas compartilham jogadores
     def compartilha_jogadores(dupla1, dupla2):
@@ -91,69 +88,74 @@ def gerar_5_rodadas_round_robin(homens: List[str], mulheres: List[str]) -> Dict:
         set2 = {dupla2[0], dupla2[1]}
         return len(set1 & set2) > 0
     
-    # Cria confrontos garantindo que nenhum jogador apareça em ambas as duplas
-    for i in range(len(todas_duplas)):
-        if i in duplas_usadas_confronto:
-            continue
+    def criar_confrontos_sem_byes(duplas_list, max_tentativas=100):
+        """
+        Tenta criar confrontos SEM BYES usando backtracking.
+        Para 12x12 (60 duplas), deveria gerar exatamente 30 confrontos sempre.
+        """
+        melhor_resultado = []
+        menor_byes = float('inf')
         
-        dupla1 = todas_duplas[i]
-        dupla2_encontrada = None
-        dupla2_idx = None
-        
-        # Procura uma dupla2 que NÃO compartilhe jogadores com dupla1
-        for j in range(i + 1, len(todas_duplas)):
-            if j in duplas_usadas_confronto:
-                continue
+        for tentativa in range(max_tentativas):
+            confrontos = []
+            duplas_restantes = duplas_list.copy()
+            random.shuffle(duplas_restantes)
             
-            dupla_candidata = todas_duplas[j]
+            while len(duplas_restantes) >= 2:
+                dupla1 = duplas_restantes[0]
+                dupla2_idx = None
+                
+                # Procura uma dupla2 compatível
+                for i in range(1, len(duplas_restantes)):
+                    if not compartilha_jogadores(dupla1, duplas_restantes[i]):
+                        dupla2_idx = i
+                        break
+                
+                if dupla2_idx is not None:
+                    # Cria confronto válido
+                    dupla2 = duplas_restantes[dupla2_idx]
+                    confronto = {
+                        "dupla1": {"jogador1": dupla1[0], "jogador2": dupla1[1]},
+                        "dupla2": {"jogador1": dupla2[0], "jogador2": dupla2[1]},
+                        "resultado": {"games_dupla1": 0, "games_dupla2": 0, "finalizado": False}
+                    }
+                    confrontos.append(confronto)
+                    
+                    # Remove duplas usadas
+                    duplas_restantes.pop(dupla2_idx)
+                    duplas_restantes.pop(0)
+                else:
+                    # Não encontrou par, tenta reordenar
+                    break
             
-            # Verifica se NÃO compartilham jogadores
-            if not compartilha_jogadores(dupla1, dupla_candidata):
-                dupla2_encontrada = dupla_candidata
-                dupla2_idx = j
-                break
+            # Calcula quantos byes seriam necessários
+            num_byes = len(duplas_restantes)
+            
+            # Se conseguiu sem byes, retorna imediatamente
+            if num_byes == 0:
+                return confrontos
+            
+            # Senão, guarda o melhor resultado
+            if num_byes < menor_byes:
+                menor_byes = num_byes
+                melhor_resultado = (confrontos, duplas_restantes)
         
-        # Se encontrou uma dupla válida, cria o confronto
-        if dupla2_encontrada:
-            confronto = {
-                "dupla1": {
-                    "jogador1": dupla1[0],
-                    "jogador2": dupla1[1]
-                },
-                "dupla2": {
-                    "jogador1": dupla2_encontrada[0],
-                    "jogador2": dupla2_encontrada[1]
-                },
-                "resultado": {
-                    "games_dupla1": 0,
-                    "games_dupla2": 0,
-                    "finalizado": False
-                }
-            }
-            confrontos_totais.append(confronto)
-            duplas_usadas_confronto.add(i)
-            duplas_usadas_confronto.add(dupla2_idx)
-    
-    # Se sobrou dupla não usada, cria confronto BYE
-    duplas_sobrando = [todas_duplas[idx] for idx in range(len(todas_duplas)) if idx not in duplas_usadas_confronto]
-    
-    if duplas_sobrando:
+        # Se não conseguiu 0 byes, retorna o melhor resultado com byes
+        confrontos_finais, duplas_sobrando = melhor_resultado
+        
         for dupla_bye in duplas_sobrando:
             confronto_bye = {
-                "dupla1": {
-                    "jogador1": dupla_bye[0],
-                    "jogador2": dupla_bye[1]
-                },
-                "dupla2": None,  # Sem adversário
-                "resultado": {
-                    "games_dupla1": 0,
-                    "games_dupla2": 0,
-                    "finalizado": False
-                },
+                "dupla1": {"jogador1": dupla_bye[0], "jogador2": dupla_bye[1]},
+                "dupla2": None,
+                "resultado": {"games_dupla1": 0, "games_dupla2": 0, "finalizado": False},
                 "tipo": "bye",
-                "obs": "Dupla sem adversário (conta como jogo realizado)"
+                "obs": "Dupla sem adversário"
             }
-            confrontos_totais.append(confronto_bye)
+            confrontos_finais.append(confronto_bye)
+        
+        return confrontos_finais
+    
+    confrontos_totais = criar_confrontos_sem_byes(todas_duplas)
     
     # ========== PASSO 3: DISTRIBUI EM 5 RODADAS (SIMPLES E EFICIENTE) ==========
     # PRIORIDADE: Garantir que TODOS os confrontos sejam usados
@@ -389,11 +391,14 @@ def calcular_ranking_individual(rodadas: List[Dict]) -> List[Dict]:
         # Adiciona jogadores dos confrontos
         for confronto in rodada.get("confrontos", []):
             dupla1 = confronto["dupla1"]
-            dupla2 = confronto["dupla2"]
+            dupla2 = confronto.get("dupla2")  # Pode ser None em caso de bye
+            
             todos_jogadores.add(dupla1["jogador1"])
             todos_jogadores.add(dupla1["jogador2"])
-            todos_jogadores.add(dupla2["jogador1"])
-            todos_jogadores.add(dupla2["jogador2"])
+            
+            if dupla2:  # Só adiciona se não for bye
+                todos_jogadores.add(dupla2["jogador1"])
+                todos_jogadores.add(dupla2["jogador2"])
         
         # Adiciona jogadores descansando
         for jogador in rodada.get("descansando", []):
@@ -419,9 +424,13 @@ def calcular_ranking_individual(rodadas: List[Dict]) -> List[Dict]:
                 continue
             
             dupla1 = confronto["dupla1"]
-            dupla2 = confronto["dupla2"]
+            dupla2 = confronto.get("dupla2")  # Pode ser None em caso de bye
             games_d1 = resultado.get("games_dupla1", 0)
             games_d2 = resultado.get("games_dupla2", 0)
+            
+            # Se é um confronto bye, simplesmente pula (não conta para ranking)
+            if not dupla2:
+                continue
             
             venceu_dupla1 = games_d1 > games_d2
             

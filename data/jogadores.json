@@ -19,8 +19,8 @@
   {"nome": "Silvaneide","sexo": "F","categorias": ["mista"],"confirmado": true},
   {"nome": "Ilka","sexo": "F","categorias": ["mista"],"confirmado": true},
   {"nome": "Irly","sexo": "F","categorias": ["mista"],"confirmado": true},
-  {"nome": "Teste H1","sexo": "M","categorias": ["mista"],"confirmado": true},
-  {"nome": "Teste H2","sexo": "M","categorias": ["mista"],"confirmado": true},
-  {"nome": "Teste M1","sexo": "F","categorias": ["mista"],"confirmado": true},
-  {"nome": "Teste M2","sexo": "F","categorias": ["mista"],"confirmado": true}
+  {"nome": "Wellington","sexo": "M","categorias": ["mista"],"confirmado": true},
+  {"nome": "Daniel","sexo": "M","categorias": ["mista"],"confirmado": true},
+  {"nome": "Hosana","sexo": "F","categorias": ["mista"],"confirmado": true},
+  {"nome": "Letícia","sexo": "F","categorias": ["mista"],"confirmado": true}
 ]

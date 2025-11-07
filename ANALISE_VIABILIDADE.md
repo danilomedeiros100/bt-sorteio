@@ -297,3 +297,4 @@ Implementar primeiro o algoritmo de sorteio de 5 rodadas como prova de conceito 
 
 **Gostaria que eu comece pela implementação do algoritmo de sorteio ou prefere discutir mais detalhes antes?** 🚀
 
+

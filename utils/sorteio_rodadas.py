@@ -155,26 +155,31 @@ def gerar_5_rodadas_round_robin(homens: List[str], mulheres: List[str]) -> Dict:
             }
             confrontos_totais.append(confronto_bye)
     
-    # ========== PASSO 3: DISTRIBUI EM 5 RODADAS APROXIMADAS ==========
+    # ========== PASSO 3: DISTRIBUI EM 5 RODADAS (SIMPLES E EFICIENTE) ==========
+    # PRIORIDADE: Garantir que TODOS os confrontos sejam usados
+    # PERMITE que uma pessoa jogue múltiplas vezes na mesma rodada (jogos sequenciais)
+    
+    rodadas_geradas = []
+    confrontos_restantes = confrontos_totais.copy()
+    random.shuffle(confrontos_restantes)  # Embaralha para distribuição aleatória
+    
+    # Calcula quantos confrontos por rodada
     total_confrontos = len(confrontos_totais)
     confrontos_por_rodada = total_confrontos // 5
     sobra = total_confrontos % 5
     
-    rodadas_geradas = []
-    idx_confronto = 0
-    
+    idx = 0
     for rodada_num in range(5):
-        # Calcula quantos confrontos nesta rodada (distribui a sobra nas primeiras rodadas)
-        num_confrontos_rodada = confrontos_por_rodada + (1 if rodada_num < sobra else 0)
+        # Algumas rodadas terão 1 confronto a mais para distribuir a sobra
+        num_confrontos = confrontos_por_rodada + (1 if rodada_num < sobra else 0)
         
-        # Pega os confrontos desta rodada
         confrontos_rodada = []
-        for _ in range(num_confrontos_rodada):
-            if idx_confronto < total_confrontos:
-                confronto = confrontos_totais[idx_confronto].copy()
+        for _ in range(num_confrontos):
+            if idx < len(confrontos_restantes):
+                confronto = confrontos_restantes[idx].copy()
                 confronto["quadra"] = len(confrontos_rodada) + 1
                 confrontos_rodada.append(confronto)
-                idx_confronto += 1
+                idx += 1
         
         rodadas_geradas.append({
             "numero": rodada_num + 1,

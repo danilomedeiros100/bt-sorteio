@@ -20,6 +20,59 @@
   </p>
 </div>
 
+<!-- Filtro por Atleta -->
+<div class="glass-card mb-4 slide-in" style="animation-delay: 0.1s; background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.9)); border: 2px solid var(--color-primary); box-shadow: 0 8px 32px rgba(0, 123, 255, 0.2);">
+  <h3 class="text-center mb-3" style="color: #1a1a2e; font-size: 1.4rem; font-weight: 700;">
+    <i class="bi bi-funnel-fill me-2" style="color: var(--color-primary);"></i>
+    Filtrar por Atleta
+  </h3>
+  <div class="row justify-content-center">
+    <div class="col-md-6">
+      <select id="filtroAtleta" class="form-select form-select-lg" style="
+        background: white !important; 
+        color: #1a1a2e !important; 
+        border: 2px solid var(--color-primary) !important; 
+        font-weight: 600 !important;
+        font-size: 1.1rem !important;
+        padding: 12px 16px !important;
+        box-shadow: 0 4px 12px rgba(0, 123, 255, 0.15) !important;
+      ">
+        <option value="">👥 Todos os Jogos</option>
+        {% set todos_jogadores = [] %}
+        {% for rodada in dados.rodadas %}
+          {% for confronto in rodada.confrontos %}
+            {% if confronto.dupla1 %}
+              {% if confronto.dupla1.jogador1 not in todos_jogadores %}
+                {% set _ = todos_jogadores.append(confronto.dupla1.jogador1) %}
+              {% endif %}
+              {% if confronto.dupla1.jogador2 not in todos_jogadores %}
+                {% set _ = todos_jogadores.append(confronto.dupla1.jogador2) %}
+              {% endif %}
+            {% endif %}
+            {% if confronto.dupla2 %}
+              {% if confronto.dupla2.jogador1 not in todos_jogadores %}
+                {% set _ = todos_jogadores.append(confronto.dupla2.jogador1) %}
+              {% endif %}
+              {% if confronto.dupla2.jogador2 not in todos_jogadores %}
+                {% set _ = todos_jogadores.append(confronto.dupla2.jogador2) %}
+              {% endif %}
+            {% endif %}
+          {% endfor %}
+        {% endfor %}
+        {% for jogador in todos_jogadores|sort %}
+          <option value="{{ jogador }}">{{ jogador }}</option>
+        {% endfor %}
+      </select>
+    </div>
+  </div>
+  <p class="text-center mt-3 mb-0" style="color: #555; font-weight: 500;">
+    <small>
+      <i class="bi bi-info-circle me-1" style="color: var(--color-primary);"></i>
+      Selecione seu nome para ver apenas seus jogos
+    </small>
+  </p>
+</div>
+
 {% for rodada in dados.rodadas %}
   <div class="glass-card mb-4 slide-in" style="animation-delay: {{ 0.1 * loop.index }}s;">
     <h2 class="text-center mb-4" style="color: var(--color-accent); font-size: 1.6rem;">
@@ -28,7 +81,16 @@
     </h2>
     
     {% for confronto in rodada.confrontos %}
-      <div class="matchup-container mb-3">
+      {% set jogadores_confronto = [] %}
+      {% if confronto.dupla1 %}
+        {% set _ = jogadores_confronto.append(confronto.dupla1.jogador1) %}
+        {% set _ = jogadores_confronto.append(confronto.dupla1.jogador2) %}
+      {% endif %}
+      {% if confronto.dupla2 %}
+        {% set _ = jogadores_confronto.append(confronto.dupla2.jogador1) %}
+        {% set _ = jogadores_confronto.append(confronto.dupla2.jogador2) %}
+      {% endif %}
+      <div class="matchup-container mb-3 confronto-item" data-jogadores="{{ jogadores_confronto|join(',') }}">
         <div class="matchup-quadra">
           <span class="badge">
             <i class="bi bi-geo-alt-fill me-1"></i>
@@ -115,6 +177,59 @@
 
 {% block scripts %}
 <script>
+// ========== FILTRO POR ATLETA ==========
+const filtroAtleta = document.getElementById('filtroAtleta');
+const confrontosItens = document.querySelectorAll('.confronto-item');
+const rodadasCards = document.querySelectorAll('.glass-card');
+
+if (filtroAtleta) {
+  filtroAtleta.addEventListener('change', function() {
+    const atletaSelecionado = this.value.trim();
+    
+    if (!atletaSelecionado) {
+      // Mostrar todos
+      confrontosItens.forEach(item => item.style.display = 'block');
+      rodadasCards.forEach(card => {
+        if (card.querySelector('.confronto-item')) {
+          card.style.display = 'block';
+        }
+      });
+      return;
+    }
+    
+    // Filtrar por atleta
+    let rodadasVisiveis = new Set();
+    
+    confrontosItens.forEach(item => {
+      const jogadores = item.dataset.jogadores || '';
+      const jogadoresArray = jogadores.split(',').map(j => j.trim());
+      
+      if (jogadoresArray.includes(atletaSelecionado)) {
+        item.style.display = 'block';
+        // Marca a rodada como visível
+        const rodadaCard = item.closest('.glass-card');
+        if (rodadaCard) {
+          rodadasVisiveis.add(rodadaCard);
+        }
+      } else {
+        item.style.display = 'none';
+      }
+    });
+    
+    // Mostrar/ocultar rodadas vazias
+    rodadasCards.forEach(card => {
+      if (card.querySelector('.confronto-item')) {
+        if (rodadasVisiveis.has(card)) {
+          card.style.display = 'block';
+        } else {
+          card.style.display = 'none';
+        }
+      }
+    });
+  });
+}
+
+// ========== FORMULÁRIOS DE RESULTADO ==========
 document.querySelectorAll('.resultado-form').forEach(form => {
   form.addEventListener('submit', async (e) => {
     e.preventDefault();

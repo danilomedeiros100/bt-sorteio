@@ -157,13 +157,63 @@ def gerar_5_rodadas_round_robin(homens: List[str], mulheres: List[str]) -> Dict:
     
     confrontos_totais = criar_confrontos_sem_byes(todas_duplas)
     
-    # ========== PASSO 3: DISTRIBUI EM 5 RODADAS (SIMPLES E EFICIENTE) ==========
-    # PRIORIDADE: Garantir que TODOS os confrontos sejam usados
+    # ========== PASSO 3: DISTRIBUI EM 5 RODADAS COM OTIMIZAÇÃO DE ESPAÇAMENTO ==========
+    # PRIORIDADE 1: Garantir que TODOS os confrontos sejam usados
+    # PRIORIDADE 2: Maximizar espaçamento entre jogos da mesma pessoa
     # PERMITE que uma pessoa jogue múltiplas vezes na mesma rodada (jogos sequenciais)
     
+    def otimizar_espacamento_rodada(confrontos_rodada):
+        """
+        Otimiza a ordem dos confrontos em uma rodada para maximizar espaçamento
+        entre jogos da mesma pessoa.
+        """
+        if len(confrontos_rodada) <= 1:
+            return confrontos_rodada
+        
+        def get_jogadores_confronto(conf):
+            jogadores = set()
+            d1 = conf['dupla1']
+            d2 = conf.get('dupla2')
+            if d1:
+                jogadores.add(d1['jogador1'])
+                jogadores.add(d1['jogador2'])
+            if d2:
+                jogadores.add(d2['jogador1'])
+                jogadores.add(d2['jogador2'])
+            return jogadores
+        
+        # Tenta várias permutações para encontrar melhor espaçamento
+        melhor_ordem = confrontos_rodada.copy()
+        melhor_score = -999999
+        
+        for tentativa in range(50):  # 50 tentativas de otimização
+            ordem_atual = confrontos_rodada.copy()
+            random.shuffle(ordem_atual)
+            
+            # Calcula score desta ordem (quanto maior, melhor o espaçamento)
+            score = 0
+            pessoa_ultima_quadra = {}  # última quadra onde cada pessoa jogou
+            
+            for quadra_idx, confronto in enumerate(ordem_atual):
+                jogadores = get_jogadores_confronto(confronto)
+                
+                for jogador in jogadores:
+                    if jogador in pessoa_ultima_quadra:
+                        # Premia distância entre quadras
+                        distancia = quadra_idx - pessoa_ultima_quadra[jogador]
+                        score += distancia * 10  # Peso 10 para cada quadra de diferença
+                    pessoa_ultima_quadra[jogador] = quadra_idx
+            
+            if score > melhor_score:
+                melhor_score = score
+                melhor_ordem = ordem_atual
+        
+        return melhor_ordem
+    
+    # Distribui confrontos nas 5 rodadas
     rodadas_geradas = []
     confrontos_restantes = confrontos_totais.copy()
-    random.shuffle(confrontos_restantes)  # Embaralha para distribuição aleatória
+    random.shuffle(confrontos_restantes)
     
     # Calcula quantos confrontos por rodada
     total_confrontos = len(confrontos_totais)
@@ -178,14 +228,22 @@ def gerar_5_rodadas_round_robin(homens: List[str], mulheres: List[str]) -> Dict:
         confrontos_rodada = []
         for _ in range(num_confrontos):
             if idx < len(confrontos_restantes):
-                confronto = confrontos_restantes[idx].copy()
-                confronto["quadra"] = len(confrontos_rodada) + 1
-                confrontos_rodada.append(confronto)
+                confrontos_rodada.append(confrontos_restantes[idx])
                 idx += 1
+        
+        # OTIMIZA A ORDEM DOS CONFRONTOS para melhor espaçamento
+        confrontos_rodada_otimizados = otimizar_espacamento_rodada(confrontos_rodada)
+        
+        # Atribui números de quadra
+        confrontos_finais = []
+        for quadra_num, confronto in enumerate(confrontos_rodada_otimizados, 1):
+            confronto_copy = confronto.copy()
+            confronto_copy["quadra"] = quadra_num
+            confrontos_finais.append(confronto_copy)
         
         rodadas_geradas.append({
             "numero": rodada_num + 1,
-            "confrontos": confrontos_rodada,
+            "confrontos": confrontos_finais,
             "descansando": []  # NINGUÉM descansa - todos jogam exatamente 5x!
         })
     

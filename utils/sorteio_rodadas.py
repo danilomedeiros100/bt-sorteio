@@ -192,23 +192,22 @@ def gerar_5_rodadas_round_robin(homens: List[str], mulheres: List[str]) -> Dict:
     def distribuir_confrontos_otimizado(confrontos, num_rodadas=8):
         """
         Distribui confrontos em 8 rodadas ELIMINANDO jogos múltiplos
-        Usa algoritmo backtracking com heurística de menor conflito
+        E INTERCALANDO jogos e descansos (evita sequências longas)
         """
         melhor_distribuicao = None
-        melhor_alocados = 0
+        melhor_score = float('inf')
         
         # Tenta múltiplas distribuições
         for tentativa_global in range(2000):
             # Inicializa rodadas vazias
             rodadas_temp = [[] for _ in range(num_rodadas)]
             jogadores_usados_rodada = [set() for _ in range(num_rodadas)]
+            ultima_rodada_jogador = {}  # Última rodada onde cada jogador jogou
             
             # Embaralha confrontos
             confrontos_shuffled = confrontos.copy()
             random.shuffle(confrontos_shuffled)
             
-            # Ordena confrontos por heurística: jogadores menos usados primeiro
-            # (isso ajuda a distribuir melhor)
             confrontos_alocados = 0
             
             for confronto in confrontos_shuffled:
@@ -221,22 +220,74 @@ def gerar_5_rodadas_round_robin(homens: List[str], mulheres: List[str]) -> Dict:
                         rodadas_possiveis.append(rodada_idx)
                 
                 if rodadas_possiveis:
-                    # Escolhe a rodada com MENOS jogadores já alocados (balanceamento)
-                    melhor_rodada = min(rodadas_possiveis, 
-                                       key=lambda r: len(jogadores_usados_rodada[r]))
+                    # HEURÍSTICA MELHORADA: Prefere rodadas que INTERCALAM jogos
+                    # Calcula score para cada rodada possível
+                    scores_rodadas = []
+                    for rodada_idx in rodadas_possiveis:
+                        score = 0
+                        
+                        # 1. Balanceamento: prefere rodadas com menos jogadores
+                        score += len(jogadores_usados_rodada[rodada_idx]) * 10
+                        
+                        # 2. Intercalação: prefere rodadas distantes da última vez que jogaram
+                        for jogador in jogadores_confronto:
+                            if jogador in ultima_rodada_jogador:
+                                distancia = rodada_idx - ultima_rodada_jogador[jogador]
+                                # Premia distância (quanto maior, melhor)
+                                score -= distancia * 20
+                        
+                        scores_rodadas.append((score, rodada_idx))
+                    
+                    # Escolhe rodada com melhor score (menor = melhor)
+                    melhor_rodada = min(scores_rodadas, key=lambda x: x[0])[1]
                     
                     rodadas_temp[melhor_rodada].append(confronto)
                     jogadores_usados_rodada[melhor_rodada].update(jogadores_confronto)
+                    
+                    # Atualiza última rodada de cada jogador
+                    for jogador in jogadores_confronto:
+                        ultima_rodada_jogador[jogador] = melhor_rodada
+                    
                     confrontos_alocados += 1
             
-            # Atualiza melhor resultado
-            if confrontos_alocados > melhor_alocados:
-                melhor_alocados = confrontos_alocados
-                melhor_distribuicao = rodadas_temp
+            # Calcula score da distribuição (considera intercalação)
+            if confrontos_alocados == len(confrontos):
+                score_distribuicao = 0
                 
-                # Se alocou todos, para
-                if confrontos_alocados == len(confrontos):
-                    break
+                # Para cada pessoa, conta max jogos/descansos consecutivos
+                pessoas = set()
+                for rodada_confrontos in rodadas_temp:
+                    for confronto in rodada_confrontos:
+                        pessoas.update(get_jogadores_confronto(confronto))
+                
+                for pessoa in pessoas:
+                    # Monta agenda da pessoa
+                    agenda = []
+                    for rodada_idx in range(num_rodadas):
+                        joga = any(pessoa in get_jogadores_confronto(c) 
+                                  for c in rodadas_temp[rodada_idx])
+                        agenda.append('J' if joga else 'D')
+                    
+                    # Penaliza sequências longas
+                    max_seq_j = max_seq_d = 0
+                    seq_j = seq_d = 0
+                    for tipo in agenda:
+                        if tipo == 'J':
+                            seq_j += 1
+                            max_seq_j = max(max_seq_j, seq_j)
+                            seq_d = 0
+                        else:
+                            seq_d += 1
+                            max_seq_d = max(max_seq_d, seq_d)
+                            seq_j = 0
+                    
+                    # Score: penaliza muito sequências longas
+                    score_distribuicao += max_seq_j ** 2 + max_seq_d ** 2
+                
+                # Atualiza melhor resultado
+                if score_distribuicao < melhor_score:
+                    melhor_score = score_distribuicao
+                    melhor_distribuicao = rodadas_temp
         
         return melhor_distribuicao
     

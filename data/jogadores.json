@@ -22,5 +22,9 @@
   {"nome": "Wellington","sexo": "M","categorias": ["mista"],"confirmado": true},
   {"nome": "Daniel","sexo": "M","categorias": ["mista"],"confirmado": true},
   {"nome": "Hosana","sexo": "F","categorias": ["mista"],"confirmado": true},
-  {"nome": "Letícia","sexo": "F","categorias": ["mista"],"confirmado": true}
+  {"nome": "Letícia","sexo": "F","categorias": ["mista"],"confirmado": true},
+  {"nome": "Nego","sexo": "M","categorias": ["mista"],"confirmado": true},
+  {"nome": "Nea","sexo": "F","categorias": ["mista"],"confirmado": true},
+  {"nome": "Rafael","sexo": "M","categorias": ["mista"],"confirmado": true},
+  {"nome": "Rebecca","sexo": "F","categorias": ["mista"],"confirmado": true}
 ]

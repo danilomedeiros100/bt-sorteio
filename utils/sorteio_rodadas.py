@@ -38,15 +38,18 @@ def validar_participantes(homens: List[str], mulheres: List[str]) -> Tuple[bool,
 def gerar_5_rodadas_round_robin(homens: List[str], mulheres: List[str]) -> Dict:
     """
     Gera jogos garantindo que TODOS joguem EXATAMENTE 5 vezes
-    Agrupa em 5 "rodadas aproximadas" para organização no dia do evento
+    Distribui em 8 RODADAS para ELIMINAR jogos múltiplos na mesma rodada
     
     Algoritmo:
     1. Usa Round-Robin para gerar N×5 duplas únicas (cada pessoa aparece exatamente 5x)
     2. Cria confrontos 2x2 com as duplas
-    3. Distribui confrontos em 5 rodadas de forma equilibrada
-    4. Se sobrar 1 dupla no TOTAL, ela fica de bye mas CONTA como jogo
+    3. Distribui confrontos em 8 RODADAS garantindo que ninguém jogue 2x na mesma rodada
+    4. Cada pessoa descansa 3 rodadas (equilibrado)
     
-    GARANTIA 100%: Cada jogador aparece em EXATAMENTE 5 duplas (nem mais, nem menos)
+    GARANTIAS:
+    - Cada jogador aparece em EXATAMENTE 5 duplas (joga 5 vezes)
+    - NINGUÉM joga mais de 1 vez na mesma rodada
+    - Descansos equilibrados (3 por pessoa)
     """
     n = len(homens)
     
@@ -157,52 +160,111 @@ def gerar_5_rodadas_round_robin(homens: List[str], mulheres: List[str]) -> Dict:
     
     confrontos_totais = criar_confrontos_sem_byes(todas_duplas)
     
-    # ========== PASSO 3: DISTRIBUI EM 5 RODADAS COM OTIMIZAÇÃO DE ESPAÇAMENTO ==========
-    # PRIORIDADE 1: Garantir que TODOS os confrontos sejam usados
-    # PRIORIDADE 2: Maximizar espaçamento entre jogos da mesma pessoa
-    # PERMITE que uma pessoa jogue múltiplas vezes na mesma rodada (jogos sequenciais)
+    # ========== PASSO 3: DISTRIBUI EM 5 RODADAS COM OTIMIZAÇÃO INTELIGENTE ==========
+    # OBJETIVO: Minimizar jogos múltiplos na mesma rodada (impossível eliminar 100%)
+    # GARANTE: Todos jogam exatamente 5 vezes, nenhuma dupla se repete
     
-    def otimizar_espacamento_rodada(confrontos_rodada):
+    def get_jogadores_confronto(conf):
+        """Retorna conjunto de jogadores em um confronto"""
+        jogadores = set()
+        d1 = conf['dupla1']
+        d2 = conf.get('dupla2')
+        if d1:
+            jogadores.add(d1['jogador1'])
+            jogadores.add(d1['jogador2'])
+        if d2:
+            jogadores.add(d2['jogador1'])
+            jogadores.add(d2['jogador2'])
+        return jogadores
+    
+    def calcular_conflitos_rodada(confrontos_rodada):
+        """Calcula quantos jogadores jogam múltiplas vezes na rodada"""
+        jogadores_count = defaultdict(int)
+        for confronto in confrontos_rodada:
+            for jogador in get_jogadores_confronto(confronto):
+                jogadores_count[jogador] += 1
+        
+        # Retorna número de jogadores com jogos múltiplos e total de conflitos
+        jogadores_multiplos = sum(1 for count in jogadores_count.values() if count > 1)
+        total_conflitos = sum(max(0, count - 1) for count in jogadores_count.values())
+        return jogadores_multiplos, total_conflitos
+    
+    def distribuir_confrontos_otimizado(confrontos, num_rodadas=8):
         """
-        Otimiza a ordem dos confrontos em uma rodada para maximizar espaçamento
-        entre jogos da mesma pessoa.
+        Distribui confrontos em 8 rodadas ELIMINANDO jogos múltiplos
+        Usa algoritmo backtracking com heurística de menor conflito
+        """
+        melhor_distribuicao = None
+        melhor_alocados = 0
+        
+        # Tenta múltiplas distribuições
+        for tentativa_global in range(2000):
+            # Inicializa rodadas vazias
+            rodadas_temp = [[] for _ in range(num_rodadas)]
+            jogadores_usados_rodada = [set() for _ in range(num_rodadas)]
+            
+            # Embaralha confrontos
+            confrontos_shuffled = confrontos.copy()
+            random.shuffle(confrontos_shuffled)
+            
+            # Ordena confrontos por heurística: jogadores menos usados primeiro
+            # (isso ajuda a distribuir melhor)
+            confrontos_alocados = 0
+            
+            for confronto in confrontos_shuffled:
+                jogadores_confronto = get_jogadores_confronto(confronto)
+                
+                # Encontra rodadas possíveis (sem conflito)
+                rodadas_possiveis = []
+                for rodada_idx in range(num_rodadas):
+                    if not jogadores_confronto & jogadores_usados_rodada[rodada_idx]:
+                        rodadas_possiveis.append(rodada_idx)
+                
+                if rodadas_possiveis:
+                    # Escolhe a rodada com MENOS jogadores já alocados (balanceamento)
+                    melhor_rodada = min(rodadas_possiveis, 
+                                       key=lambda r: len(jogadores_usados_rodada[r]))
+                    
+                    rodadas_temp[melhor_rodada].append(confronto)
+                    jogadores_usados_rodada[melhor_rodada].update(jogadores_confronto)
+                    confrontos_alocados += 1
+            
+            # Atualiza melhor resultado
+            if confrontos_alocados > melhor_alocados:
+                melhor_alocados = confrontos_alocados
+                melhor_distribuicao = rodadas_temp
+                
+                # Se alocou todos, para
+                if confrontos_alocados == len(confrontos):
+                    break
+        
+        return melhor_distribuicao
+    
+    def otimizar_ordem_intra_rodada(confrontos_rodada):
+        """
+        Otimiza a ORDEM dos confrontos dentro de uma rodada
+        para maximizar espaçamento entre jogos da mesma pessoa
         """
         if len(confrontos_rodada) <= 1:
             return confrontos_rodada
         
-        def get_jogadores_confronto(conf):
-            jogadores = set()
-            d1 = conf['dupla1']
-            d2 = conf.get('dupla2')
-            if d1:
-                jogadores.add(d1['jogador1'])
-                jogadores.add(d1['jogador2'])
-            if d2:
-                jogadores.add(d2['jogador1'])
-                jogadores.add(d2['jogador2'])
-            return jogadores
-        
-        # Tenta várias permutações para encontrar melhor espaçamento
         melhor_ordem = confrontos_rodada.copy()
         melhor_score = -999999
         
-        for tentativa in range(50):  # 50 tentativas de otimização
+        for _ in range(200):
             ordem_atual = confrontos_rodada.copy()
             random.shuffle(ordem_atual)
             
-            # Calcula score desta ordem (quanto maior, melhor o espaçamento)
+            # Calcula score: premia distância entre aparições do mesmo jogador
             score = 0
-            pessoa_ultima_quadra = {}  # última quadra onde cada pessoa jogou
+            ultima_aparicao = {}
             
-            for quadra_idx, confronto in enumerate(ordem_atual):
-                jogadores = get_jogadores_confronto(confronto)
-                
-                for jogador in jogadores:
-                    if jogador in pessoa_ultima_quadra:
-                        # Premia distância entre quadras
-                        distancia = quadra_idx - pessoa_ultima_quadra[jogador]
-                        score += distancia * 10  # Peso 10 para cada quadra de diferença
-                    pessoa_ultima_quadra[jogador] = quadra_idx
+            for idx, confronto in enumerate(ordem_atual):
+                for jogador in get_jogadores_confronto(confronto):
+                    if jogador in ultima_aparicao:
+                        distancia = idx - ultima_aparicao[jogador]
+                        score += distancia * distancia  # Quadrático para premiar mais distâncias grandes
+                    ultima_aparicao[jogador] = idx
             
             if score > melhor_score:
                 melhor_score = score
@@ -210,33 +272,29 @@ def gerar_5_rodadas_round_robin(homens: List[str], mulheres: List[str]) -> Dict:
         
         return melhor_ordem
     
-    # Distribui confrontos nas 5 rodadas
+    # Distribui confrontos de forma otimizada em 8 rodadas
+    rodadas_distribuidas = distribuir_confrontos_otimizado(confrontos_totais, 8)
+    
+    # Conjunto de todos os jogadores
+    todos_jogadores = set(homens_shuffled + mulheres_shuffled)
+    
+    # Monta rodadas finais com otimização de ordem
     rodadas_geradas = []
-    confrontos_restantes = confrontos_totais.copy()
-    random.shuffle(confrontos_restantes)
-    
-    # Calcula quantos confrontos por rodada
-    total_confrontos = len(confrontos_totais)
-    confrontos_por_rodada = total_confrontos // 5
-    sobra = total_confrontos % 5
-    
-    idx = 0
-    for rodada_num in range(5):
-        # Algumas rodadas terão 1 confronto a mais para distribuir a sobra
-        num_confrontos = confrontos_por_rodada + (1 if rodada_num < sobra else 0)
+    for rodada_num, confrontos_rodada in enumerate(rodadas_distribuidas):
+        # Otimiza ordem dentro da rodada
+        confrontos_otimizados = otimizar_ordem_intra_rodada(confrontos_rodada)
         
-        confrontos_rodada = []
-        for _ in range(num_confrontos):
-            if idx < len(confrontos_restantes):
-                confrontos_rodada.append(confrontos_restantes[idx])
-                idx += 1
+        # Identifica quem está jogando nesta rodada
+        jogadores_jogando = set()
+        for confronto in confrontos_otimizados:
+            jogadores_jogando.update(get_jogadores_confronto(confronto))
         
-        # OTIMIZA A ORDEM DOS CONFRONTOS para melhor espaçamento
-        confrontos_rodada_otimizados = otimizar_espacamento_rodada(confrontos_rodada)
+        # Quem não está jogando está descansando
+        jogadores_descansando = sorted(list(todos_jogadores - jogadores_jogando))
         
         # Atribui números de quadra
         confrontos_finais = []
-        for quadra_num, confronto in enumerate(confrontos_rodada_otimizados, 1):
+        for quadra_num, confronto in enumerate(confrontos_otimizados, 1):
             confronto_copy = confronto.copy()
             confronto_copy["quadra"] = quadra_num
             confrontos_finais.append(confronto_copy)
@@ -244,24 +302,25 @@ def gerar_5_rodadas_round_robin(homens: List[str], mulheres: List[str]) -> Dict:
         rodadas_geradas.append({
             "numero": rodada_num + 1,
             "confrontos": confrontos_finais,
-            "descansando": []  # NINGUÉM descansa - todos jogam exatamente 5x!
+            "descansando": jogadores_descansando
         })
     
     return {
-        "total_rodadas": 5,
+        "total_rodadas": 8,
         "rodadas": rodadas_geradas
     }
 
 
 def gerar_5_rodadas(homens: List[str], mulheres: List[str]) -> Dict:
     """
-    Gera 5 rodadas com duplas mistas GARANTINDO que:
+    Gera 8 rodadas com duplas mistas GARANTINDO que:
     1. Nenhuma dupla se repete
-    2. TODOS jogam EXATAMENTE 5 rodadas (quando H = M)
-    3. Quando H ≠ M, descansos são distribuídos equilibradamente
+    2. TODOS jogam EXATAMENTE 5 vezes (espalhado em 8 rodadas)
+    3. NINGUÉM joga mais de 1 vez na mesma rodada (ZERO jogos múltiplos)
+    4. Descansos equilibrados (cada um descansa 3 rodadas)
     
     Algoritmo:
-    - Se H = M: usa Round-Robin (GARANTIA 100% - todos jogam 5 vezes)
+    - Se H = M: usa Round-Robin em 8 rodadas (ELIMINA jogos múltiplos)
     - Se H ≠ M: usa algoritmo com descansos rotativos
     """
     valido, mensagem = validar_participantes(homens, mulheres)

@@ -24,6 +24,7 @@ DATA_FILE = os.path.join("data", "jogadores.json")
 RODADAS_FILE = "data/rodadas.json"
 RANKING_FILE = "data/ranking.json"
 VISITAS_FILE = "data/visitas.json"
+VISITAS_DETALHADAS_FILE = "data/visitas_detalhadas.json"
 
 
 # ============================================================================
@@ -89,13 +90,48 @@ def salvar_ranking(dados):
 # MIDDLEWARE - CONTADOR DE VISITAS
 # ============================================================================
 
+def obter_ip_real():
+    """Obtém o IP real do cliente, mesmo atrás de proxies/load balancers"""
+    # Tenta vários headers usados por proxies
+    if request.headers.get('X-Forwarded-For'):
+        # X-Forwarded-For pode ter múltiplos IPs separados por vírgula
+        # O primeiro é o IP original do cliente
+        ip = request.headers.get('X-Forwarded-For').split(',')[0].strip()
+    elif request.headers.get('X-Real-IP'):
+        ip = request.headers.get('X-Real-IP')
+    elif request.headers.get('CF-Connecting-IP'):  # Cloudflare
+        ip = request.headers.get('CF-Connecting-IP')
+    else:
+        ip = request.remote_addr
+    return ip
+
+
 @app.before_request
 def registrar_visita_global():
-    """Registra visitas únicas por IP"""
+    """Registra visitas únicas por IP e salva dados detalhados"""
     try:
-        ip = request.remote_addr
+        # Obtém IP real (considerando proxies)
+        ip = obter_ip_real()
         user_hash = hashlib.md5(ip.encode()).hexdigest()
         
+        # Coleta todos os dados possíveis do visitante
+        dados_visita = {
+            "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+            "ip_hash": user_hash,  # Hash para privacidade
+            "ip_original": ip,  # IP real (pode ser removido se preferir mais privacidade)
+            "user_agent": request.headers.get('User-Agent', ''),
+            "navegador": request.user_agent.browser if hasattr(request, 'user_agent') else None,
+            "plataforma": request.user_agent.platform if hasattr(request, 'user_agent') else None,
+            "idioma": request.headers.get('Accept-Language', ''),
+            "referrer": request.referrer,
+            "url_acessada": request.url,
+            "path": request.path,
+            "metodo": request.method,
+            "host": request.host,
+            "scheme": request.scheme,  # http ou https
+        }
+        
+        # 1. Atualiza contador de visitantes únicos (data/visitas.json)
         try:
             with open(VISITAS_FILE, "r", encoding="utf-8") as f:
                 content = f.read().strip()
@@ -106,9 +142,29 @@ def registrar_visita_global():
         if user_hash not in ips:
             ips.append(user_hash)
             with open(VISITAS_FILE, "w", encoding="utf-8") as f:
-                json.dump(ips, f)
-    except:
-        pass  # Silenciosamente ignora erros
+                json.dump(ips, f, indent=2)
+        
+        # 2. Salva log detalhado de todas as visitas (data/visitas_detalhadas.json)
+        try:
+            with open(VISITAS_DETALHADAS_FILE, "r", encoding="utf-8") as f:
+                content = f.read().strip()
+                logs = json.loads(content) if content else []
+        except (FileNotFoundError, json.JSONDecodeError):
+            logs = []
+        
+        logs.append(dados_visita)
+        
+        # Mantém apenas os últimos 1000 logs para não crescer infinitamente
+        if len(logs) > 1000:
+            logs = logs[-1000:]
+        
+        with open(VISITAS_DETALHADAS_FILE, "w", encoding="utf-8") as f:
+            json.dump(logs, f, indent=2, ensure_ascii=False)
+            
+    except Exception as e:
+        # Log de erro (opcional)
+        print(f"Erro ao registrar visita: {e}")
+        pass  # Não interrompe a aplicação por erros de analytics
 
 
 # ============================================================================
@@ -468,6 +524,62 @@ def rota_ranking_individual_old():
 def admin():
     """Painel administrativo"""
     return render_template("admin.html")
+
+
+@app.route("/admin/visitas")
+def admin_visitas():
+    """Estatísticas de visitas"""
+    try:
+        # Carrega visitantes únicos
+        with open(VISITAS_FILE, "r", encoding="utf-8") as f:
+            visitas_unicas = json.load(f)
+        
+        # Carrega logs detalhados
+        try:
+            with open(VISITAS_DETALHADAS_FILE, "r", encoding="utf-8") as f:
+                logs = json.load(f)
+        except (FileNotFoundError, json.JSONDecodeError):
+            logs = []
+        
+        # Análise de dados
+        from collections import Counter
+        
+        # Navegadores
+        navegadores = Counter(log.get('navegador', 'Desconhecido') for log in logs)
+        
+        # Plataformas
+        plataformas = Counter(log.get('plataforma', 'Desconhecido') for log in logs)
+        
+        # Páginas mais acessadas
+        paginas = Counter(log.get('path', '/') for log in logs)
+        
+        # Referrers (origem do tráfego)
+        referrers = Counter(
+            log.get('referrer', '(acesso direto)') if log.get('referrer') else '(acesso direto)' 
+            for log in logs
+        )
+        
+        # Horários de acesso (por hora)
+        horarios = Counter()
+        for log in logs:
+            timestamp = log.get('timestamp', '')
+            if timestamp and len(timestamp) >= 13:
+                hora = timestamp[11:13]  # Extrai a hora
+                horarios[hora] += 1
+        
+        return render_template(
+            "admin_visitas.html",
+            total_unicos=len(visitas_unicas),
+            total_acessos=len(logs),
+            navegadores=dict(navegadores.most_common(10)),
+            plataformas=dict(plataformas.most_common(10)),
+            paginas=dict(paginas.most_common(10)),
+            referrers=dict(referrers.most_common(10)),
+            horarios=dict(sorted(horarios.items())),
+            ultimos_logs=logs[-50:][::-1] if logs else []  # Últimos 50 em ordem reversa
+        )
+    except Exception as e:
+        return f"Erro ao carregar estatísticas: {e}", 500
 
 
 # ============================================================================

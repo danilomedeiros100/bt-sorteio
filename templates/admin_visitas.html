@@ -1,0 +1,259 @@
+{% extends 'base.html' %}
+{% block title %}Estatísticas de Visitas - Admin{% endblock %}
+
+{% block content %}
+<div class="fade-in">
+  
+  <!-- Cabeçalho -->
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="app-title">
+      <i class="bi bi-graph-up-arrow me-2" style="color: var(--color-accent);"></i>
+      Estatísticas de Visitas
+    </h1>
+    <a href="{{ url_for('admin') }}" class="btn btn-outline-secondary">
+      <i class="bi bi-arrow-left me-2"></i>Voltar
+    </a>
+  </div>
+
+  <!-- Cards de Resumo -->
+  <div class="row g-3 mb-4">
+    <div class="col-md-6">
+      <div class="glass-card text-center">
+        <div style="font-size: 2.5rem; color: var(--color-primary);">
+          <i class="bi bi-people-fill"></i>
+        </div>
+        <h3 class="mt-2" style="color: var(--color-accent); font-size: 2rem;">{{ total_unicos }}</h3>
+        <p class="text-muted mb-0">Visitantes Únicos</p>
+      </div>
+    </div>
+    <div class="col-md-6">
+      <div class="glass-card text-center">
+        <div style="font-size: 2.5rem; color: var(--color-secondary);">
+          <i class="bi bi-eye-fill"></i>
+        </div>
+        <h3 class="mt-2" style="color: var(--color-accent); font-size: 2rem;">{{ total_acessos }}</h3>
+        <p class="text-muted mb-0">Total de Acessos</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Navegadores -->
+  <div class="glass-card mb-4">
+    <h4 class="mb-3">
+      <i class="bi bi-browser-chrome me-2" style="color: var(--color-primary);"></i>
+      Navegadores
+    </h4>
+    {% if navegadores %}
+      <div class="table-responsive">
+        <table class="table table-hover">
+          <thead>
+            <tr>
+              <th>Navegador</th>
+              <th class="text-end">Acessos</th>
+              <th class="text-end">%</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for nav, count in navegadores.items() %}
+            <tr>
+              <td>{{ nav or 'Desconhecido' }}</td>
+              <td class="text-end">{{ count }}</td>
+              <td class="text-end">{{ "%.1f"|format((count / total_acessos * 100)) }}%</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <p class="text-muted mb-0">Nenhum dado disponível</p>
+    {% endif %}
+  </div>
+
+  <!-- Plataformas -->
+  <div class="glass-card mb-4">
+    <h4 class="mb-3">
+      <i class="bi bi-laptop me-2" style="color: var(--color-primary);"></i>
+      Plataformas / Dispositivos
+    </h4>
+    {% if plataformas %}
+      <div class="table-responsive">
+        <table class="table table-hover">
+          <thead>
+            <tr>
+              <th>Plataforma</th>
+              <th class="text-end">Acessos</th>
+              <th class="text-end">%</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for plat, count in plataformas.items() %}
+            <tr>
+              <td>{{ plat or 'Desconhecido' }}</td>
+              <td class="text-end">{{ count }}</td>
+              <td class="text-end">{{ "%.1f"|format((count / total_acessos * 100)) }}%</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <p class="text-muted mb-0">Nenhum dado disponível</p>
+    {% endif %}
+  </div>
+
+  <!-- Páginas Mais Acessadas -->
+  <div class="glass-card mb-4">
+    <h4 class="mb-3">
+      <i class="bi bi-file-earmark-text me-2" style="color: var(--color-primary);"></i>
+      Páginas Mais Acessadas
+    </h4>
+    {% if paginas %}
+      <div class="table-responsive">
+        <table class="table table-hover">
+          <thead>
+            <tr>
+              <th>Página</th>
+              <th class="text-end">Acessos</th>
+              <th class="text-end">%</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for pag, count in paginas.items() %}
+            <tr>
+              <td><code>{{ pag }}</code></td>
+              <td class="text-end">{{ count }}</td>
+              <td class="text-end">{{ "%.1f"|format((count / total_acessos * 100)) }}%</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <p class="text-muted mb-0">Nenhum dado disponível</p>
+    {% endif %}
+  </div>
+
+  <!-- Origem do Tráfego -->
+  <div class="glass-card mb-4">
+    <h4 class="mb-3">
+      <i class="bi bi-link-45deg me-2" style="color: var(--color-primary);"></i>
+      Origem do Tráfego
+    </h4>
+    {% if referrers %}
+      <div class="table-responsive">
+        <table class="table table-hover">
+          <thead>
+            <tr>
+              <th>Origem</th>
+              <th class="text-end">Acessos</th>
+              <th class="text-end">%</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for ref, count in referrers.items() %}
+            <tr>
+              <td>
+                {% if ref == '(acesso direto)' %}
+                  <em class="text-muted">{{ ref }}</em>
+                {% else %}
+                  {{ ref }}
+                {% endif %}
+              </td>
+              <td class="text-end">{{ count }}</td>
+              <td class="text-end">{{ "%.1f"|format((count / total_acessos * 100)) }}%</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <p class="text-muted mb-0">Nenhum dado disponível</p>
+    {% endif %}
+  </div>
+
+  <!-- Horários de Acesso -->
+  <div class="glass-card mb-4">
+    <h4 class="mb-3">
+      <i class="bi bi-clock me-2" style="color: var(--color-primary);"></i>
+      Acessos por Hora
+    </h4>
+    {% if horarios %}
+      <div class="table-responsive">
+        <table class="table table-hover">
+          <thead>
+            <tr>
+              <th>Hora</th>
+              <th class="text-end">Acessos</th>
+              <th>Visualização</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for hora, count in horarios.items() %}
+            <tr>
+              <td><strong>{{ hora }}:00</strong></td>
+              <td class="text-end">{{ count }}</td>
+              <td>
+                <div class="progress" style="height: 20px;">
+                  <div class="progress-bar bg-primary" role="progressbar" 
+                       style="width: {{ (count / total_acessos * 100)|int }}%"
+                       aria-valuenow="{{ count }}" aria-valuemin="0" aria-valuemax="{{ total_acessos }}">
+                  </div>
+                </div>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <p class="text-muted mb-0">Nenhum dado disponível</p>
+    {% endif %}
+  </div>
+
+  <!-- Últimos Acessos -->
+  <div class="glass-card mb-4">
+    <h4 class="mb-3">
+      <i class="bi bi-clock-history me-2" style="color: var(--color-primary);"></i>
+      Últimos 50 Acessos
+    </h4>
+    {% if ultimos_logs %}
+      <div class="table-responsive">
+        <table class="table table-hover table-sm">
+          <thead>
+            <tr>
+              <th>Data/Hora</th>
+              <th>IP (hash)</th>
+              <th>Navegador</th>
+              <th>Plataforma</th>
+              <th>Página</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for log in ultimos_logs %}
+            <tr>
+              <td><small>{{ log.timestamp }}</small></td>
+              <td><code style="font-size: 0.7rem;">{{ log.ip_hash[:12] }}...</code></td>
+              <td><small>{{ log.navegador or 'N/A' }}</small></td>
+              <td><small>{{ log.plataforma or 'N/A' }}</small></td>
+              <td><small><code>{{ log.path }}</code></small></td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <p class="text-muted mb-0">Nenhum acesso registrado ainda</p>
+    {% endif %}
+  </div>
+
+  <!-- Botão Voltar -->
+  <div class="text-center mb-4">
+    <a href="{{ url_for('admin') }}" class="btn-primary-custom">
+      <i class="bi bi-arrow-left me-2"></i>
+      Voltar ao Admin
+    </a>
+  </div>
+
+</div>
+{% endblock %}
+

@@ -1,0 +1,450 @@
+{% extends "base.html" %}
+{% block title %}Ranking {{ categoria|title }}{% endblock %}
+
+{% block content %}
+<div class="fade-in" style="min-height: 70vh; padding-top: 40px;">
+
+  <div class="text-center mb-4">
+    <h1 class="app-title">
+      <i class="bi bi-trophy-fill me-2" style="color: var(--color-accent);"></i>
+      Ranking {{ categoria|title }}
+    </h1>
+    
+    <!-- Seletor de Categoria - EXATAMENTE como na main que funciona -->
+    {% if categorias_com_sorteio and categorias_com_sorteio|length > 1 %}
+    <div class="glass-card mb-3 slide-in" style="max-width: 400px; margin: 20px auto; padding: 15px; background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.9)); border: 2px solid var(--color-primary); box-shadow: 0 8px 32px rgba(0, 123, 255, 0.2);">
+      <select id="filtroCategoria" class="form-select" style="
+        background: white !important; 
+        color: #1a1a2e !important; 
+        border: 2px solid var(--color-primary) !important; 
+        font-weight: 600 !important;
+        font-size: 1rem !important;
+        padding: 10px 14px !important;
+        box-shadow: 0 4px 12px rgba(0, 123, 255, 0.15) !important;
+      ">
+        <option value="">📊 Todas as Categorias</option>
+        {% if 'misto' in categorias_com_sorteio %}
+        <option value="misto" {% if categoria == 'misto' %}selected{% endif %}>👥 Misto</option>
+        {% endif %}
+        {% if 'masculino' in categorias_com_sorteio %}
+        <option value="masculino" {% if categoria == 'masculino' %}selected{% endif %}>Masculino</option>
+        {% endif %}
+        {% if 'feminino' in categorias_com_sorteio %}
+        <option value="feminino" {% if categoria == 'feminino' %}selected{% endif %}>Feminino</option>
+        {% endif %}
+      </select>
+    </div>
+    {% endif %}
+  </div>
+
+  <div class="glass-card mb-4 slide-in">
+    <p class="mb-2 text-center">
+      <i class="bi bi-clock-history me-2" style="color: var(--color-primary);"></i>
+      <small class="text-muted">Última atualização: {{ ranking.ultima_atualizacao[:19] if ranking.ultima_atualizacao else 'N/A' }}</small>
+    </p>
+    <p class="mt-2 mb-0 text-center" style="font-size: 1.1rem; color: var(--color-accent);">
+      <i class="bi bi-info-circle me-2"></i>
+      <strong>Critérios:</strong> 1º Vitórias | 2º Saldo de Games | 3º Games Feitos | 4º Games Sofridos (menor)
+    </p>
+  </div>
+
+  {% if categoria == "misto" %}
+    <!-- Pódio Misto (se houver resultados) -->
+    {% if ranking.tem_resultados and ranking.masculino and ranking.masculino|length >= 3 and ranking.feminino and ranking.feminino|length >= 3 %}
+    <div class="glass-card mb-4 slide-in podio-container" style="animation-delay: 0.05s; background: linear-gradient(135deg, rgba(255, 215, 0, 0.1), rgba(212, 175, 55, 0.05));">
+      <h3 class="text-center mb-4" style="color: #FFD700; font-size: 1.4rem;">
+        <i class="bi bi-award-fill me-2"></i>
+        🏆 PÓDIO PREMIADO 🏆
+      </h3>
+      
+      <div class="row text-center">
+        <!-- 2º Lugar -->
+        <div class="col-md-4 mb-3">
+          <div class="p-3" style="background: linear-gradient(135deg, rgba(192, 192, 192, 0.2), rgba(169, 169, 169, 0.1)); border-radius: 12px; border: 2px solid #C0C0C0;">
+            <i class="bi bi-trophy-fill mb-2" style="color: #C0C0C0; font-size: 2rem;"></i>
+            <h4 style="color: #C0C0C0; font-size: 1.3rem; margin-bottom: 8px;">2º LUGAR</h4>
+            {% if ranking.masculino|length >= 2 %}
+              <p class="mb-1 podio-masculino" style="font-size: 1.1rem; font-weight: 600;">
+                <i class="bi bi-person me-1"></i> {{ ranking.masculino[1].nome }}
+              </p>
+              <small class="text-muted podio-masculino">Masculino - {{ ranking.masculino[1].vitorias }}V</small>
+            {% endif %}
+            <hr class="podio-separator" style="border-color: rgba(192, 192, 192, 0.3); margin: 10px 0;">
+            {% if ranking.feminino|length >= 2 %}
+              <p class="mb-1 mt-2 podio-feminino" style="font-size: 1.1rem; font-weight: 600;">
+                <i class="bi bi-person me-1"></i> {{ ranking.feminino[1].nome }}
+              </p>
+              <small class="text-muted podio-feminino">Feminino - {{ ranking.feminino[1].vitorias }}V</small>
+            {% endif %}
+          </div>
+        </div>
+        
+        <!-- 1º Lugar -->
+        <div class="col-md-4 mb-3">
+          <div class="p-3" style="background: linear-gradient(135deg, rgba(255, 215, 0, 0.3), rgba(212, 175, 55, 0.15)); border-radius: 12px; border: 3px solid #FFD700; box-shadow: 0 8px 24px rgba(255, 215, 0, 0.4); transform: translateY(-10px);">
+            <i class="bi bi-trophy-fill mb-2" style="color: #FFD700; font-size: 3rem;"></i>
+            <h4 style="color: #FFD700; font-size: 1.5rem; margin-bottom: 8px;">🥇 CAMPEÃO</h4>
+            {% if ranking.masculino|length >= 1 %}
+              <p class="mb-1 podio-masculino" style="font-size: 1.2rem; font-weight: 700;">
+                <i class="bi bi-person me-1"></i> {{ ranking.masculino[0].nome }}
+                <i class="bi bi-star-fill ms-1" style="font-size: 0.9rem;"></i>
+              </p>
+              <small class="text-muted podio-masculino">Masculino - {{ ranking.masculino[0].vitorias }}V</small>
+            {% endif %}
+            <hr class="podio-separator" style="border-color: rgba(255, 215, 0, 0.4); margin: 10px 0;">
+            {% if ranking.feminino|length >= 1 %}
+              <p class="mb-1 mt-2 podio-feminino" style="font-size: 1.2rem; font-weight: 700;">
+                <i class="bi bi-person me-1"></i> {{ ranking.feminino[0].nome }}
+                <i class="bi bi-star-fill ms-1" style="font-size: 0.9rem;"></i>
+              </p>
+              <small class="text-muted podio-feminino">Feminino - {{ ranking.feminino[0].vitorias }}V</small>
+            {% endif %}
+          </div>
+        </div>
+        
+        <!-- 3º Lugar -->
+        <div class="col-md-4 mb-3">
+          <div class="p-3" style="background: linear-gradient(135deg, rgba(205, 127, 50, 0.2), rgba(184, 115, 51, 0.1)); border-radius: 12px; border: 2px solid #CD7F32;">
+            <i class="bi bi-trophy-fill mb-2" style="color: #CD7F32; font-size: 2rem;"></i>
+            <h4 style="color: #CD7F32; font-size: 1.3rem; margin-bottom: 8px;">3º LUGAR</h4>
+            {% if ranking.masculino|length >= 3 %}
+              <p class="mb-1 podio-masculino" style="font-size: 1.1rem; font-weight: 600;">
+                <i class="bi bi-person me-1"></i> {{ ranking.masculino[2].nome }}
+              </p>
+              <small class="text-muted podio-masculino">Masculino - {{ ranking.masculino[2].vitorias }}V</small>
+            {% endif %}
+            <hr class="podio-separator" style="border-color: rgba(205, 127, 50, 0.3); margin: 10px 0;">
+            {% if ranking.feminino|length >= 3 %}
+              <p class="mb-1 mt-2 podio-feminino" style="font-size: 1.1rem; font-weight: 600;">
+                <i class="bi bi-person me-1"></i> {{ ranking.feminino[2].nome }}
+              </p>
+              <small class="text-muted podio-feminino">Feminino - {{ ranking.feminino[2].vitorias }}V</small>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+    {% endif %}
+    <!-- Ranking Misto: Masculino e Feminino separados -->
+    
+    {% if not ranking.tem_resultados %}
+    <div class="text-center mb-3" style="background: rgba(0, 0, 0, 0.4); border: 2px solid rgba(255, 255, 255, 0.6); border-radius: 8px; padding: 15px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);">
+      <i class="bi bi-info-circle me-2" style="color: #4da6ff; font-size: 1.3rem;"></i>
+      <strong style="color: #fff; font-size: 1.2rem; text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);">Lista de Inscritos</strong> <span style="color: #fff; font-size: 1.1rem; text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);">- Aguardando início do torneio</span>
+    </div>
+    {% endif %}
+    
+    {% if ranking.masculino and ranking.masculino|length > 0 %}
+    <div class="glass-card mb-4 slide-in">
+      <h3 class="mb-3 text-center">
+        <i class="bi bi-person-fill me-2" style="color: var(--color-primary);"></i>
+        Masculino
+      </h3>
+      <div class="table-responsive">
+        <table class="table table-hover ranking-table">
+          <thead>
+            <tr>
+              <th>Pos</th>
+              <th>Nome</th>
+              <th>V</th>
+              <th>D</th>
+              <th>%</th>
+              <th>Saldo</th>
+              <th>GF</th>
+              <th>GS</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for jogador in ranking.masculino %}
+            <tr {% if ranking.tem_resultados %}{% if loop.index == 1 %}class="position-1"{% elif loop.index == 2 %}class="position-2"{% elif loop.index == 3 %}class="position-3"{% endif %}{% endif %}>
+              <td class="ranking-position">
+                {% if ranking.tem_resultados %}
+                  {% if loop.index == 1 %}
+                    <i class="bi bi-trophy-fill" style="color: #FFD700; font-size: 1.5rem;"></i>
+                  {% elif loop.index == 2 %}
+                    <i class="bi bi-trophy-fill" style="color: #C0C0C0; font-size: 1.4rem;"></i>
+                  {% elif loop.index == 3 %}
+                    <i class="bi bi-trophy-fill" style="color: #CD7F32; font-size: 1.3rem;"></i>
+                  {% else %}
+                    <strong>{{ loop.index }}</strong>
+                  {% endif %}
+                {% else %}
+                  <strong>{{ loop.index }}</strong>
+                {% endif %}
+              </td>
+              <td style="text-align: left; font-weight: {% if loop.index <= 3 and ranking.tem_resultados %}700{% else %}600{% endif %}; font-size: {% if loop.index <= 3 and ranking.tem_resultados %}1.1rem{% else %}1rem{% endif %};">
+                {{ jogador.nome }}
+                {% if ranking.tem_resultados and loop.index == 1 %}
+                  <i class="bi bi-star-fill ms-2" style="color: #FFD700; font-size: 0.9rem;"></i>
+                {% endif %}
+              </td>
+              <td><span class="badge bg-success">{{ jogador.vitorias }}</span></td>
+              <td><span class="badge bg-danger">{{ jogador.derrotas }}</span></td>
+              <td>{{ jogador.percentual|default(jogador.percentual_vitorias|default(0)) }}%</td>
+              <td>
+                {% set saldo = jogador.saldo|default(jogador.saldo_games|default(0)) %}
+                {% if saldo > 0 %}
+                  <span class="text-success">+{{ saldo }}</span>
+                {% elif saldo < 0 %}
+                  <span class="text-danger">{{ saldo }}</span>
+                {% else %}
+                  <span class="text-muted">0</span>
+                {% endif %}
+              </td>
+              <td>{{ jogador.games_feitos }}</td>
+              <td>{{ jogador.games_sofridos }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+    {% endif %}
+
+    {% if ranking.feminino and ranking.feminino|length > 0 %}
+    <div class="glass-card mb-4 slide-in">
+      <h3 class="mb-3 text-center">
+        <i class="bi bi-person-heart me-2" style="color: var(--color-success);"></i>
+        Feminino
+      </h3>
+      <div class="table-responsive">
+        <table class="table table-hover ranking-table">
+          <thead>
+            <tr>
+              <th>Pos</th>
+              <th>Nome</th>
+              <th>V</th>
+              <th>D</th>
+              <th>%</th>
+              <th>Saldo</th>
+              <th>GF</th>
+              <th>GS</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for jogador in ranking.feminino %}
+            <tr {% if ranking.tem_resultados %}{% if loop.index == 1 %}class="position-1"{% elif loop.index == 2 %}class="position-2"{% elif loop.index == 3 %}class="position-3"{% endif %}{% endif %}>
+              <td class="ranking-position">
+                {% if ranking.tem_resultados %}
+                  {% if loop.index == 1 %}
+                    <i class="bi bi-trophy-fill" style="color: #FFD700; font-size: 1.5rem;"></i>
+                  {% elif loop.index == 2 %}
+                    <i class="bi bi-trophy-fill" style="color: #C0C0C0; font-size: 1.4rem;"></i>
+                  {% elif loop.index == 3 %}
+                    <i class="bi bi-trophy-fill" style="color: #CD7F32; font-size: 1.3rem;"></i>
+                  {% else %}
+                    <strong>{{ loop.index }}</strong>
+                  {% endif %}
+                {% else %}
+                  <strong>{{ loop.index }}</strong>
+                {% endif %}
+              </td>
+              <td style="text-align: left; font-weight: {% if loop.index <= 3 and ranking.tem_resultados %}700{% else %}600{% endif %}; font-size: {% if loop.index <= 3 and ranking.tem_resultados %}1.1rem{% else %}1rem{% endif %};">
+                {{ jogador.nome }}
+                {% if ranking.tem_resultados and loop.index == 1 %}
+                  <i class="bi bi-star-fill ms-2" style="color: #FFD700; font-size: 0.9rem;"></i>
+                {% endif %}
+              </td>
+              <td><span class="badge bg-success">{{ jogador.vitorias }}</span></td>
+              <td><span class="badge bg-danger">{{ jogador.derrotas }}</span></td>
+              <td>{{ jogador.percentual|default(jogador.percentual_vitorias|default(0)) }}%</td>
+              <td>
+                {% set saldo = jogador.saldo|default(jogador.saldo_games|default(0)) %}
+                {% if saldo > 0 %}
+                  <span class="text-success">+{{ saldo }}</span>
+                {% elif saldo < 0 %}
+                  <span class="text-danger">{{ saldo }}</span>
+                {% else %}
+                  <span class="text-muted">0</span>
+                {% endif %}
+              </td>
+              <td>{{ jogador.games_feitos }}</td>
+              <td>{{ jogador.games_sofridos }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+    {% endif %}
+
+  {% else %}
+    <!-- Ranking Masculino ou Feminino: ranking único -->
+    
+    <!-- Pódio para categoria individual (se houver resultados) -->
+    {% if ranking.tem_resultados and ranking.ranking and ranking.ranking|length >= 3 %}
+    <div class="glass-card mb-4 slide-in podio-container" style="animation-delay: 0.05s; background: linear-gradient(135deg, rgba(255, 215, 0, 0.1), rgba(212, 175, 55, 0.05));">
+      <h3 class="text-center mb-4" style="color: #FFD700; font-size: 1.4rem;">
+        <i class="bi bi-award-fill me-2"></i>
+        🏆 PÓDIO PREMIADO 🏆
+      </h3>
+      
+      <div class="row text-center">
+        <!-- 2º Lugar -->
+        <div class="col-md-4 mb-3">
+          <div class="p-3" style="background: linear-gradient(135deg, rgba(192, 192, 192, 0.2), rgba(169, 169, 169, 0.1)); border-radius: 12px; border: 2px solid #C0C0C0;">
+            <i class="bi bi-trophy-fill mb-2" style="color: #C0C0C0; font-size: 2rem;"></i>
+            <h4 style="color: #C0C0C0; font-size: 1.3rem; margin-bottom: 8px;">2º LUGAR</h4>
+            {% if ranking.ranking|length >= 2 %}
+              <p class="mb-1" style="font-size: 1.1rem; font-weight: 600;">
+                <i class="bi bi-person me-1"></i> {{ ranking.ranking[1].nome }}
+              </p>
+              <small class="text-muted">{{ ranking.ranking[1].vitorias }}V - {{ ranking.ranking[1].derrotas }}D</small>
+            {% endif %}
+          </div>
+        </div>
+        
+        <!-- 1º Lugar -->
+        <div class="col-md-4 mb-3">
+          <div class="p-3" style="background: linear-gradient(135deg, rgba(255, 215, 0, 0.3), rgba(212, 175, 55, 0.15)); border-radius: 12px; border: 3px solid #FFD700; box-shadow: 0 8px 24px rgba(255, 215, 0, 0.4); transform: translateY(-10px);">
+            <i class="bi bi-trophy-fill mb-2" style="color: #FFD700; font-size: 3rem;"></i>
+            <h4 style="color: #FFD700; font-size: 1.5rem; margin-bottom: 8px;">🥇 CAMPEÃO</h4>
+            {% if ranking.ranking|length >= 1 %}
+              <p class="mb-1" style="font-size: 1.2rem; font-weight: 700;">
+                <i class="bi bi-person me-1"></i> {{ ranking.ranking[0].nome }}
+                <i class="bi bi-star-fill ms-1" style="font-size: 0.9rem;"></i>
+              </p>
+              <small class="text-muted">{{ ranking.ranking[0].vitorias }}V - {{ ranking.ranking[0].derrotas }}D</small>
+            {% endif %}
+          </div>
+        </div>
+        
+        <!-- 3º Lugar -->
+        <div class="col-md-4 mb-3">
+          <div class="p-3" style="background: linear-gradient(135deg, rgba(205, 127, 50, 0.2), rgba(184, 115, 51, 0.1)); border-radius: 12px; border: 2px solid #CD7F32;">
+            <i class="bi bi-trophy-fill mb-2" style="color: #CD7F32; font-size: 2rem;"></i>
+            <h4 style="color: #CD7F32; font-size: 1.3rem; margin-bottom: 8px;">3º LUGAR</h4>
+            {% if ranking.ranking|length >= 3 %}
+              <p class="mb-1" style="font-size: 1.1rem; font-weight: 600;">
+                <i class="bi bi-person me-1"></i> {{ ranking.ranking[2].nome }}
+              </p>
+              <small class="text-muted">{{ ranking.ranking[2].vitorias }}V - {{ ranking.ranking[2].derrotas }}D</small>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+    {% endif %}
+    
+    {% if not ranking.tem_resultados %}
+    <div class="text-center mb-3" style="background: rgba(0, 0, 0, 0.4); border: 2px solid rgba(255, 255, 255, 0.6); border-radius: 8px; padding: 15px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);">
+      <i class="bi bi-info-circle me-2" style="color: #4da6ff; font-size: 1.3rem;"></i>
+      <strong style="color: #fff; font-size: 1.2rem; text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);">Lista de Inscritos</strong> <span style="color: #fff; font-size: 1.1rem; text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);">- Aguardando início do torneio</span>
+    </div>
+    {% endif %}
+    
+    {% if ranking.ranking and ranking.ranking|length > 0 %}
+    <div class="glass-card mb-4 slide-in">
+      <div class="table-responsive">
+        <table class="table table-hover ranking-table">
+          <thead>
+            <tr>
+              <th>Pos</th>
+              <th>Nome</th>
+              <th>V</th>
+              <th>D</th>
+              <th>%</th>
+              <th>Saldo</th>
+              <th>GF</th>
+              <th>GS</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for jogador in ranking.ranking %}
+            <tr {% if ranking.tem_resultados %}{% if loop.index == 1 %}class="position-1"{% elif loop.index == 2 %}class="position-2"{% elif loop.index == 3 %}class="position-3"{% endif %}{% endif %}>
+              <td class="ranking-position">
+                {% if ranking.tem_resultados %}
+                  {% if loop.index == 1 %}
+                    <i class="bi bi-trophy-fill" style="color: #FFD700; font-size: 1.5rem;"></i>
+                  {% elif loop.index == 2 %}
+                    <i class="bi bi-trophy-fill" style="color: #C0C0C0; font-size: 1.4rem;"></i>
+                  {% elif loop.index == 3 %}
+                    <i class="bi bi-trophy-fill" style="color: #CD7F32; font-size: 1.3rem;"></i>
+                  {% else %}
+                    <strong>{{ loop.index }}</strong>
+                  {% endif %}
+                {% else %}
+                  <strong>{{ loop.index }}</strong>
+                {% endif %}
+              </td>
+              <td style="text-align: left; font-weight: {% if loop.index <= 3 and ranking.tem_resultados %}700{% else %}600{% endif %}; font-size: {% if loop.index <= 3 and ranking.tem_resultados %}1.1rem{% else %}1rem{% endif %};">
+                {{ jogador.nome }}
+                {% if ranking.tem_resultados and loop.index == 1 %}
+                  <i class="bi bi-star-fill ms-2" style="color: #FFD700; font-size: 0.9rem;"></i>
+                {% endif %}
+              </td>
+              <td><span class="badge bg-success">{{ jogador.vitorias }}</span></td>
+              <td><span class="badge bg-danger">{{ jogador.derrotas }}</span></td>
+              <td>{{ jogador.percentual|default(jogador.percentual_vitorias|default(0)) }}%</td>
+              <td>
+                {% set saldo = jogador.saldo|default(jogador.saldo_games|default(0)) %}
+                {% if saldo > 0 %}
+                  <span class="text-success">+{{ saldo }}</span>
+                {% elif saldo < 0 %}
+                  <span class="text-danger">{{ saldo }}</span>
+                {% else %}
+                  <span class="text-muted">0</span>
+                {% endif %}
+              </td>
+              <td>{{ jogador.games_feitos }}</td>
+              <td>{{ jogador.games_sofridos }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+    {% else %}
+    <div class="glass-card text-center">
+      <p class="mb-0">
+        <i class="bi bi-info-circle me-2"></i>
+        Nenhum resultado registrado ainda para esta categoria.
+      </p>
+    </div>
+    {% endif %}
+
+  {% endif %}
+
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // Fix para selects no mobile: força posicionamento correto
+  const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+  if (isMobile) {
+    // Remove transformações de elementos que contêm selects
+    document.querySelectorAll('select.form-select').forEach(select => {
+      let parent = select.closest('.fade-in, .slide-in, .glass-card');
+      while (parent) {
+        parent.style.transform = 'none';
+        parent.style.willChange = 'auto';
+        parent = parent.parentElement?.closest('.fade-in, .slide-in');
+      }
+      // Garante que o select está no fluxo normal
+      select.style.position = 'relative';
+      select.style.zIndex = '1';
+    });
+  }
+  
+  const filtroCategoria = document.getElementById('filtroCategoria');
+  
+  // Filtro de categoria - redireciona para URL específica
+  if (filtroCategoria) {
+    filtroCategoria.addEventListener('change', function() {
+      const categoria = this.value;
+      if (categoria) {
+        // Redireciona para /ranking/<categoria>
+        window.location.href = '/ranking/' + categoria;
+      } else {
+        // Redireciona para /ranking (todas as categorias)
+        window.location.href = '/ranking';
+      }
+    });
+  }
+});
+</script>
+{% endblock %}
+

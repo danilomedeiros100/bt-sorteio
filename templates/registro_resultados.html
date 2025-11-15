@@ -9,306 +9,421 @@
   Registrar Resultados
 </h1>
 
-<div class="glass-card text-center mb-4 slide-in">
-  <p class="mb-2">
-    <i class="bi bi-info-circle me-2" style="color: var(--color-primary);"></i>
-    Insira os games de cada dupla. <strong>Mínimo de 6 games para vencer</strong> (ou 7 no tiebreak).
-  </p>
-  <p class="mb-0" style="color: var(--color-warning);">
-    <i class="bi bi-lightning-fill me-2"></i>
-    <small>O ranking será atualizado automaticamente após cada resultado!</small>
-  </p>
-</div>
-
-<!-- Filtro por Atleta -->
-<div class="glass-card mb-4 slide-in" style="animation-delay: 0.1s; background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.9)); border: 2px solid var(--color-primary); box-shadow: 0 8px 32px rgba(0, 123, 255, 0.2);">
-  <h3 class="text-center mb-3" style="color: #1a1a2e; font-size: 1.4rem; font-weight: 700;">
-    <i class="bi bi-funnel-fill me-2" style="color: var(--color-primary);"></i>
-    Filtrar por Atleta
-  </h3>
-  <div class="row justify-content-center">
-    <div class="col-md-6">
-      <select id="filtroAtleta" class="form-select form-select-lg" style="
-        background: white !important; 
-        color: #1a1a2e !important; 
-        border: 2px solid var(--color-primary) !important; 
-        font-weight: 600 !important;
-        font-size: 1.1rem !important;
-        padding: 12px 16px !important;
-        box-shadow: 0 4px 12px rgba(0, 123, 255, 0.15) !important;
-      ">
-        <option value="">👥 Todos os Jogos</option>
-        {% set todos_jogadores = [] %}
-        {% for rodada in dados.rodadas %}
-          {% for confronto in rodada.confrontos %}
-            {% if confronto.dupla1 %}
-              {% if confronto.dupla1.jogador1 not in todos_jogadores %}
-                {% set _ = todos_jogadores.append(confronto.dupla1.jogador1) %}
-              {% endif %}
-              {% if confronto.dupla1.jogador2 not in todos_jogadores %}
-                {% set _ = todos_jogadores.append(confronto.dupla1.jogador2) %}
-              {% endif %}
-            {% endif %}
-            {% if confronto.dupla2 %}
-              {% if confronto.dupla2.jogador1 not in todos_jogadores %}
-                {% set _ = todos_jogadores.append(confronto.dupla2.jogador1) %}
-              {% endif %}
-              {% if confronto.dupla2.jogador2 not in todos_jogadores %}
-                {% set _ = todos_jogadores.append(confronto.dupla2.jogador2) %}
-              {% endif %}
-            {% endif %}
-          {% endfor %}
-        {% endfor %}
-        {% for jogador in todos_jogadores|sort %}
-          <option value="{{ jogador }}">{{ jogador }}</option>
-        {% endfor %}
-      </select>
+{% if not todas_rodadas or (not todas_rodadas.mista and not todas_rodadas.masculino and not todas_rodadas.feminino) %}
+  <div class="glass-card text-center">
+    <i class="bi bi-exclamation-triangle" style="font-size: 3rem; color: var(--color-warning);"></i>
+    <h2 class="mt-3 mb-3">Nenhuma Rodada Gerada</h2>
+    <p class="text-muted">As rodadas ainda não foram geradas. Aguarde a administração gerar o sorteio.</p>
+    <a href="{{ url_for('index') }}" class="btn-primary-custom mt-3">
+      <i class="bi bi-house-fill me-2"></i>
+      Voltar para Início
+    </a>
+  </div>
+  
+{% else %}
+  
+  <!-- Seletor de Categoria -->
+  <div class="glass-card mb-4 slide-in">
+    <div class="row justify-content-center">
+      <div class="col-md-6">
+        <label for="seletorCategoria" class="form-label text-center d-block mb-3" style="color: var(--color-text); font-size: 1.2rem; font-weight: 600;">
+          <i class="bi bi-funnel-fill me-2" style="color: var(--color-primary);"></i>
+          Selecionar Categoria
+        </label>
+        <select id="seletorCategoria" class="form-select form-select-lg" 
+                style="background: white !important; color: #1a1a2e !important; border: 2px solid var(--color-primary) !important; font-weight: 600 !important; font-size: 1.1rem !important; padding: 12px 16px !important; box-shadow: 0 4px 12px rgba(0, 123, 255, 0.15) !important;">
+          {% if todas_rodadas.mista %}
+          <option value="mista" {% if categoria_selecionada == 'mista' %}selected{% endif %}>Mista</option>
+          {% endif %}
+          
+          {% if todas_rodadas.masculino %}
+          <option value="masculino" {% if categoria_selecionada == 'masculino' %}selected{% endif %}>Masculino</option>
+          {% endif %}
+          
+          {% if todas_rodadas.feminino %}
+          <option value="feminino" {% if categoria_selecionada == 'feminino' %}selected{% endif %}>Feminino</option>
+          {% endif %}
+        </select>
+      </div>
     </div>
   </div>
-  <p class="text-center mt-3 mb-0" style="color: #555; font-weight: 500;">
-    <small>
-      <i class="bi bi-info-circle me-1" style="color: var(--color-primary);"></i>
-      Selecione seu nome para ver apenas seus jogos
-    </small>
-  </p>
-</div>
 
-{% for rodada in dados.rodadas %}
-  <div class="glass-card mb-4 slide-in" style="animation-delay: {{ 0.1 * loop.index }}s;">
-    <h2 class="text-center mb-4" style="color: var(--color-accent); font-size: 1.6rem;">
-      <i class="bi bi-circle-fill me-2" style="font-size: 0.7rem;"></i>
-      RODADA {{ rodada.numero }}
-    </h2>
+  <div class="glass-card text-center mb-4 slide-in">
+    <p class="mb-2">
+      <i class="bi bi-info-circle me-2" style="color: var(--color-primary);"></i>
+      Insira os games de cada dupla. <strong>Mínimo de 6 games para vencer</strong> (ou 7 no tiebreak).
+    </p>
+    <p class="mb-0" style="color: var(--color-warning);">
+      <i class="bi bi-lightning-fill me-2"></i>
+      <small>O ranking será atualizado automaticamente após cada resultado!</small>
+    </p>
+  </div>
+
+  <!-- Conteúdo das Categorias -->
+  <div id="categoriaContent">
     
-    {% for confronto in rodada.confrontos %}
-      {% set jogadores_confronto = [] %}
-      {% if confronto.dupla1 %}
-        {% set _ = jogadores_confronto.append(confronto.dupla1.jogador1) %}
-        {% set _ = jogadores_confronto.append(confronto.dupla1.jogador2) %}
-      {% endif %}
-      {% if confronto.dupla2 %}
-        {% set _ = jogadores_confronto.append(confronto.dupla2.jogador1) %}
-        {% set _ = jogadores_confronto.append(confronto.dupla2.jogador2) %}
-      {% endif %}
-      <div class="matchup-container mb-3 confronto-item" data-jogadores="{{ jogadores_confronto|join(',') }}">
-        <div class="matchup-quadra">
-          <span class="badge">
-            <i class="bi bi-geo-alt-fill me-1"></i>
-            Quadra {{ confronto.quadra }}
-          </span>
-        </div>
+    {% for categoria_nome in ["mista", "masculino", "feminino"] %}
+      {% set dados = todas_rodadas[categoria_nome] %}
+      {% if dados %}
+      <div class="categoria-panel {% if categoria_selecionada == categoria_nome %}active{% else %}d-none{% endif %}" 
+           id="{{ categoria_nome }}-panel" 
+           data-categoria="{{ categoria_nome }}">
         
-        <form class="resultado-form" data-rodada="{{ rodada.numero }}" data-confronto="{{ loop.index0 }}">
-          <!-- Confronto na mesma linha -->
-          <div class="d-flex flex-wrap align-items-center justify-content-center gap-2 mb-3">
-            <!-- Input Dupla 1 -->
-            <input 
-              type="number" 
-              class="form-control text-center fw-bold" 
-              name="games_dupla1" 
-              min="0" 
-              max="7" 
-              value="{{ confronto.resultado.games_dupla1 if confronto.resultado.finalizado else '' }}" 
-              required
-              placeholder="0"
-              style="width: 60px; height: 50px; font-size: 1.3rem; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: var(--color-text);"
-            >
-            
-            <!-- Dupla 1 -->
-            <div style="font-weight: 600; color: var(--color-text);">
-              {{ confronto.dupla1.jogador1 }} <span style="color: rgba(255,255,255,0.5);">&</span> {{ confronto.dupla1.jogador2 }}
+        <!-- Filtro por Atleta -->
+        <div class="glass-card mb-4 slide-in categoria-content" 
+             data-categoria="{{ categoria_nome }}"
+             style="animation-delay: 0.1s; background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.9)); border: 2px solid var(--color-primary); box-shadow: 0 8px 32px rgba(0, 123, 255, 0.2);">
+          <h3 class="text-center mb-3" style="color: #1a1a2e; font-size: 1.4rem; font-weight: 700;">
+            <i class="bi bi-funnel-fill me-2" style="color: var(--color-primary);"></i>
+            Filtrar por Atleta
+          </h3>
+          <div class="row justify-content-center">
+            <div class="col-md-6">
+              <select class="form-select form-select-lg filtro-atleta" 
+                      data-categoria="{{ categoria_nome }}"
+                      style="background: white !important; color: #1a1a2e !important; border: 2px solid var(--color-primary) !important; font-weight: 600 !important; font-size: 1.1rem !important; padding: 12px 16px !important; box-shadow: 0 4px 12px rgba(0, 123, 255, 0.15) !important;">
+                <option value="">Todos os Jogos</option>
+                {% set todos_jogadores = [] %}
+                {% for rodada in dados.rodadas %}
+                  {% for confronto in rodada.confrontos %}
+                    {% if confronto.dupla1 %}
+                      {% if confronto.dupla1.jogador1 not in todos_jogadores %}
+                        {% set _ = todos_jogadores.append(confronto.dupla1.jogador1) %}
+                      {% endif %}
+                      {% if confronto.dupla1.jogador2 not in todos_jogadores %}
+                        {% set _ = todos_jogadores.append(confronto.dupla1.jogador2) %}
+                      {% endif %}
+                    {% endif %}
+                    {% if confronto.dupla2 %}
+                      {% if confronto.dupla2.jogador1 not in todos_jogadores %}
+                        {% set _ = todos_jogadores.append(confronto.dupla2.jogador1) %}
+                      {% endif %}
+                      {% if confronto.dupla2.jogador2 not in todos_jogadores %}
+                        {% set _ = todos_jogadores.append(confronto.dupla2.jogador2) %}
+                      {% endif %}
+                    {% endif %}
+                  {% endfor %}
+                {% endfor %}
+                {% for jogador in todos_jogadores|sort %}
+                  <option value="{{ jogador }}">{{ jogador }}</option>
+                {% endfor %}
+              </select>
             </div>
-            
-            <!-- VS -->
-            <div class="matchup-vs">VS</div>
-            
-            <!-- Dupla 2 -->
-            <div style="font-weight: 600; color: var(--color-text);">
-              {{ confronto.dupla2.jogador1 }} <span style="color: rgba(255,255,255,0.5);">&</span> {{ confronto.dupla2.jogador2 }}
-            </div>
-            
-            <!-- Input Dupla 2 -->
-            <input 
-              type="number" 
-              class="form-control text-center fw-bold" 
-              name="games_dupla2" 
-              min="0" 
-              max="7" 
-              value="{{ confronto.resultado.games_dupla2 if confronto.resultado.finalizado else '' }}" 
-              required
-              placeholder="0"
-              style="width: 60px; height: 50px; font-size: 1.3rem; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: var(--color-text);"
-            >
           </div>
-          
-          <!-- Botão -->
-          <div class="text-center">
-            <button type="submit" class="btn-primary-custom btn-success w-100">
-              {% if confronto.resultado.finalizado %}
-                <i class="bi bi-pencil me-2"></i>
-                Atualizar Resultado
-              {% else %}
-                <i class="bi bi-check-circle me-2"></i>
-                Salvar Resultado
+          <p class="text-center mt-3 mb-0" style="color: #555; font-weight: 500;">
+            <small>
+              <i class="bi bi-info-circle me-1" style="color: var(--color-primary);"></i>
+              Selecione seu nome para ver apenas seus jogos
+            </small>
+          </p>
+        </div>
+
+        <!-- Rodadas -->
+        {% for rodada in dados.rodadas %}
+          <div class="glass-card mb-4 slide-in rodada-card categoria-{{ categoria_nome }}" style="animation-delay: {{ 0.1 * loop.index }}s;">
+            <h2 class="text-center mb-4" style="color: var(--color-accent); font-size: 1.6rem;">
+              <i class="bi bi-circle-fill me-2" style="font-size: 0.7rem;"></i>
+              RODADA {{ rodada.numero }}
+            </h2>
+            
+            {% for confronto in rodada.confrontos %}
+              {% set jogadores_confronto = [] %}
+              {% if confronto.dupla1 %}
+                {% set _ = jogadores_confronto.append(confronto.dupla1.jogador1) %}
+                {% set _ = jogadores_confronto.append(confronto.dupla1.jogador2) %}
               {% endif %}
-            </button>
+              {% if confronto.dupla2 %}
+                {% set _ = jogadores_confronto.append(confronto.dupla2.jogador1) %}
+                {% set _ = jogadores_confronto.append(confronto.dupla2.jogador2) %}
+              {% endif %}
+              
+              <div class="matchup-container mb-3 confronto-item categoria-{{ categoria_nome }}" data-jogadores="{{ jogadores_confronto|join(',') }}">
+                <div class="matchup-quadra">
+                  <span class="badge">
+                    <i class="bi bi-geo-alt-fill me-1"></i>
+                    Quadra {{ confronto.quadra }}
+                  </span>
+                </div>
+                
+                <form class="resultado-form" data-rodada="{{ rodada.numero }}" data-confronto="{{ loop.index0 }}" data-categoria="{{ categoria_nome }}">
+                  <!-- Confronto na mesma linha -->
+                  <div class="d-flex flex-wrap align-items-center justify-content-center gap-2 mb-3">
+                    <!-- Input Dupla 1 -->
+                    <input 
+                      type="number" 
+                      class="form-control text-center fw-bold" 
+                      name="games_dupla1" 
+                      min="0" 
+                      max="7" 
+                      value="{{ confronto.resultado.games_dupla1 if confronto.resultado and confronto.resultado.finalizado else '' }}" 
+                      required
+                      placeholder="0"
+                      style="width: 60px; height: 50px; font-size: 1.3rem; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: var(--color-text);"
+                    >
+                    
+                    <!-- Dupla 1 -->
+                    <div style="font-weight: 600; color: var(--color-text);">
+                      {{ confronto.dupla1.jogador1 }} <span style="color: rgba(255,255,255,0.5);">&</span> {{ confronto.dupla1.jogador2 }}
+                    </div>
+                    
+                    <!-- VS -->
+                    <div class="matchup-vs">VS</div>
+                    
+                    <!-- Dupla 2 -->
+                    {% if confronto.dupla2 %}
+                    <div style="font-weight: 600; color: var(--color-text);">
+                      {{ confronto.dupla2.jogador1 }} <span style="color: rgba(255,255,255,0.5);">&</span> {{ confronto.dupla2.jogador2 }}
+                    </div>
+                    {% else %}
+                    <div style="font-weight: 600; color: var(--color-text-muted); opacity: 0.6;">
+                      <span>Sem adversário (BYE)</span>
+                    </div>
+                    {% endif %}
+                    
+                    <!-- Input Dupla 2 -->
+                    {% if confronto.dupla2 %}
+                    <input 
+                      type="number" 
+                      class="form-control text-center fw-bold" 
+                      name="games_dupla2" 
+                      min="0" 
+                      max="7" 
+                      value="{{ confronto.resultado.games_dupla2 if confronto.resultado and confronto.resultado.finalizado else '' }}" 
+                      required
+                      placeholder="0"
+                      style="width: 60px; height: 50px; font-size: 1.3rem; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: var(--color-text);"
+                    >
+                    {% else %}
+                    <input 
+                      type="hidden" 
+                      name="games_dupla2" 
+                      value="0"
+                    >
+                    {% endif %}
+                  </div>
+                  
+                  <!-- Botão -->
+                  <div class="text-center">
+                    <button type="submit" class="btn-primary-custom btn-success w-100">
+                      {% if confronto.resultado and confronto.resultado.finalizado %}
+                        <i class="bi bi-pencil me-2"></i>
+                        Atualizar Resultado
+                      {% else %}
+                        <i class="bi bi-check-circle me-2"></i>
+                        Salvar Resultado
+                      {% endif %}
+                    </button>
+                  </div>
+                </form>
+              </div>
+            {% endfor %}
           </div>
-        </form>
+        {% endfor %}
+
+        <!-- Botões no final -->
+        <div class="text-center mb-4">
+          <a href="{{ url_for('rota_ver_rodadas', categoria=categoria_nome) }}" class="btn-primary-custom me-2">
+            <i class="bi bi-calendar-event me-2"></i>
+            Ver Todas as Rodadas
+          </a>
+          <a href="{{ url_for('rota_ranking_por_categoria', categoria=categoria_nome) }}" class="btn-primary-custom btn-accent">
+            <i class="bi bi-bar-chart-fill me-2"></i>
+            Ver Ranking
+          </a>
+        </div>
       </div>
+      {% endif %}
     {% endfor %}
   </div>
-{% endfor %}
 
-<div class="text-center mb-4">
-  <a href="{{ url_for('rota_ver_rodadas') }}" class="btn-primary-custom me-2">
-    <i class="bi bi-calendar-event me-2"></i>
-    Ver Todas as Rodadas
-  </a>
-  <a href="{{ url_for('rota_ranking_individual') }}" class="btn-primary-custom btn-accent">
-    <i class="bi bi-bar-chart-fill me-2"></i>
-    Ver Ranking
-  </a>
-</div>
-
-<div style="height: 70px;"></div>
+  <div class="text-center mb-4">
+    <a href="{{ url_for('index') }}" class="btn-primary-custom">
+      <i class="bi bi-house-fill me-2"></i>
+      Voltar para Início
+    </a>
+  </div>
+  
+  <div style="height: 70px;"></div>
+  
+{% endif %}
 
 </div>
 {% endblock %}
 
 {% block scripts %}
 <script>
-// ========== FILTRO POR ATLETA ==========
-const filtroAtleta = document.getElementById('filtroAtleta');
-const confrontosItens = document.querySelectorAll('.confronto-item');
-const rodadasCards = document.querySelectorAll('.glass-card');
-
-if (filtroAtleta) {
-  filtroAtleta.addEventListener('change', function() {
-    const atletaSelecionado = this.value.trim();
-    
-    if (!atletaSelecionado) {
-      // Mostrar todos
-      confrontosItens.forEach(item => item.style.display = 'block');
-      rodadasCards.forEach(card => {
-        if (card.querySelector('.confronto-item')) {
-          card.style.display = 'block';
-        }
-      });
-      return;
-    }
-    
-    // Filtrar por atleta
-    let rodadasVisiveis = new Set();
-    
-    confrontosItens.forEach(item => {
-      const jogadores = item.dataset.jogadores || '';
-      const jogadoresArray = jogadores.split(',').map(j => j.trim());
-      
-      if (jogadoresArray.includes(atletaSelecionado)) {
-        item.style.display = 'block';
-        // Marca a rodada como visível
-        const rodadaCard = item.closest('.glass-card');
-        if (rodadaCard) {
-          rodadasVisiveis.add(rodadaCard);
-        }
-      } else {
-        item.style.display = 'none';
-      }
-    });
-    
-    // Mostrar/ocultar rodadas vazias
-    rodadasCards.forEach(card => {
-      if (card.querySelector('.confronto-item')) {
-        if (rodadasVisiveis.has(card)) {
-          card.style.display = 'block';
-        } else {
-          card.style.display = 'none';
-        }
-      }
-    });
+function mostrarCategoria(categoria) {
+  // Atualiza URL sem recarregar a página
+  const url = new URL(window.location);
+  url.searchParams.set('categoria', categoria);
+  window.history.pushState({}, '', url);
+  
+  // Esconde todos os painéis
+  document.querySelectorAll('.categoria-panel').forEach(panel => {
+    panel.classList.add('d-none');
+    panel.classList.remove('active');
   });
+  
+  // Mostra o painel selecionado
+  const painelSelecionado = document.getElementById(categoria + '-panel');
+  if (painelSelecionado) {
+    painelSelecionado.classList.remove('d-none');
+    painelSelecionado.classList.add('active');
+  }
+  
+  // Reseta filtros
+  document.querySelectorAll('.filtro-atleta').forEach(select => {
+    select.value = '';
+  });
+  
+  // Aplica filtro se houver
+  aplicarFiltro(categoria);
 }
 
-// ========== FORMULÁRIOS DE RESULTADO ==========
-document.querySelectorAll('.resultado-form').forEach(form => {
-  form.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    
-    const formData = new FormData(form);
-    const rodada = form.dataset.rodada;
-    const confronto = form.dataset.confronto;
-    
-    const games1 = parseInt(formData.get('games_dupla1'));
-    const games2 = parseInt(formData.get('games_dupla2'));
-    
-    // Validação básica
-    if (games1 < 0 || games2 < 0) {
-      alert('❌ Games não podem ser negativos!');
-      return;
-    }
-    
-    if (games1 < 6 && games2 < 6) {
-      alert('❌ Pelo menos uma dupla deve ter 6 ou mais games!');
-      return;
-    }
-    
-    if (games1 > 7 || games2 > 7) {
-      alert('❌ Máximo de 7 games no tiebreak!');
-      return;
-    }
-    
-    // Salva via fetch
-    try {
-      const btn = form.querySelector('button[type="submit"]');
-      const originalText = btn.innerHTML;
-      btn.disabled = true;
-      btn.innerHTML = '<i class="bi bi-hourglass-split me-2"></i> Salvando...';
+function aplicarFiltro(categoria) {
+  const filtro = document.querySelector(`.filtro-atleta[data-categoria="${categoria}"]`);
+  if (!filtro) return;
+  
+  const atletaSelecionado = filtro.value;
+  const categoriaContainer = document.getElementById(categoria + '-panel');
+  
+  if (!categoriaContainer) return;
+  
+  if (atletaSelecionado === '') {
+    // Mostrar todos os jogos
+    categoriaContainer.querySelectorAll('.confronto-item, .rodada-card').forEach(el => {
+      if (el.classList.contains('categoria-' + categoria)) {
+        el.style.display = '';
+      }
+    });
+  } else {
+    // Filtrar por atleta
+    categoriaContainer.querySelectorAll('.rodada-card.categoria-' + categoria).forEach(rodadaCard => {
+      let temJogoDoAtleta = false;
       
-      const response = await fetch('/salvar-resultado', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: new URLSearchParams({
-          rodada: rodada,
-          confronto: confronto,
-          games_dupla1: games1,
-          games_dupla2: games2
-        })
+      rodadaCard.querySelectorAll('.confronto-item').forEach(confronto => {
+        const jogadores = confronto.dataset.jogadores.split(',');
+        if (jogadores.includes(atletaSelecionado)) {
+          confronto.style.display = '';
+          temJogoDoAtleta = true;
+        } else {
+          confronto.style.display = 'none';
+        }
       });
       
-      const data = await response.json();
-      
-      if (data.erro) {
-        alert('❌ Erro: ' + data.erro);
-        btn.disabled = false;
-        btn.innerHTML = originalText;
+      if (temJogoDoAtleta) {
+        rodadaCard.style.display = '';
       } else {
-        // Atualizar visual sem recarregar
-        btn.innerHTML = '<i class="bi bi-check-circle me-2"></i> Salvo com Sucesso!';
-        btn.classList.remove('btn-success');
-        btn.style.background = 'var(--color-success)';
-        btn.style.cursor = 'default';
+        rodadaCard.style.display = 'none';
+      }
+    });
+  }
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  // Inicializa categoria ativa
+  const categoriaAtiva = '{{ categoria_selecionada or "mista" }}';
+  mostrarCategoria(categoriaAtiva);
+  
+  // Event listener para seletor de categoria
+  const seletorCategoria = document.getElementById('seletorCategoria');
+  if (seletorCategoria) {
+    seletorCategoria.addEventListener('change', function() {
+      mostrarCategoria(this.value);
+    });
+  }
+  
+  // Event listeners para filtros
+  document.querySelectorAll('.filtro-atleta').forEach(select => {
+    select.addEventListener('change', function() {
+      const categoria = this.dataset.categoria;
+      aplicarFiltro(categoria);
+    });
+  });
+
+  // ========== FORMULÁRIOS DE RESULTADO ==========
+  document.querySelectorAll('.resultado-form').forEach(form => {
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const formData = new FormData(form);
+      const rodada = form.dataset.rodada;
+      const confronto = form.dataset.confronto;
+      const categoria = form.dataset.categoria || 'mista';
+      
+      const games1 = parseInt(formData.get('games_dupla1'));
+      const games2 = parseInt(formData.get('games_dupla2')) || 0;
+      
+      // Validação básica
+      if (games1 < 0 || games2 < 0) {
+        alert('❌ Games não podem ser negativos!');
+        return;
+      }
+      
+      if (games1 < 6 && games2 < 6) {
+        alert('❌ Pelo menos uma dupla deve ter 6 ou mais games!');
+        return;
+      }
+      
+      if (games1 > 7 || games2 > 7) {
+        alert('❌ Máximo de 7 games no tiebreak!');
+        return;
+      }
+      
+      // Salva via fetch
+      try {
+        const btn = form.querySelector('button[type="submit"]');
+        const originalText = btn.innerHTML;
+        btn.disabled = true;
+        btn.innerHTML = '<i class="bi bi-hourglass-split me-2"></i> Salvando...';
         
-        // Desabilitar inputs após salvar
-        form.querySelectorAll('input[type="number"]').forEach(input => {
-          input.style.background = 'rgba(6, 214, 160, 0.2)';
-          input.style.borderColor = 'var(--color-success)';
+        const response = await fetch('/salvar-resultado', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+          body: new URLSearchParams({
+            categoria: categoria,
+            rodada: rodada,
+            confronto: confronto,
+            games_dupla1: games1,
+            games_dupla2: games2
+          })
         });
         
-        // Feedback visual
-        const matchupContainer = form.closest('.matchup-container');
-        matchupContainer.style.background = 'rgba(6, 214, 160, 0.1)';
-        matchupContainer.style.borderLeft = '4px solid var(--color-success)';
+        const data = await response.json();
         
-        // Mostrar mensagem de sucesso
-        setTimeout(() => {
-          btn.innerHTML = '<i class="bi bi-pencil me-2"></i> Atualizar Resultado';
+        if (data.erro) {
+          alert('❌ Erro: ' + data.erro);
           btn.disabled = false;
-        }, 2000);
+          btn.innerHTML = originalText;
+        } else {
+          // Atualizar visual sem recarregar
+          btn.innerHTML = '<i class="bi bi-check-circle me-2"></i> Salvo com Sucesso!';
+          btn.classList.remove('btn-success');
+          btn.style.background = 'var(--color-success)';
+          btn.style.cursor = 'default';
+          
+          // Desabilitar inputs após salvar
+          form.querySelectorAll('input[type="number"]').forEach(input => {
+            input.style.background = 'rgba(6, 214, 160, 0.2)';
+            input.style.borderColor = 'var(--color-success)';
+          });
+          
+          // Feedback visual
+          const matchupContainer = form.closest('.matchup-container');
+          matchupContainer.style.background = 'rgba(6, 214, 160, 0.1)';
+          matchupContainer.style.borderLeft = '4px solid var(--color-success)';
+          
+          // Mostrar mensagem de sucesso
+          setTimeout(() => {
+            btn.innerHTML = '<i class="bi bi-pencil me-2"></i> Atualizar Resultado';
+            btn.disabled = false;
+          }, 2000);
+        }
+      } catch (error) {
+        alert('❌ Erro ao salvar resultado!');
+        console.error(error);
       }
-    } catch (error) {
-      alert('❌ Erro ao salvar resultado!');
-      console.error(error);
-    }
+    });
   });
 });
 </script>

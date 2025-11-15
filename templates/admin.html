@@ -2,65 +2,198 @@
 {% block title %}Administração{% endblock %}
 
 {% block content %}
+<style>
+  /* Estilos específicos para mobile no painel admin */
+  @media (max-width: 768px) {
+    .admin-panel-title {
+      font-size: 2rem !important;
+      margin-bottom: 2rem !important;
+    }
+    
+    .admin-panel-title i {
+      font-size: 2rem !important;
+    }
+    
+    .admin-glass-card {
+      max-width: 95% !important;
+      padding: 1.5rem !important;
+    }
+    
+    .admin-btn {
+      font-size: 1.2rem !important;
+      padding: 18px 24px !important;
+      min-height: 60px !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+    }
+    
+    .admin-btn i {
+      font-size: 1.4rem !important;
+      margin-right: 12px !important;
+    }
+    
+    .admin-gap {
+      gap: 1rem !important;
+    }
+    
+    .admin-footer {
+      font-size: 1.1rem !important;
+      margin-top: 3rem !important;
+    }
+    
+    .admin-footer i {
+      font-size: 1.3rem !important;
+    }
+    
+    .admin-footer small {
+      font-size: 1rem !important;
+    }
+    
+    .admin-hr {
+      margin: 1.5rem 0 !important;
+      border-width: 2px !important;
+    }
+  }
+  
+  /* Estilos para desktop também melhorados */
+  .admin-btn {
+    font-size: 1.1rem;
+    padding: 16px 20px;
+    min-height: 56px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+  }
+  
+  .admin-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 123, 255, 0.3);
+  }
+  
+  .admin-btn i {
+    font-size: 1.2rem;
+  }
+</style>
+
 <div class="fade-in text-center" style="min-height: 70vh; display: flex; flex-direction: column; justify-content: center; padding-top: 40px;">
   
-  <h1 class="app-title mb-4">
+  <h1 class="app-title mb-4 admin-panel-title">
     <i class="bi bi-gear-fill me-2" style="color: var(--color-accent);"></i>
     Painel Administrativo
   </h1>
   
-  <div class="glass-card" style="max-width: 600px; margin: 0 auto;">
-    <div class="d-grid gap-3">
+  <!-- Bloco Superior: Visualização e Operações (Sempre visível) -->
+  <div class="glass-card admin-glass-card mb-4" style="max-width: 600px; margin: 0 auto;">
+    <h3 class="text-center mb-3" style="color: var(--color-accent); font-size: 1.3rem; font-weight: 600;">
+      <i class="bi bi-eye-fill me-2"></i>
+      Visualização e Operações
+    </h3>
+    <div class="d-grid admin-gap" style="gap: 1rem;">
       
-      <a href="{{ url_for('presenca') }}" class="btn-primary-custom btn-block">
-        <i class="bi bi-people-fill me-2"></i>
-        Gerenciar Jogadores
-      </a>
-      
-      <a href="{{ url_for('rota_gerar_sorteio') }}" class="btn-primary-custom btn-block" style="background: linear-gradient(135deg, var(--color-primary), var(--color-accent));">
-        <i class="bi bi-shuffle me-2"></i>
-        Gerar Sorteio
-      </a>
-      
-      <a href="{{ url_for('rota_ver_rodadas') }}" class="btn-primary-custom btn-block">
+      <a href="{{ url_for('rota_ver_rodadas') }}" class="btn-primary-custom btn-block admin-btn">
         <i class="bi bi-calendar-event me-2"></i>
-        Ver Rodadas
+        <span>Ver Rodadas</span>
       </a>
       
-      <a href="{{ url_for('rota_registro_resultados') }}" class="btn-primary-custom btn-success btn-block">
-        <i class="bi bi-pencil-square me-2"></i>
-        Registrar Resultados
-      </a>
-      
-      <a href="{{ url_for('rota_ranking_individual') }}" class="btn-primary-custom btn-accent btn-block">
+      <a href="{{ url_for('rota_ranking_individual') }}" class="btn-primary-custom btn-accent btn-block admin-btn">
         <i class="bi bi-bar-chart-fill me-2"></i>
-        Ver Ranking
+        <span>Ver Ranking</span>
       </a>
       
-      <a href="{{ url_for('admin_visitas') }}" class="btn-primary-custom btn-block" style="background: var(--color-secondary);">
+      <a href="{{ url_for('rota_registro_resultados') }}" class="btn-primary-custom btn-success btn-block admin-btn">
+        <i class="bi bi-pencil-square me-2"></i>
+        <span>Registrar Resultados</span>
+      </a>
+      
+      <a href="{{ url_for('admin_visitas') }}" class="btn-primary-custom btn-block admin-btn" style="background: var(--color-secondary);">
         <i class="bi bi-graph-up-arrow me-2"></i>
-        Estatísticas de Visitas
+        <span>Estatísticas de Visitas</span>
       </a>
       
-      <hr style="border-color: rgba(255, 255, 255, 0.2); margin: 20px 0;">
-      
-      <a href="{{ url_for('rota_resetar_rodadas') }}" 
-         class="btn-primary-custom btn-block" 
-         style="background: var(--color-danger);" 
-         onclick="return confirm('⚠️ Tem certeza? Isso apagará TODAS as rodadas e resultados!')">
-        <i class="bi bi-arrow-clockwise me-2"></i>
-        Resetar Tudo
-      </a>
-      
-      <a href="{{ url_for('index') }}" class="btn-primary-custom btn-block" style="background: rgba(255,255,255,0.1);">
+      <a href="{{ url_for('index') }}" class="btn-primary-custom btn-block admin-btn" style="background: rgba(255,255,255,0.1);">
         <i class="bi bi-house-fill me-2"></i>
-        Página Inicial
+        <span>Página Inicial</span>
       </a>
       
     </div>
   </div>
 
-  <div class="mt-5 text-muted fade-in" style="animation-delay: 0.3s;">
+  <!-- Bloco Inferior: Configuração e Administração (Requer senha) -->
+  {% if not senha_valida %}
+  <div class="glass-card admin-glass-card" style="max-width: 500px; margin: 0 auto;">
+    <h3 class="text-center mb-4" style="color: var(--color-accent); font-size: 1.5rem; font-weight: 600;">
+      <i class="bi bi-shield-lock-fill me-2"></i>
+      Acesso Restrito
+    </h3>
+    
+    {% if erro %}
+    <div class="alert alert-danger mb-3">
+      <i class="bi bi-exclamation-triangle-fill me-2"></i>
+      {{ erro }}
+    </div>
+    {% endif %}
+    
+    <p class="text-center mb-4" style="color: var(--color-text);">
+      Para acessar as opções de <strong>Configuração e Administração</strong>, digite a senha:
+    </p>
+    
+    <form method="POST" action="{{ url_for('admin') }}">
+      <div class="mb-4">
+        <label for="senha" class="form-label text-start d-block mb-2" style="color: var(--color-text); font-weight: 600;">
+          <i class="bi bi-key-fill me-2" style="color: var(--color-primary);"></i>
+          Senha administrativa:
+        </label>
+        <input 
+          type="password" 
+          class="form-control form-control-lg" 
+          id="senha" 
+          name="senha" 
+          placeholder="Digite a senha"
+          required
+          autofocus
+          style="font-size: 1.2rem; padding: 15px; text-align: center;"
+        >
+      </div>
+      
+      <button type="submit" class="btn-primary-custom btn-block admin-btn" style="width: 100%;">
+        <i class="bi bi-unlock-fill me-2"></i>
+        <span>Validar Senha</span>
+      </button>
+    </form>
+  </div>
+  {% else %}
+  <div class="glass-card admin-glass-card" style="max-width: 600px; margin: 0 auto;">
+    <h3 class="text-center mb-3" style="color: var(--color-accent); font-size: 1.3rem; font-weight: 600;">
+      <i class="bi bi-gear-fill me-2"></i>
+      Configuração e Administração
+    </h3>
+    <div class="d-grid admin-gap" style="gap: 1rem;">
+      
+      <a href="{{ url_for('presenca') }}" class="btn-primary-custom btn-block admin-btn">
+        <i class="bi bi-people-fill me-2"></i>
+        <span>Gerenciar Jogadores</span>
+      </a>
+      
+      <a href="{{ url_for('gerar_sorteio') }}" class="btn-primary-custom btn-accent btn-block admin-btn">
+        <i class="bi bi-shuffle me-2"></i>
+        <span>Gerar Sorteio</span>
+      </a>
+      
+      <a href="{{ url_for('rota_resetar_rodadas') }}" 
+         class="btn-primary-custom btn-block admin-btn" 
+         style="background: var(--color-danger);" 
+         onclick="return confirm('⚠️ Tem certeza? Isso apagará TODAS as rodadas e resultados!')">
+        <i class="bi bi-arrow-clockwise me-2"></i>
+        <span>Resetar Tudo</span>
+      </a>
+      
+    </div>
+  </div>
+  {% endif %}
+
+  <div class="mt-5 text-muted fade-in admin-footer" style="animation-delay: 0.3s;">
     <p class="mb-1">
       <i class="bi bi-volleyball me-2"></i>
       Sistema de 5 Rodadas com Duplas Mistas

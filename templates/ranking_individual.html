@@ -6,16 +6,91 @@
 
 <h1 class="text-center app-title mb-4">
   <i class="bi bi-trophy-fill me-2" style="color: var(--color-accent);"></i>
-  Ranking
+  Ranking {% if categoria == "masculino" %}- Masculino{% elif categoria == "feminino" %}- Feminino{% else %}- Mista{% endif %}
 </h1>
 
+<!-- Modal de Seleção de Categoria -->
+{% if mostrar_modal and categorias_disponiveis %}
+<div class="modal fade show" id="modalCategoria" tabindex="-1" aria-labelledby="modalCategoriaLabel" aria-modal="true" role="dialog" style="display: block;">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content glass-card" style="background: rgba(26, 26, 46, 0.95); border: 2px solid var(--color-primary);">
+      <div class="modal-header" style="border-bottom: 1px solid rgba(255, 255, 255, 0.1);">
+        <h5 class="modal-title" id="modalCategoriaLabel" style="color: var(--color-text); font-size: 1.5rem;">
+          <i class="bi bi-trophy-fill me-2" style="color: var(--color-accent);"></i>
+          Selecionar Categoria
+        </h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close" onclick="fecharModal()"></button>
+      </div>
+      <div class="modal-body text-center" style="padding: 2rem;">
+        <p class="mb-4" style="color: var(--color-text); font-size: 1.1rem;">
+          Escolha a categoria para visualizar o ranking:
+        </p>
+        <div class="d-grid gap-3">
+          {% if "mista" in categorias_disponiveis %}
+          <a href="{{ url_for('rota_ranking_por_categoria', categoria='mista') }}" class="btn btn-primary btn-lg" style="padding: 1rem; font-size: 1.2rem;">
+            <i class="bi bi-people-fill me-2"></i>
+            Mista
+          </a>
+          {% endif %}
+          
+          {% if "masculino" in categorias_disponiveis %}
+          <a href="{{ url_for('rota_ranking_por_categoria', categoria='masculino') }}" class="btn btn-primary btn-lg" style="padding: 1rem; font-size: 1.2rem;">
+            <i class="bi bi-person-fill me-2"></i>
+            Masculino
+          </a>
+          {% endif %}
+          
+          {% if "feminino" in categorias_disponiveis %}
+          <a href="{{ url_for('rota_ranking_por_categoria', categoria='feminino') }}" class="btn btn-primary btn-lg" style="padding: 1rem; font-size: 1.2rem;">
+            <i class="bi bi-person-heart me-2"></i>
+            Feminino
+          </a>
+          {% endif %}
+        </div>
+      </div>
+      <div class="modal-footer" style="border-top: 1px solid rgba(255, 255, 255, 0.1);">
+        <a href="{{ url_for('index') }}" class="btn btn-secondary">
+          <i class="bi bi-house-fill me-2"></i>
+          Voltar para Início
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="modal-backdrop fade show" onclick="fecharModal()"></div>
+{% endif %}
+
+{% if mostrar_modal and not categorias_disponiveis %}
+  <div class="glass-card text-center">
+    <i class="bi bi-exclamation-triangle" style="font-size: 3rem; color: var(--color-warning);"></i>
+    <h2 class="mt-3 mb-3">Nenhum Sorteio Realizado</h2>
+    <p class="text-muted">Ainda não há sorteios gerados. Aguarde a administração gerar o sorteio.</p>
+    <a href="{{ url_for('index') }}" class="btn-primary-custom mt-3">
+      <i class="bi bi-house-fill me-2"></i>
+      Voltar para Início
+    </a>
+  </div>
+{% elif not mostrar_modal %}
+
+{% set categoria_atual = categoria|default("mista") %}
 {% set tem_resultados = namespace(value=false) %}
-{% if ranking.masculino %}
-  {% for jogador in ranking.masculino %}
-    {% if jogador.vitorias > 0 or jogador.derrotas > 0 %}
-      {% set tem_resultados.value = true %}
-    {% endif %}
-  {% endfor %}
+
+{% if categoria_atual == "mista" %}
+  {% if ranking.masculino %}
+    {% for jogador in ranking.masculino %}
+      {% if jogador.vitorias > 0 or jogador.derrotas > 0 %}
+        {% set tem_resultados.value = true %}
+      {% endif %}
+    {% endfor %}
+  {% endif %}
+{% else %}
+  {% if ranking.ranking %}
+    {% for jogador in ranking.ranking %}
+      {% if jogador.vitorias > 0 or jogador.derrotas > 0 %}
+        {% set tem_resultados.value = true %}
+      {% endif %}
+    {% endfor %}
+  {% endif %}
 {% endif %}
 
 <div class="glass-card text-center mb-4 slide-in">
@@ -40,7 +115,8 @@
   {% endif %}
 </div>
 
-<!-- Filtro de Categoria -->
+<!-- Filtro de Categoria (apenas para mista) -->
+{% if categoria_atual == "mista" %}
 <div class="glass-card mb-4 slide-in" style="animation-delay: 0.05s; background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.9)); border: 2px solid var(--color-primary); box-shadow: 0 8px 32px rgba(0, 123, 255, 0.2);">
   <h3 class="text-center mb-3" style="color: #1a1a2e; font-size: 1.4rem; font-weight: 700;">
     <i class="bi bi-funnel-fill me-2" style="color: var(--color-primary);"></i>
@@ -57,9 +133,9 @@
         padding: 12px 16px !important;
         box-shadow: 0 4px 12px rgba(0, 123, 255, 0.15) !important;
       ">
-        <option value="todos">👥 Todos (Masculino e Feminino)</option>
-        <option value="masculino">👨 Apenas Masculino</option>
-        <option value="feminino">👩 Apenas Feminino</option>
+        <option value="todos">Todos (Masculino e Feminino)</option>
+        <option value="masculino">Apenas Masculino</option>
+        <option value="feminino">Apenas Feminino</option>
       </select>
     </div>
   </div>
@@ -70,9 +146,23 @@
     </small>
   </p>
 </div>
+{% else %}
+<!-- Links para outras categorias -->
+<div class="glass-card mb-4 slide-in text-center" style="animation-delay: 0.05s;">
+  <a href="/ranking/mista" class="btn btn-outline-primary me-2">Mista</a>
+  <a href="/ranking/masculino" class="btn btn-outline-primary me-2">Masculino</a>
+  <a href="/ranking/feminino" class="btn btn-outline-primary">Feminino</a>
+</div>
+{% endif %}
 
 <!-- Pódio de Destaque (apenas se houver resultados) -->
-{% if tem_resultados.value and ranking.masculino and ranking.masculino|length >= 3 %}
+{% if categoria_atual == "mista" %}
+  {% set tem_podio = tem_resultados.value and ranking.masculino and ranking.masculino|length >= 3 %}
+{% else %}
+  {% set tem_podio = tem_resultados.value and ranking.ranking and ranking.ranking|length >= 3 %}
+{% endif %}
+
+{% if tem_podio %}
 <div class="glass-card mb-4 slide-in podio-container" style="animation-delay: 0.05s; background: linear-gradient(135deg, rgba(255, 215, 0, 0.1), rgba(212, 175, 55, 0.05));">
   <h3 class="text-center mb-4" style="color: #FFD700; font-size: 1.4rem;">
     <i class="bi bi-award-fill me-2"></i>
@@ -80,74 +170,123 @@
   </h3>
   
   <div class="row text-center">
-    <!-- 2º Lugar -->
-    <div class="col-md-4 mb-3">
-      <div class="p-3" style="background: linear-gradient(135deg, rgba(192, 192, 192, 0.2), rgba(169, 169, 169, 0.1)); border-radius: 12px; border: 2px solid #C0C0C0;">
-        <i class="bi bi-trophy-fill mb-2" style="color: #C0C0C0; font-size: 2rem;"></i>
-        <h4 style="color: #C0C0C0; font-size: 1.3rem; margin-bottom: 8px;">2º LUGAR</h4>
-        {% if ranking.masculino|length >= 2 %}
-          <p class="mb-1 podio-masculino" style="font-size: 1.1rem; font-weight: 600;">
-            <i class="bi bi-person me-1"></i> {{ ranking.masculino[1].nome }}
-          </p>
-          <small class="text-muted podio-masculino">Masculino - {{ ranking.masculino[1].vitorias }}V</small>
-        {% endif %}
-        <hr class="podio-separator" style="border-color: rgba(192, 192, 192, 0.3); margin: 10px 0;">
-        {% if ranking.feminino|length >= 2 %}
-          <p class="mb-1 mt-2 podio-feminino" style="font-size: 1.1rem; font-weight: 600;">
-            <i class="bi bi-person me-1"></i> {{ ranking.feminino[1].nome }}
-          </p>
-          <small class="text-muted podio-feminino">Feminino - {{ ranking.feminino[1].vitorias }}V</small>
-        {% endif %}
+    {% if categoria_atual == "mista" %}
+      <!-- Pódio Mista (Masculino e Feminino) -->
+      <!-- 2º Lugar -->
+      <div class="col-md-4 mb-3">
+        <div class="p-3" style="background: linear-gradient(135deg, rgba(192, 192, 192, 0.2), rgba(169, 169, 169, 0.1)); border-radius: 12px; border: 2px solid #C0C0C0;">
+          <i class="bi bi-trophy-fill mb-2" style="color: #C0C0C0; font-size: 2rem;"></i>
+          <h4 style="color: #C0C0C0; font-size: 1.3rem; margin-bottom: 8px;">2º LUGAR</h4>
+          {% if ranking.masculino|length >= 2 %}
+            <p class="mb-1 podio-masculino" style="font-size: 1.1rem; font-weight: 600;">
+              <i class="bi bi-person me-1"></i> {{ ranking.masculino[1].nome }}
+            </p>
+            <small class="text-muted podio-masculino">Masculino - {{ ranking.masculino[1].vitorias }}V</small>
+          {% endif %}
+          <hr class="podio-separator" style="border-color: rgba(192, 192, 192, 0.3); margin: 10px 0;">
+          {% if ranking.feminino|length >= 2 %}
+            <p class="mb-1 mt-2 podio-feminino" style="font-size: 1.1rem; font-weight: 600;">
+              <i class="bi bi-person me-1"></i> {{ ranking.feminino[1].nome }}
+            </p>
+            <small class="text-muted podio-feminino">Feminino - {{ ranking.feminino[1].vitorias }}V</small>
+          {% endif %}
+        </div>
       </div>
-    </div>
-    
-    <!-- 1º Lugar -->
-    <div class="col-md-4 mb-3">
-      <div class="p-3" style="background: linear-gradient(135deg, rgba(255, 215, 0, 0.3), rgba(212, 175, 55, 0.15)); border-radius: 12px; border: 3px solid #FFD700; box-shadow: 0 8px 24px rgba(255, 215, 0, 0.4); transform: translateY(-10px);">
-        <i class="bi bi-trophy-fill mb-2" style="color: #FFD700; font-size: 3rem;"></i>
-        <h4 style="color: #FFD700; font-size: 1.5rem; margin-bottom: 8px;">🥇 CAMPEÃO</h4>
-        {% if ranking.masculino|length >= 1 %}
-          <p class="mb-1 podio-masculino" style="font-size: 1.2rem; font-weight: 700;">
-            <i class="bi bi-person me-1"></i> {{ ranking.masculino[0].nome }}
-            <i class="bi bi-star-fill ms-1" style="font-size: 0.9rem;"></i>
-          </p>
-          <small class="text-muted podio-masculino">Masculino - {{ ranking.masculino[0].vitorias }}V</small>
-        {% endif %}
-        <hr class="podio-separator" style="border-color: rgba(255, 215, 0, 0.4); margin: 10px 0;">
-        {% if ranking.feminino|length >= 1 %}
-          <p class="mb-1 mt-2 podio-feminino" style="font-size: 1.2rem; font-weight: 700;">
-            <i class="bi bi-person me-1"></i> {{ ranking.feminino[0].nome }}
-            <i class="bi bi-star-fill ms-1" style="font-size: 0.9rem;"></i>
-          </p>
-          <small class="text-muted podio-feminino">Feminino - {{ ranking.feminino[0].vitorias }}V</small>
-        {% endif %}
+      
+      <!-- 1º Lugar -->
+      <div class="col-md-4 mb-3">
+        <div class="p-3" style="background: linear-gradient(135deg, rgba(255, 215, 0, 0.3), rgba(212, 175, 55, 0.15)); border-radius: 12px; border: 3px solid #FFD700; box-shadow: 0 8px 24px rgba(255, 215, 0, 0.4); transform: translateY(-10px);">
+          <i class="bi bi-trophy-fill mb-2" style="color: #FFD700; font-size: 3rem;"></i>
+          <h4 style="color: #FFD700; font-size: 1.5rem; margin-bottom: 8px;">🥇 CAMPEÃO</h4>
+          {% if ranking.masculino|length >= 1 %}
+            <p class="mb-1 podio-masculino" style="font-size: 1.2rem; font-weight: 700;">
+              <i class="bi bi-person me-1"></i> {{ ranking.masculino[0].nome }}
+              <i class="bi bi-star-fill ms-1" style="font-size: 0.9rem;"></i>
+            </p>
+            <small class="text-muted podio-masculino">Masculino - {{ ranking.masculino[0].vitorias }}V</small>
+          {% endif %}
+          <hr class="podio-separator" style="border-color: rgba(255, 215, 0, 0.4); margin: 10px 0;">
+          {% if ranking.feminino|length >= 1 %}
+            <p class="mb-1 mt-2 podio-feminino" style="font-size: 1.2rem; font-weight: 700;">
+              <i class="bi bi-person me-1"></i> {{ ranking.feminino[0].nome }}
+              <i class="bi bi-star-fill ms-1" style="font-size: 0.9rem;"></i>
+            </p>
+            <small class="text-muted podio-feminino">Feminino - {{ ranking.feminino[0].vitorias }}V</small>
+          {% endif %}
+        </div>
       </div>
-    </div>
-    
-    <!-- 3º Lugar -->
-    <div class="col-md-4 mb-3">
-      <div class="p-3" style="background: linear-gradient(135deg, rgba(205, 127, 50, 0.2), rgba(184, 115, 51, 0.1)); border-radius: 12px; border: 2px solid #CD7F32;">
-        <i class="bi bi-trophy-fill mb-2" style="color: #CD7F32; font-size: 2rem;"></i>
-        <h4 style="color: #CD7F32; font-size: 1.3rem; margin-bottom: 8px;">3º LUGAR</h4>
-        {% if ranking.masculino|length >= 3 %}
-          <p class="mb-1 podio-masculino" style="font-size: 1.1rem; font-weight: 600;">
-            <i class="bi bi-person me-1"></i> {{ ranking.masculino[2].nome }}
-          </p>
-          <small class="text-muted podio-masculino">Masculino - {{ ranking.masculino[2].vitorias }}V</small>
-        {% endif %}
-        <hr class="podio-separator" style="border-color: rgba(205, 127, 50, 0.3); margin: 10px 0;">
-        {% if ranking.feminino|length >= 3 %}
-          <p class="mb-1 mt-2 podio-feminino" style="font-size: 1.1rem; font-weight: 600;">
-            <i class="bi bi-person me-1"></i> {{ ranking.feminino[2].nome }}
-          </p>
-          <small class="text-muted podio-feminino">Feminino - {{ ranking.feminino[2].vitorias }}V</small>
-        {% endif %}
+      
+      <!-- 3º Lugar -->
+      <div class="col-md-4 mb-3">
+        <div class="p-3" style="background: linear-gradient(135deg, rgba(205, 127, 50, 0.2), rgba(184, 115, 51, 0.1)); border-radius: 12px; border: 2px solid #CD7F32;">
+          <i class="bi bi-trophy-fill mb-2" style="color: #CD7F32; font-size: 2rem;"></i>
+          <h4 style="color: #CD7F32; font-size: 1.3rem; margin-bottom: 8px;">3º LUGAR</h4>
+          {% if ranking.masculino|length >= 3 %}
+            <p class="mb-1 podio-masculino" style="font-size: 1.1rem; font-weight: 600;">
+              <i class="bi bi-person me-1"></i> {{ ranking.masculino[2].nome }}
+            </p>
+            <small class="text-muted podio-masculino">Masculino - {{ ranking.masculino[2].vitorias }}V</small>
+          {% endif %}
+          <hr class="podio-separator" style="border-color: rgba(205, 127, 50, 0.3); margin: 10px 0;">
+          {% if ranking.feminino|length >= 3 %}
+            <p class="mb-1 mt-2 podio-feminino" style="font-size: 1.1rem; font-weight: 600;">
+              <i class="bi bi-person me-1"></i> {{ ranking.feminino[2].nome }}
+            </p>
+            <small class="text-muted podio-feminino">Feminino - {{ ranking.feminino[2].vitorias }}V</small>
+          {% endif %}
+        </div>
       </div>
-    </div>
+    {% else %}
+      <!-- Pódio para Masculino ou Feminino -->
+      {% set ranking_list = ranking.ranking %}
+      <!-- 2º Lugar -->
+      <div class="col-md-4 mb-3">
+        <div class="p-3" style="background: linear-gradient(135deg, rgba(192, 192, 192, 0.2), rgba(169, 169, 169, 0.1)); border-radius: 12px; border: 2px solid #C0C0C0;">
+          <i class="bi bi-trophy-fill mb-2" style="color: #C0C0C0; font-size: 2rem;"></i>
+          <h4 style="color: #C0C0C0; font-size: 1.3rem; margin-bottom: 8px;">2º LUGAR</h4>
+          {% if ranking_list|length >= 2 %}
+            <p class="mb-1" style="font-size: 1.1rem; font-weight: 600;">
+              <i class="bi bi-person me-1"></i> {{ ranking_list[1].nome }}
+            </p>
+            <small class="text-muted">{{ ranking_list[1].vitorias }}V</small>
+          {% endif %}
+        </div>
+      </div>
+      
+      <!-- 1º Lugar -->
+      <div class="col-md-4 mb-3">
+        <div class="p-3" style="background: linear-gradient(135deg, rgba(255, 215, 0, 0.3), rgba(212, 175, 55, 0.15)); border-radius: 12px; border: 3px solid #FFD700; box-shadow: 0 8px 24px rgba(255, 215, 0, 0.4); transform: translateY(-10px);">
+          <i class="bi bi-trophy-fill mb-2" style="color: #FFD700; font-size: 3rem;"></i>
+          <h4 style="color: #FFD700; font-size: 1.5rem; margin-bottom: 8px;">🥇 CAMPEÃO</h4>
+          {% if ranking_list|length >= 1 %}
+            <p class="mb-1" style="font-size: 1.2rem; font-weight: 700;">
+              <i class="bi bi-person me-1"></i> {{ ranking_list[0].nome }}
+              <i class="bi bi-star-fill ms-1" style="font-size: 0.9rem;"></i>
+            </p>
+            <small class="text-muted">{{ ranking_list[0].vitorias }}V</small>
+          {% endif %}
+        </div>
+      </div>
+      
+      <!-- 3º Lugar -->
+      <div class="col-md-4 mb-3">
+        <div class="p-3" style="background: linear-gradient(135deg, rgba(205, 127, 50, 0.2), rgba(184, 115, 51, 0.1)); border-radius: 12px; border: 2px solid #CD7F32;">
+          <i class="bi bi-trophy-fill mb-2" style="color: #CD7F32; font-size: 2rem;"></i>
+          <h4 style="color: #CD7F32; font-size: 1.3rem; margin-bottom: 8px;">3º LUGAR</h4>
+          {% if ranking_list|length >= 3 %}
+            <p class="mb-1" style="font-size: 1.1rem; font-weight: 600;">
+              <i class="bi bi-person me-1"></i> {{ ranking_list[2].nome }}
+            </p>
+            <small class="text-muted">{{ ranking_list[2].vitorias }}V</small>
+          {% endif %}
+        </div>
+      </div>
+    {% endif %}
   </div>
 </div>
 {% endif %}
 
+{% if categoria_atual == "mista" %}
 <!-- MASCULINO -->
 <div class="glass-card mb-4 slide-in ranking-masculino" style="animation-delay: 0.1s;">
   <h2 class="text-center mb-4" style="color: var(--color-primary); font-size: 1.6rem;">
@@ -273,6 +412,70 @@
     <p class="text-center text-muted">Nenhum resultado registrado ainda.</p>
   {% endif %}
 </div>
+{% else %}
+<!-- Ranking para Masculino ou Feminino -->
+<div class="glass-card mb-4 slide-in" style="animation-delay: 0.1s;">
+  <h2 class="text-center mb-4" style="color: var(--color-primary); font-size: 1.6rem;">
+    <i class="bi bi-person-fill me-2"></i>
+    RANKING {% if categoria_atual == "masculino" %}MASCULINO{% else %}FEMININO{% endif %}
+  </h2>
+  
+  {% if ranking.ranking and ranking.ranking|length > 0 %}
+    <div class="table-responsive">
+      <table class="ranking-table">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th style="text-align: left;">{% if categoria_atual == "masculino" %}Jogador{% else %}Jogadora{% endif %}</th>
+            <th><i class="bi bi-trophy"></i> V</th>
+            <th><i class="bi bi-x-circle"></i> D</th>
+            <th>%</th>
+            <th>Saldo</th>
+            <th>GF</th>
+            <th>GS</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for jogador in ranking.ranking %}
+            <tr {% if tem_resultados.value %}{% if loop.index == 1 %}class="position-1"{% elif loop.index == 2 %}class="position-2"{% elif loop.index == 3 %}class="position-3"{% endif %}{% endif %}>
+              <td class="ranking-position">
+                {% if tem_resultados.value %}
+                  {% if loop.index == 1 %}
+                    <i class="bi bi-trophy-fill" style="color: #FFD700; font-size: 1.5rem;"></i>
+                  {% elif loop.index == 2 %}
+                    <i class="bi bi-trophy-fill" style="color: #C0C0C0; font-size: 1.4rem;"></i>
+                  {% elif loop.index == 3 %}
+                    <i class="bi bi-trophy-fill" style="color: #CD7F32; font-size: 1.3rem;"></i>
+                  {% else %}{{ loop.index }}
+                  {% endif %}
+                {% else %}
+                  {{ loop.index }}
+                {% endif %}
+              </td>
+              <td style="text-align: left; font-weight: {% if loop.index <= 3 and tem_resultados.value %}700{% else %}600{% endif %}; font-size: {% if loop.index <= 3 and tem_resultados.value %}1.1rem{% else %}1rem{% endif %};">
+                {{ jogador.nome }}
+                {% if tem_resultados.value and loop.index == 1 %}
+                  <i class="bi bi-star-fill ms-2" style="color: #FFD700; font-size: 0.9rem;"></i>
+                {% endif %}
+              </td>
+              <td style="color: var(--color-success); font-weight: 600;">{{ jogador.vitorias }}</td>
+              <td style="color: var(--color-danger);">{{ jogador.derrotas }}</td>
+              <td>{{ jogador.percentual_vitorias }}%</td>
+              <td style="font-weight: 600; {% if jogador.saldo_games > 0 %}color: var(--color-success);{% elif jogador.saldo_games < 0 %}color: var(--color-danger);{% endif %}">
+                {{ '+' if jogador.saldo_games > 0 else '' }}{{ jogador.saldo_games }}
+              </td>
+              <td>{{ jogador.games_feitos }}</td>
+              <td>{{ jogador.games_sofridos }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% else %}
+    <p class="text-center text-muted">Nenhum resultado registrado ainda.</p>
+  {% endif %}
+</div>
+{% endif %}
 
 <!-- Legenda -->
 <div class="glass-card text-center mb-4 slide-in" style="animation-delay: 0.3s;">
@@ -297,11 +500,26 @@
 
 <div style="height: 70px;"></div>
 
+{% endif %}
+
 </div>
 {% endblock %}
 
 {% block scripts %}
 <script>
+function fecharModal() {
+  const modal = document.getElementById('modalCategoria');
+  const backdrop = document.querySelector('.modal-backdrop');
+  if (modal) {
+    modal.classList.remove('show');
+    modal.style.display = 'none';
+  }
+  if (backdrop) {
+    backdrop.classList.remove('show');
+    backdrop.remove();
+  }
+}
+
 // Filtro de categoria
 document.addEventListener('DOMContentLoaded', function() {
   const filtroCategoria = document.getElementById('filtroCategoria');
@@ -310,38 +528,24 @@ document.addEventListener('DOMContentLoaded', function() {
     filtroCategoria.addEventListener('change', function() {
       const categoria = this.value;
       
-      const rankingMasculino = document.querySelector('.ranking-masculino');
-      const rankingFeminino = document.querySelector('.ranking-feminino');
-      const podioMasculino = document.querySelectorAll('.podio-masculino');
-      const podioFeminino = document.querySelectorAll('.podio-feminino');
-      const podioSeparators = document.querySelectorAll('.podio-separator');
-      
-      if (categoria === 'todos') {
-        // Mostrar tudo
-        if (rankingMasculino) rankingMasculino.style.display = '';
-        if (rankingFeminino) rankingFeminino.style.display = '';
-        podioMasculino.forEach(el => el.style.display = '');
-        podioFeminino.forEach(el => el.style.display = '');
-        podioSeparators.forEach(el => el.style.display = '');
-        
-      } else if (categoria === 'masculino') {
-        // Mostrar apenas masculino
-        if (rankingMasculino) rankingMasculino.style.display = '';
-        if (rankingFeminino) rankingFeminino.style.display = 'none';
-        podioMasculino.forEach(el => el.style.display = '');
-        podioFeminino.forEach(el => el.style.display = 'none');
-        podioSeparators.forEach(el => el.style.display = 'none');
-        
+      // Redireciona para a rota específica da categoria
+      if (categoria === 'masculino') {
+        window.location.href = '/ranking/masculino';
       } else if (categoria === 'feminino') {
-        // Mostrar apenas feminino
-        if (rankingMasculino) rankingMasculino.style.display = 'none';
-        if (rankingFeminino) rankingFeminino.style.display = '';
-        podioMasculino.forEach(el => el.style.display = 'none');
-        podioFeminino.forEach(el => el.style.display = '');
-        podioSeparators.forEach(el => el.style.display = 'none');
+        window.location.href = '/ranking/feminino';
+      } else {
+        // 'todos' ou qualquer outro valor volta para mista
+        window.location.href = '/ranking/mista';
       }
     });
   }
+  
+  // Fecha modal ao pressionar ESC
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+      fecharModal();
+    }
+  });
 });
 
 // Auto-atualizar a cada 30 segundos

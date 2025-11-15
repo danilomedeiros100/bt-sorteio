@@ -1,0 +1,248 @@
+{
+  "categoria": "masculino",
+  "data_sorteio": "2025-11-15T17:04:56.450742",
+  "total_jogadores": 10,
+  "jogos_por_pessoa": 4,
+  "total_rodadas": 7,
+  "rodadas": [
+    {
+      "numero": 1,
+      "confrontos": [
+        {
+          "dupla1": {
+            "jogador1": "Luciano",
+            "jogador2": "Davi"
+          },
+          "dupla2": {
+            "jogador1": "Francisco",
+            "jogador2": "Wellington"
+          },
+          "resultado": {
+            "games_dupla1": 6,
+            "games_dupla2": 1,
+            "finalizado": true
+          },
+          "quadra": 1
+        },
+        {
+          "dupla1": {
+            "jogador1": "Raul",
+            "jogador2": "Danilo"
+          },
+          "dupla2": {
+            "jogador1": "Carlos",
+            "jogador2": "David"
+          },
+          "resultado": {
+            "games_dupla1": 6,
+            "games_dupla2": 5,
+            "finalizado": true
+          },
+          "quadra": 2
+        }
+      ],
+      "descansando": [
+        "Arthur",
+        "Emmanuel "
+      ]
+    },
+    {
+      "numero": 2,
+      "confrontos": [
+        {
+          "dupla1": {
+            "jogador1": "Emmanuel ",
+            "jogador2": "Luciano"
+          },
+          "dupla2": {
+            "jogador1": "Raul",
+            "jogador2": "Francisco"
+          },
+          "resultado": {
+            "games_dupla1": 6,
+            "games_dupla2": 3,
+            "finalizado": true
+          },
+          "quadra": 1
+        }
+      ],
+      "descansando": [
+        "Arthur",
+        "Carlos",
+        "Danilo",
+        "Davi",
+        "David",
+        "Wellington"
+      ]
+    },
+    {
+      "numero": 3,
+      "confrontos": [
+        {
+          "dupla1": {
+            "jogador1": "Danilo",
+            "jogador2": "Wellington"
+          },
+          "dupla2": {
+            "jogador1": "Francisco",
+            "jogador2": "Carlos"
+          },
+          "resultado": {
+            "games_dupla1": 5,
+            "games_dupla2": 6,
+            "finalizado": true
+          },
+          "quadra": 1
+        },
+        {
+          "dupla1": {
+            "jogador1": "Emmanuel ",
+            "jogador2": "David"
+          },
+          "dupla2": {
+            "jogador1": "Arthur",
+            "jogador2": "Luciano"
+          },
+          "resultado": {
+            "games_dupla1": 2,
+            "games_dupla2": 6,
+            "finalizado": true
+          },
+          "quadra": 2
+        }
+      ],
+      "descansando": [
+        "Davi",
+        "Raul"
+      ]
+    },
+    {
+      "numero": 4,
+      "confrontos": [
+        {
+          "dupla1": {
+            "jogador1": "Danilo",
+            "jogador2": "Arthur"
+          },
+          "dupla2": {
+            "jogador1": "Emmanuel ",
+            "jogador2": "Davi"
+          },
+          "resultado": {
+            "games_dupla1": 6,
+            "games_dupla2": 4,
+            "finalizado": true
+          },
+          "quadra": 1
+        },
+        {
+          "dupla1": {
+            "jogador1": "Raul",
+            "jogador2": "Carlos"
+          },
+          "dupla2": {
+            "jogador1": "Francisco",
+            "jogador2": "David"
+          },
+          "resultado": {
+            "games_dupla1": 6,
+            "games_dupla2": 3,
+            "finalizado": true
+          },
+          "quadra": 2
+        }
+      ],
+      "descansando": [
+        "Luciano",
+        "Wellington"
+      ]
+    },
+    {
+      "numero": 5,
+      "confrontos": [
+        {
+          "dupla1": {
+            "jogador1": "Arthur",
+            "jogador2": "David"
+          },
+          "dupla2": {
+            "jogador1": "Emmanuel ",
+            "jogador2": "Wellington"
+          },
+          "resultado": {
+            "games_dupla1": 3,
+            "games_dupla2": 6,
+            "finalizado": true
+          },
+          "quadra": 1
+        }
+      ],
+      "descansando": [
+        "Carlos",
+        "Danilo",
+        "Davi",
+        "Francisco",
+        "Luciano",
+        "Raul"
+      ]
+    },
+    {
+      "numero": 6,
+      "confrontos": [
+        {
+          "dupla1": {
+            "jogador1": "Danilo",
+            "jogador2": "Luciano"
+          },
+          "dupla2": {
+            "jogador1": "Arthur",
+            "jogador2": "Davi"
+          },
+          "resultado": {
+            "games_dupla1": 6,
+            "games_dupla2": 4,
+            "finalizado": true
+          },
+          "quadra": 1
+        }
+      ],
+      "descansando": [
+        "Carlos",
+        "David",
+        "Emmanuel ",
+        "Francisco",
+        "Raul",
+        "Wellington"
+      ]
+    },
+    {
+      "numero": 7,
+      "confrontos": [
+        {
+          "dupla1": {
+            "jogador1": "Raul",
+            "jogador2": "Davi"
+          },
+          "dupla2": {
+            "jogador1": "Carlos",
+            "jogador2": "Wellington"
+          },
+          "resultado": {
+            "games_dupla1": 2,
+            "games_dupla2": 6,
+            "finalizado": true
+          },
+          "quadra": 1
+        }
+      ],
+      "descansando": [
+        "Arthur",
+        "Danilo",
+        "David",
+        "Emmanuel ",
+        "Francisco",
+        "Luciano"
+      ]
+    }
+  ]
+}

@@ -2,472 +2,455 @@
 {% block title %}Gerar Sorteio{% endblock %}
 
 {% block content %}
-<div class="fade-in">
-  <h1 class="text-center app-title mb-4">
-    <i class="bi bi-shuffle me-2" style="color: var(--color-primary);"></i>
-    Gerar Sorteio
-  </h1>
-
-  <!-- Informações dos Participantes -->
-  <div class="glass-card mb-4 slide-in">
-    <h3 class="text-center mb-3" style="color: var(--color-accent);">
-      <i class="bi bi-people-fill me-2"></i>
-      Participantes Confirmados
-    </h3>
-    <div class="row justify-content-center text-center">
-      <div class="col-md-4 mb-2">
-        <div style="font-size: 1.1rem;">
-          <i class="bi bi-people me-2" style="color: var(--color-primary);"></i>
-          <strong>Misto:</strong> 
-          <span id="info-misto-h" style="color: var(--color-success);">{{ categorias_info.misto_h }}</span>H / 
-          <span id="info-misto-f" style="color: var(--color-accent);">{{ categorias_info.misto_f }}</span>F
-        </div>
-      </div>
-      <div class="col-md-4 mb-2">
-        <div style="font-size: 1.1rem;">
-          <i class="bi bi-person me-2" style="color: var(--color-success);"></i>
-          <strong>Masculino:</strong> 
-          <span id="info-masc" style="color: var(--color-success);">{{ categorias_info.masculino }}</span>
-        </div>
-      </div>
-      <div class="col-md-4 mb-2">
-        <div style="font-size: 1.1rem;">
-          <i class="bi bi-person me-2" style="color: var(--color-accent);"></i>
-          <strong>Feminino:</strong> 
-          <span id="info-fem" style="color: var(--color-accent);">{{ categorias_info.feminino }}</span>
-        </div>
-      </div>
-    </div>
+<div class="fade-in" style="min-height: 70vh; padding-top: 40px;">
+  
+  <div class="text-center mb-4">
+    <h1 class="app-title">
+      <i class="bi bi-shuffle me-2" style="color: var(--color-accent);"></i>
+      Gerar Sorteio - Sistema Flexível
+    </h1>
+    <p class="text-muted">Escolha a categoria e o sistema sugerirá as melhores opções</p>
   </div>
-
-  <!-- Configuração do Sorteio com Abas -->
-  <div class="glass-card mb-4 slide-in">
-    <h3 class="text-center mb-4" style="color: var(--color-text);">
-      <i class="bi bi-gear me-2" style="color: var(--color-primary);"></i>
-      Configuração do Sorteio
-    </h3>
-
-    <!-- Abas de Categorias -->
-    <ul class="nav nav-pills nav-justified mb-4" id="categoria-tabs" role="tablist" style="border-bottom: 2px solid rgba(255,255,255,0.2);">
-      <li class="nav-item" role="presentation">
-        <button class="nav-link active categoria-tab" id="tab-misto" data-categoria="misto" 
-                type="button" role="tab"
-                style="background: rgba(0,123,255,0.3); color: var(--color-text); border: none; border-radius: 8px 8px 0 0; font-weight: 600;">
-          <i class="bi bi-people-fill me-2"></i>
-          Misto
-        </button>
-      </li>
-      <li class="nav-item" role="presentation">
-        <button class="nav-link categoria-tab" id="tab-masculino" data-categoria="masculino" 
-                type="button" role="tab"
-                style="background: rgba(0,123,255,0.1); color: var(--color-text); border: none; border-radius: 8px 8px 0 0; font-weight: 600;">
-          <i class="bi bi-person-fill me-2"></i>
-          Masculino
-        </button>
-      </li>
-      <li class="nav-item" role="presentation">
-        <button class="nav-link categoria-tab" id="tab-feminino" data-categoria="feminino" 
-                type="button" role="tab"
-                style="background: rgba(0,123,255,0.1); color: var(--color-text); border: none; border-radius: 8px 8px 0 0; font-weight: 600;">
-          <i class="bi bi-person-fill me-2"></i>
-          Feminino
-        </button>
-      </li>
-    </ul>
-
-    <!-- Conteúdo das Abas -->
-    <div class="tab-content" id="categoria-tab-content">
-      <!-- Aba Misto -->
-      <div class="tab-pane categoria-pane active" id="pane-misto" role="tabpanel">
-        <div id="config-misto">
-          <div class="text-center mb-3">
-            <p class="text-muted" id="info-misto">
-              <i class="bi bi-hourglass-split me-1"></i>
-              Analisando participantes...
-            </p>
-          </div>
-          <div class="row justify-content-center mb-3">
-            <div class="col-md-8">
-              <label for="jogos-misto" class="form-label" style="color: var(--color-text); font-weight: 600;">
-                <i class="bi bi-123 me-2"></i>
-                Quantos jogos cada pessoa fará?
-              </label>
-              <select id="jogos-misto" class="form-select form-select-lg" disabled>
-                <option value="">Carregando opções...</option>
-              </select>
+  
+  <div class="glass-card" style="max-width: 800px; margin: 0 auto;">
+    
+    <!-- PASSO 1: Seleção de Categoria -->
+    <div id="passo1" class="mb-4">
+      <h3 class="mb-3">
+        <i class="bi bi-1-circle-fill me-2" style="color: var(--color-primary);"></i>
+        Selecione a Categoria
+      </h3>
+      
+      <div class="row g-3">
+        <div class="col-md-4">
+          <div class="card categoria-card" data-categoria="mista" style="cursor: pointer; transition: all 0.3s;">
+            <div class="card-body text-center">
+              <i class="bi bi-people-fill" style="font-size: 2rem; color: var(--color-primary);"></i>
+              <h5 class="mt-2">Mista</h5>
+              <small class="text-muted">{{ categorias.mista.total }} participantes</small>
             </div>
-          </div>
-          <div id="preview-misto" class="mt-3" style="display: none;"></div>
-          <div class="text-center mt-4">
-            <button type="button" id="btn-gerar-misto" class="btn btn-primary-custom" disabled style="font-size: 1.2rem; padding: 15px 40px;">
-              <i class="bi bi-play-circle me-2"></i>
-              Gerar Sorteio Misto
-            </button>
           </div>
         </div>
-      </div>
-
-      <!-- Aba Masculino -->
-      <div class="tab-pane categoria-pane" id="pane-masculino" role="tabpanel" style="display: none;">
-        <div id="config-masculino">
-          <div class="text-center mb-3">
-            <p class="text-muted" id="info-masculino">
-              <i class="bi bi-hourglass-split me-1"></i>
-              Analisando participantes...
-            </p>
-          </div>
-          <div class="row justify-content-center mb-3">
-            <div class="col-md-8">
-              <label for="jogos-masculino" class="form-label" style="color: var(--color-text); font-weight: 600;">
-                <i class="bi bi-123 me-2"></i>
-                Quantos jogos cada pessoa fará?
-              </label>
-              <select id="jogos-masculino" class="form-select form-select-lg" disabled>
-                <option value="">Carregando opções...</option>
-              </select>
+        <div class="col-md-4">
+          <div class="card categoria-card" data-categoria="masculino" style="cursor: pointer; transition: all 0.3s;">
+            <div class="card-body text-center">
+              <i class="bi bi-person-fill" style="font-size: 2rem; color: var(--color-accent);"></i>
+              <h5 class="mt-2">Masculino</h5>
+              <small class="text-muted">{{ categorias.masculino.total }} participantes</small>
             </div>
-          </div>
-          <div id="preview-masculino" class="mt-3" style="display: none;"></div>
-          <div class="text-center mt-4">
-            <button type="button" id="btn-gerar-masculino" class="btn btn-primary-custom" disabled style="font-size: 1.2rem; padding: 15px 40px;">
-              <i class="bi bi-play-circle me-2"></i>
-              Gerar Sorteio Masculino
-            </button>
           </div>
         </div>
-      </div>
-
-      <!-- Aba Feminino -->
-      <div class="tab-pane categoria-pane" id="pane-feminino" role="tabpanel" style="display: none;">
-        <div id="config-feminino">
-          <div class="text-center mb-3">
-            <p class="text-muted" id="info-feminino">
-              <i class="bi bi-hourglass-split me-1"></i>
-              Analisando participantes...
-            </p>
-          </div>
-          <div class="row justify-content-center mb-3">
-            <div class="col-md-8">
-              <label for="jogos-feminino" class="form-label" style="color: var(--color-text); font-weight: 600;">
-                <i class="bi bi-123 me-2"></i>
-                Quantos jogos cada pessoa fará?
-              </label>
-              <select id="jogos-feminino" class="form-select form-select-lg" disabled>
-                <option value="">Carregando opções...</option>
-              </select>
+        <div class="col-md-4">
+          <div class="card categoria-card" data-categoria="feminino" style="cursor: pointer; transition: all 0.3s;">
+            <div class="card-body text-center">
+              <i class="bi bi-person-heart" style="font-size: 2rem; color: var(--color-success);"></i>
+              <h5 class="mt-2">Feminino</h5>
+              <small class="text-muted">{{ categorias.feminino.total }} participantes</small>
             </div>
-          </div>
-          <div id="preview-feminino" class="mt-3" style="display: none;"></div>
-          <div class="text-center mt-4">
-            <button type="button" id="btn-gerar-feminino" class="btn btn-primary-custom" disabled style="font-size: 1.2rem; padding: 15px 40px;">
-              <i class="bi bi-play-circle me-2"></i>
-              Gerar Sorteio Feminino
-            </button>
           </div>
         </div>
       </div>
     </div>
+    
+    <!-- PASSO 2: Análise e Opções -->
+    <div id="passo2" style="display: none;">
+      <h3 class="mb-3">
+        <i class="bi bi-2-circle-fill me-2" style="color: var(--color-primary);"></i>
+        Opções Disponíveis
+      </h3>
+      
+      <div id="loading" class="text-center py-4" style="display: none;">
+        <div class="spinner-border text-primary" role="status">
+          <span class="visually-hidden">Analisando...</span>
+        </div>
+        <p class="mt-2">Analisando participantes...</p>
+      </div>
+      
+      <div id="erro" class="alert alert-danger" style="display: none;"></div>
+      
+      <div id="opcoes-container" style="display: none;">
+        <div class="alert-custom alert-info-custom mb-3">
+          <i id="info-categoria-icon" class="bi bi-people-fill me-2" style="color: var(--color-primary); font-size: 1.3rem; display: inline-block; vertical-align: middle;"></i>
+          <strong id="info-categoria">Selecione uma categoria</strong>
+        </div>
+        
+        <div id="sugestao-card" class="card mb-3" style="border: 2px solid var(--color-accent); background: rgba(255, 193, 7, 0.1);">
+          <div class="card-body">
+            <div class="d-flex align-items-center mb-2">
+              <i class="bi bi-star-fill me-2" style="color: var(--color-accent); font-size: 1.5rem;"></i>
+              <h5 class="mb-0">Sugestão do Sistema</h5>
+            </div>
+            <div id="sugestao-content">
+              <p class="text-muted">Selecione uma categoria para ver as opções</p>
+            </div>
+          </div>
+        </div>
+        
+        <h5 class="mb-3">Outras Opções:</h5>
+        <div id="outras-opcoes" class="row g-3"></div>
+      </div>
+    </div>
+    
+    <!-- Botão Voltar -->
+    <div id="btn-voltar" class="mt-4" style="display: none;">
+      <button class="btn btn-secondary" onclick="voltarPasso1()">
+        <i class="bi bi-arrow-left me-2"></i>
+        Voltar
+      </button>
+    </div>
+    
   </div>
+  
 </div>
 
+<style>
+.categoria-card {
+  background: rgba(255, 255, 255, 0.05);
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  transition: all 0.3s;
+  color: var(--color-text);
+}
+
+.categoria-card:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: var(--color-primary);
+  transform: translateY(-5px);
+}
+
+.categoria-card.selected {
+  background: rgba(0, 123, 255, 0.2);
+  border-color: var(--color-primary);
+}
+
+.opcao-card {
+  background: rgba(255, 255, 255, 0.05);
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  cursor: pointer;
+  transition: all 0.3s;
+  color: var(--color-text);
+}
+
+.opcao-card:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: var(--color-accent);
+  transform: translateY(-3px);
+}
+
+.opcao-card.selected {
+  background: rgba(255, 193, 7, 0.2);
+  border-color: var(--color-accent);
+}
+
+.alert-info-custom {
+  background: rgba(0, 123, 255, 0.15);
+  border: 2px solid rgba(0, 123, 255, 0.3);
+  border-radius: 8px;
+  padding: 15px 20px;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+}
+
+.alert-info-custom i {
+  font-size: 1.3rem;
+  display: inline-block;
+  vertical-align: middle;
+}
+
+.card {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: var(--color-text);
+}
+
+.card-body {
+  color: var(--color-text);
+}
+
+.card h5 {
+  color: var(--color-text);
+}
+
+.spinner-border {
+  color: var(--color-primary);
+}
+</style>
+
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-  // Elementos por categoria
-  const elementos = {
-    misto: {
-      select: document.getElementById('jogos-misto'),
-      btn: document.getElementById('btn-gerar-misto'),
-      preview: document.getElementById('preview-misto'),
-      info: document.getElementById('info-misto'),
-      categoria: 'misto'
-    },
-    masculino: {
-      select: document.getElementById('jogos-masculino'),
-      btn: document.getElementById('btn-gerar-masculino'),
-      preview: document.getElementById('preview-masculino'),
-      info: document.getElementById('info-masculino'),
-      categoria: 'masculino'
-    },
-    feminino: {
-      select: document.getElementById('jogos-feminino'),
-      btn: document.getElementById('btn-gerar-feminino'),
-      preview: document.getElementById('preview-feminino'),
-      info: document.getElementById('info-feminino'),
-      categoria: 'feminino'
-    }
-  };
+let categoriaSelecionada = null;
+let opcaoSelecionada = null;
+let dadosAnalise = null;
 
-  // Carrega informações dos participantes
-  async function carregarInfoParticipantes() {
-    try {
-      const response = await fetch('/api/info_participantes');
-      const data = await response.json();
-      
-      // Atualiza informações na tela
-      document.getElementById('info-misto-h').textContent = data.misto.homens;
-      document.getElementById('info-misto-f').textContent = data.misto.mulheres;
-      document.getElementById('info-masc').textContent = data.masculino;
-      document.getElementById('info-fem').textContent = data.feminino;
-    } catch (error) {
-      console.error('Erro ao carregar participantes:', error);
-    }
-  }
-
-  // Função para carregar opções de uma categoria
-  async function carregarOpcoesCategoria(categoria) {
-    const el = elementos[categoria];
-    if (!el) return;
+// Seleção de categoria
+document.querySelectorAll('.categoria-card').forEach(card => {
+  card.addEventListener('click', function() {
+    // Remove seleção anterior
+    document.querySelectorAll('.categoria-card').forEach(c => c.classList.remove('selected'));
+    // Seleciona atual
+    this.classList.add('selected');
+    categoriaSelecionada = this.dataset.categoria;
     
-    el.select.disabled = true;
-    el.select.innerHTML = '<option value="">Carregando...</option>';
-    el.btn.disabled = true;
-    el.preview.style.display = 'none';
-    el.info.innerHTML = '<i class="bi bi-hourglass-split me-1"></i> Analisando participantes...';
+    // Analisa categoria
+    analisarCategoria();
+  });
+});
 
-    try {
-      const response = await fetch('/api/analisar_categoria', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ categoria })
-      });
-
-      const data = await response.json();
-
-      if (data.viavel && data.opcoes && data.opcoes.length > 0) {
-        el.select.innerHTML = '';
-        
-        // Ordena opções por jogos_por_pessoa
-        const opcoesOrdenadas = [...data.opcoes].sort((a, b) => a.jogos_por_pessoa - b.jogos_por_pessoa);
-        
-        opcoesOrdenadas.forEach(opcao => {
-          const option = document.createElement('option');
-          option.value = opcao.jogos_por_pessoa;
-          option.textContent = `${opcao.jogos_por_pessoa} jogos (~${opcao.rodadas_estimadas} rodadas)`;
-          
-          // Seleciona a sugestão ou primeira opção
-          if (data.sugestao && opcao.jogos_por_pessoa === data.sugestao.jogos_por_pessoa) {
-            option.selected = true;
-            option.textContent += ' ⭐';
-          } else if (el.select.selectedIndex === -1 && opcao === opcoesOrdenadas[0]) {
-            option.selected = true;
-          }
-          
-          el.select.appendChild(option);
-        });
-
-        el.select.disabled = false;
-        
-        // Destaca opções para números ímpares
-        let infoText = '';
-        if (opcoesOrdenadas.length === 2 && opcoesOrdenadas[0].jogos_por_pessoa === 4 && opcoesOrdenadas[1].jogos_por_pessoa === 8) {
-          infoText = `<small style="opacity: 0.9; color: var(--color-accent); font-weight: 600;">⚠️ Número ímpar de participantes: apenas <strong>4</strong> ou <strong>8</strong> jogos funcionam</small>`;
-        } else {
-          infoText = `<small style="opacity: 0.8;">${opcoesOrdenadas.length} opção(ões) viável(is): ${opcoesOrdenadas.map(o => o.jogos_por_pessoa).join(', ')} jogos</small>`;
-        }
-        
-        el.info.innerHTML = `
-          <i class="bi bi-check-circle me-1" style="color: var(--color-success);"></i>
-          <strong style="color: var(--color-success);">${data.mensagem}</strong><br>
-          ${infoText}
-        `;
-        
-        // Valida automaticamente a opção selecionada
-        validarConfiguracao(categoria);
-      } else {
-        el.select.innerHTML = '<option value="">Nenhuma opção viável</option>';
-        el.info.innerHTML = `<i class="bi bi-x-circle me-1" style="color: var(--color-danger);"></i> <strong style="color: var(--color-danger);">${data.mensagem}</strong>`;
-        el.preview.innerHTML = `
-          <div class="alert alert-danger">
-            <h5><i class="bi bi-x-circle me-2"></i>Não é possível gerar sorteio</h5>
-            <p>${data.mensagem}</p>
-          </div>
-        `;
-        el.preview.style.display = 'block';
-      }
-    } catch (error) {
-      el.select.innerHTML = '<option value="">Erro ao carregar</option>';
-      el.info.innerHTML = `<i class="bi bi-x-circle me-1" style="color: var(--color-danger);"></i> Erro: ${error.message}`;
-    }
-  }
-
-  // Event listeners para mudança de abas (implementação manual sem Bootstrap JS)
-  document.querySelectorAll('.categoria-tab').forEach(tab => {
-    tab.addEventListener('click', function(event) {
-      event.preventDefault();
-      const categoria = this.getAttribute('data-categoria');
+function analisarCategoria() {
+  document.getElementById('passo2').style.display = 'block';
+  document.getElementById('btn-voltar').style.display = 'block';
+  document.getElementById('loading').style.display = 'block';
+  document.getElementById('opcoes-container').style.display = 'none';
+  document.getElementById('erro').style.display = 'none';
+  
+  fetch('/api/analisar_categoria', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({ categoria: categoriaSelecionada })
+  })
+    .then(response => response.json())
+    .then(data => {
+      document.getElementById('loading').style.display = 'none';
       
-      // Remove active de todas as abas
-      document.querySelectorAll('.categoria-tab').forEach(t => {
-        t.classList.remove('active');
-        t.style.background = 'rgba(0,123,255,0.1)';
-      });
-      
-      // Esconde todos os panes
-      document.querySelectorAll('.categoria-pane').forEach(p => {
-        p.style.display = 'none';
-        p.classList.remove('active');
-      });
-      
-      // Ativa aba clicada
-      this.classList.add('active');
-      this.style.background = 'rgba(0,123,255,0.3)';
-      
-      // Mostra pane correspondente
-      const pane = document.getElementById(`pane-${categoria}`);
-      if (pane) {
-        pane.style.display = 'block';
-        pane.classList.add('active');
+      if (data.erro || !data.viável) {
+        document.getElementById('erro').style.display = 'block';
+        document.getElementById('erro').textContent = data.erro || data.mensagem || 'Não foi possível analisar a categoria';
+        return;
       }
       
-      // Carrega opções se ainda não foram carregadas
-      if (categoria && elementos[categoria].select.innerHTML.includes('Carregando') || 
-          categoria && elementos[categoria].select.innerHTML.includes('Carregando opções')) {
-        carregarOpcoesCategoria(categoria);
-      } else if (categoria && elementos[categoria].select.value) {
-        validarConfiguracao(categoria);
-      }
+      dadosAnalise = data;
+      exibirOpcoes(data);
+    })
+    .catch(error => {
+      document.getElementById('loading').style.display = 'none';
+      document.getElementById('erro').style.display = 'block';
+      document.getElementById('erro').textContent = 'Erro ao analisar categoria: ' + error.message;
     });
-  });
+}
 
-  // Event listeners para mudança de jogos
-  Object.keys(elementos).forEach(cat => {
-    elementos[cat].select.addEventListener('change', () => validarConfiguracao(cat));
-  });
-
-  async function validarConfiguracao(categoria) {
-    const el = elementos[categoria];
-    if (!el) return;
-    
-    const jogosPorPessoa = parseInt(el.select.value);
-
-    if (!jogosPorPessoa) {
-      el.btn.disabled = true;
-      el.preview.style.display = 'none';
-      return;
-    }
-
-    try {
-      const response = await fetch('/api/analisar_categoria', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ categoria })
-      });
-
-      const data = await response.json();
-
-      if (data.viavel) {
-        const opcoes = data.opcoes || [];
-        const opcaoValida = opcoes.find(op => op.jogos_por_pessoa === jogosPorPessoa);
-
-        if (opcaoValida) {
-          el.preview.innerHTML = `
-            <div class="alert alert-success" style="background: rgba(6, 214, 160, 0.2); border: 2px solid var(--color-success);">
-              <h5><i class="bi bi-check-circle me-2"></i>Configuração Válida!</h5>
-              <div class="row mt-3">
-                <div class="col-md-4">
-                  <strong><i class="bi bi-person-check me-2"></i>Cada pessoa jogará:</strong><br>
-                  <span style="font-size: 1.3rem; color: var(--color-success);">${jogosPorPessoa} vezes</span>
-                </div>
-                <div class="col-md-4">
-                  <strong><i class="bi bi-calendar-week me-2"></i>Rodadas estimadas:</strong><br>
-                  <span style="font-size: 1.3rem; color: var(--color-primary);">~${opcaoValida.rodadas_estimadas}</span>
-                </div>
-                <div class="col-md-4">
-                  <strong><i class="bi bi-people me-2"></i>Duplas necessárias:</strong><br>
-                  <span style="font-size: 1.3rem; color: var(--color-accent);">${opcaoValida.duplas_necessarias}</span>
-                </div>
-              </div>
-            </div>
-          `;
-          el.preview.style.display = 'block';
-          el.btn.disabled = false;
-        } else {
-          el.preview.innerHTML = `
-            <div class="alert alert-warning">
-              <h5><i class="bi bi-exclamation-triangle me-2"></i>Configuração Inválida</h5>
-              <p>O número de jogos selecionado (${jogosPorPessoa}) não é viável para esta categoria.</p>
-              <p><strong>Opções viáveis:</strong> ${opcoes.map(op => op.jogos_por_pessoa).join(', ')}</p>
-            </div>
-          `;
-          el.preview.style.display = 'block';
-          el.btn.disabled = true;
-        }
-      } else {
-        el.preview.innerHTML = `
-          <div class="alert alert-danger">
-            <h5><i class="bi bi-x-circle me-2"></i>Não é possível gerar sorteio</h5>
-            <p>${data.mensagem}</p>
-          </div>
-        `;
-        el.preview.style.display = 'block';
-        el.btn.disabled = true;
-      }
-    } catch (error) {
-      el.preview.innerHTML = `
-        <div class="alert alert-danger">
-          <h5><i class="bi bi-x-circle me-2"></i>Erro</h5>
-          <p>Erro ao validar: ${error.message}</p>
-        </div>
-      `;
-      el.preview.style.display = 'block';
-      el.btn.disabled = true;
-    }
-  }
-
-  // Função para gerar sorteio
-  async function gerarSorteio(categoria) {
-    const el = elementos[categoria];
-    if (!el) return;
-    
-    const jogosPorPessoa = parseInt(el.select.value);
-    
-    el.btn.disabled = true;
-    el.btn.innerHTML = '<i class="bi bi-hourglass-split me-2"></i>Gerando...';
-
-    try {
-      const response = await fetch('/api/gerar-sorteio', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ categoria, jogos_por_pessoa: jogosPorPessoa })
-      });
-
-      const data = await response.json();
-
-      if (data.sucesso) {
-        window.location.href = `/rodadas?categoria=${categoria}`;
-      } else {
-        alert('Erro ao gerar sorteio: ' + (data.erro || 'Erro desconhecido'));
-        el.btn.disabled = false;
-        el.btn.innerHTML = '<i class="bi bi-play-circle me-2"></i>Gerar Sorteio ' + (categoria === 'misto' ? 'Misto' : categoria === 'masculino' ? 'Masculino' : 'Feminino');
-      }
-    } catch (error) {
-      alert('Erro ao gerar sorteio: ' + error.message);
-      el.btn.disabled = false;
-      el.btn.innerHTML = '<i class="bi bi-play-circle me-2"></i>Gerar Sorteio ' + (categoria === 'misto' ? 'Misto' : categoria === 'masculino' ? 'Masculino' : 'Feminino');
-    }
-  }
-
-  // Event listeners para botões de gerar
-  elementos.misto.btn.addEventListener('click', () => gerarSorteio('misto'));
-  elementos.masculino.btn.addEventListener('click', () => gerarSorteio('masculino'));
-  elementos.feminino.btn.addEventListener('click', () => gerarSorteio('feminino'));
-
-  // Carrega informações iniciais e analisa automaticamente
-  async function inicializar() {
-    await carregarInfoParticipantes();
-    // Carrega opções da categoria padrão (misto) automaticamente
-    carregarOpcoesCategoria('misto');
+function exibirOpcoes(data) {
+  const categoriaNome = categoriaSelecionada.charAt(0).toUpperCase() + categoriaSelecionada.slice(1);
+  
+  // Define ícone e cor baseado na categoria
+  const iconElement = document.getElementById('info-categoria-icon');
+  
+  let iconClass = '';
+  let iconColor = '';
+  
+  if (categoriaSelecionada === 'mista') {
+    iconClass = 'bi bi-people-fill';
+    iconColor = 'var(--color-primary)';
+  } else if (categoriaSelecionada === 'masculino') {
+    iconClass = 'bi bi-person-fill';
+    iconColor = 'var(--color-accent)';
+  } else if (categoriaSelecionada === 'feminino') {
+    iconClass = 'bi bi-person-heart';
+    iconColor = 'var(--color-success)';
   }
   
-  // Inicializa ao carregar a página
-  inicializar();
-});
+  iconElement.className = iconClass + ' me-2';
+  iconElement.setAttribute('style', `color: ${iconColor}; font-size: 1.3rem; display: inline-block; vertical-align: middle;`);
+  
+  // Info da categoria
+  let infoText = '';
+  if (categoriaSelecionada === 'mista') {
+    infoText = `${categoriaNome}: ${data.total_homens || 0} homens e ${data.total_mulheres || 0} mulheres confirmados`;
+  } else {
+    const total = categoriaSelecionada === 'masculino' ? 
+      {{ categorias.masculino.total }} : 
+      {{ categorias.feminino.total }};
+    infoText = `${categoriaNome}: ${total} participantes confirmados`;
+  }
+  document.getElementById('info-categoria').textContent = infoText;
+  
+  // Sugestão
+  if (data.sugestao && data.opcoes) {
+    const sugestaoOpcao = data.opcoes.find(op => op.jogos === data.sugestao);
+    if (sugestaoOpcao) {
+      const sugestaoHtml = `
+        <div class="d-flex justify-content-between align-items-center">
+          <div>
+            <h4 class="mb-1">${sugestaoOpcao.jogos} jogos por pessoa</h4>
+            <p class="mb-0 text-muted">
+              • ${sugestaoOpcao.duplas} duplas (sem repetir)<br>
+              • ~${sugestaoOpcao.rodadas_estimadas} rodadas
+            </p>
+          </div>
+          <button class="btn btn-primary" onclick="selecionarOpcao(${sugestaoOpcao.jogos}, true)">
+            Selecionar
+          </button>
+        </div>
+      `;
+      document.getElementById('sugestao-content').innerHTML = sugestaoHtml;
+    }
+  }
+  
+  // Outras opções
+  const outrasOpcoes = data.opcoes ? data.opcoes.filter(op => op.jogos !== data.sugestao) : [];
+  const container = document.getElementById('outras-opcoes');
+  container.innerHTML = '';
+  
+  outrasOpcoes.forEach(opcao => {
+    const col = document.createElement('div');
+    col.className = 'col-md-6';
+    const card = document.createElement('div');
+    card.className = 'card opcao-card';
+    card.onclick = () => selecionarOpcao(opcao.jogos, false);
+    card.innerHTML = `
+      <div class="card-body">
+        <h5 class="mb-2">${opcao.jogos} jogos por pessoa</h5>
+        <p class="mb-1 small">
+          • ${opcao.duplas} duplas<br>
+          • ~${opcao.rodadas_estimadas} rodadas
+        </p>
+      </div>
+    `;
+    col.appendChild(card);
+    container.appendChild(col);
+  });
+  
+  document.getElementById('opcoes-container').style.display = 'block';
+}
+
+function selecionarOpcao(jogos, isSugestao) {
+  opcaoSelecionada = jogos;
+  
+  // Remove seleção anterior
+  document.querySelectorAll('.opcao-card').forEach(c => c.classList.remove('selected'));
+  
+  // Seleciona atual
+  if (isSugestao) {
+    document.getElementById('sugestao-card').style.borderColor = 'var(--color-success)';
+  } else {
+    event.currentTarget.classList.add('selected');
+  }
+  
+  // Mostra botão de gerar
+  mostrarBotaoGerar();
+}
+
+function mostrarBotaoGerar() {
+  const btnContainer = document.getElementById('btn-gerar-container');
+  if (!btnContainer) {
+    const container = document.createElement('div');
+    container.id = 'btn-gerar-container';
+    container.className = 'mt-4 text-center';
+    container.innerHTML = `
+      <button class="btn btn-success btn-lg" onclick="gerarSorteio()" style="min-width: 200px;">
+        <i class="bi bi-check-circle me-2"></i>
+        Gerar Sorteio
+      </button>
+    `;
+    document.getElementById('passo2').appendChild(container);
+  }
+}
+
+function gerarSorteio() {
+  if (!categoriaSelecionada || !opcaoSelecionada) {
+    alert('Por favor, selecione uma opção primeiro');
+    return;
+  }
+  
+  if (!confirm(`Gerar sorteio ${categoriaSelecionada} com ${opcaoSelecionada} jogos por pessoa?`)) {
+    return;
+  }
+  
+  const btnGerar = document.querySelector('#btn-gerar-container button');
+  if (!btnGerar) {
+    console.error('Botão de gerar não encontrado');
+    return;
+  }
+  
+  console.log('Iniciando geração de sorteio...', { categoria: categoriaSelecionada, jogos: opcaoSelecionada });
+  
+  btnGerar.disabled = true;
+  btnGerar.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Gerando...';
+  
+  // Timeout de 60 segundos
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => {
+    console.error('Timeout na requisição');
+    controller.abort();
+  }, 60000);
+  
+  fetch('/api/gerar-sorteio', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      categoria: categoriaSelecionada,
+      jogos_por_pessoa: opcaoSelecionada
+    }),
+    signal: controller.signal
+  })
+  .then(response => {
+    clearTimeout(timeoutId);
+    console.log('Response recebido:', response.status, response.statusText);
+    
+    if (!response.ok) {
+      return response.json().then(data => {
+        console.error('Erro na resposta:', data);
+        throw new Error(data.erro || `Erro ${response.status}: ${response.statusText}`);
+      });
+    }
+    return response.json();
+  })
+  .then(data => {
+    console.log('Dados recebidos:', data);
+    
+    if (data.erro) {
+      alert('Erro: ' + data.erro);
+      btnGerar.disabled = false;
+      btnGerar.innerHTML = '<i class="bi bi-check-circle me-2"></i>Gerar Sorteio';
+      return;
+    }
+    
+    // Sucesso
+    console.log('Sucesso! Redirecionando...');
+    
+    // Mostra mensagem de sucesso
+    btnGerar.innerHTML = '<i class="bi bi-check-circle me-2"></i>Sorteio Gerado!';
+    btnGerar.style.background = 'var(--color-success)';
+    
+    // Redireciona após 1 segundo
+    setTimeout(() => {
+      if (categoriaSelecionada === 'mista') {
+        window.location.href = '/rodadas';
+      } else {
+        window.location.href = `/rodadas?categoria=${categoriaSelecionada}`;
+      }
+    }, 1000);
+  })
+  .catch(error => {
+    clearTimeout(timeoutId);
+    console.error('Erro capturado:', error);
+    
+    if (error.name === 'AbortError') {
+      alert('⏱️ Tempo esgotado! O sorteio está demorando muito. Tente novamente ou escolha menos jogos por pessoa.');
+    } else {
+      alert('Erro ao gerar sorteio: ' + error.message);
+    }
+    
+    btnGerar.disabled = false;
+    btnGerar.innerHTML = '<i class="bi bi-check-circle me-2"></i>Gerar Sorteio';
+  });
+}
+
+function voltarPasso1() {
+  document.getElementById('passo2').style.display = 'none';
+  document.getElementById('btn-voltar').style.display = 'none';
+  document.querySelectorAll('.categoria-card').forEach(c => c.classList.remove('selected'));
+  categoriaSelecionada = null;
+  opcaoSelecionada = null;
+  dadosAnalise = null;
+  
+  // Remove botão de gerar se existir
+  const btnContainer = document.getElementById('btn-gerar-container');
+  if (btnContainer) {
+    btnContainer.remove();
+  }
+}
 </script>
 {% endblock %}
-

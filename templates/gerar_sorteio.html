@@ -70,10 +70,11 @@
             Quantos jogos cada pessoa fará?
           </label>
           <select id="jogos_por_pessoa" name="jogos_por_pessoa" class="form-select form-select-lg" required disabled>
-            <option value="">Selecione a categoria primeiro</option>
+            <option value="">Analisando participantes...</option>
           </select>
           <small class="text-muted" id="info-jogos" style="display: block; margin-top: 5px;">
-            As opções serão carregadas automaticamente
+            <i class="bi bi-hourglass-split me-1"></i>
+            Analisando opções viáveis...
           </small>
         </div>
       </div>
@@ -141,18 +142,34 @@ document.addEventListener('DOMContentLoaded', function() {
       if (data.viavel && data.opcoes && data.opcoes.length > 0) {
         // Preenche select com opções viáveis
         jogosSelect.innerHTML = '';
-        data.opcoes.forEach(opcao => {
+        
+        // Ordena opções por jogos_por_pessoa
+        const opcoesOrdenadas = [...data.opcoes].sort((a, b) => a.jogos_por_pessoa - b.jogos_por_pessoa);
+        
+        opcoesOrdenadas.forEach(opcao => {
           const option = document.createElement('option');
           option.value = opcao.jogos_por_pessoa;
-          option.textContent = `${opcao.jogos_por_pessoa} jogos (~${opcao.rodadas_estimadas} rodadas)`;
-          if (opcao.jogos_por_pessoa === 5) {
-            option.selected = true; // Seleciona 5 por padrão
+          option.textContent = `${opcao.jogos_por_pessoa} jogos por pessoa (~${opcao.rodadas_estimadas} rodadas)`;
+          
+          // Seleciona a sugestão ou 5 (se disponível) ou primeira opção
+          if (data.sugestao && opcao.jogos_por_pessoa === data.sugestao.jogos_por_pessoa) {
+            option.selected = true;
+            option.textContent += ' ⭐ (Sugerido)';
+          } else if (!data.sugestao && opcao.jogos_por_pessoa === 5 && jogosSelect.selectedIndex === -1) {
+            option.selected = true;
+          } else if (jogosSelect.selectedIndex === -1 && opcao === opcoesOrdenadas[0]) {
+            option.selected = true;
           }
+          
           jogosSelect.appendChild(option);
         });
 
         jogosSelect.disabled = false;
-        infoCategoria.textContent = `✅ ${data.mensagem}`;
+        infoCategoria.innerHTML = `
+          <i class="bi bi-check-circle me-1"></i>
+          <strong>${data.mensagem}</strong><br>
+          <small style="opacity: 0.8;">${opcoesOrdenadas.length} opção(ões) viável(is): ${opcoesOrdenadas.map(o => o.jogos_por_pessoa).join(', ')} jogos</small>
+        `;
         infoCategoria.style.color = 'var(--color-success)';
         
         // Valida automaticamente a opção selecionada
@@ -267,11 +284,15 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   }
 
-  // Carrega informações iniciais
-  carregarInfoParticipantes();
+  // Carrega informações iniciais e analisa automaticamente
+  async function inicializar() {
+    await carregarInfoParticipantes();
+    // Carrega opções da categoria padrão (misto) automaticamente
+    categoriaSelect.dispatchEvent(new Event('change'));
+  }
   
-  // Carrega opções da categoria padrão (misto)
-  categoriaSelect.dispatchEvent(new Event('change'));
+  // Inicializa ao carregar a página
+  inicializar();
 
   btnGerar.addEventListener('click', async function() {
     const categoria = categoriaSelect.value;

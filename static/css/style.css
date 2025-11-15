@@ -547,3 +547,26 @@ body {
   border: 1px solid #ffd166;
 }
 
+/* === CORREÇÕES MOBILE PARA SELECTS (V3) === */
+/* Garante que selects funcionem corretamente em mobile */
+select.form-select {
+  position: static !important;
+  transform: none !important;
+  appearance: menulist !important;
+  will-change: auto !important;
+}
+
+/* Correção específica para iOS Safari */
+@supports (-webkit-touch-callout: none) {
+  select.form-select {
+    position: static !important;
+    -webkit-appearance: menulist-button !important;
+    appearance: menulist-button !important;
+  }
+  
+  .fade-in,
+  .slide-in {
+    transform: none !important;
+  }
+}
+

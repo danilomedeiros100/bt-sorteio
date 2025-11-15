@@ -14,7 +14,10 @@ from utils.sorteio_rodadas import (
     gerar_5_rodadas,
     validar_participantes,
     calcular_ranking_individual,
-    separar_ranking_por_genero
+    separar_ranking_por_genero,
+    analisar_viabilidade_categoria,
+    analisar_viabilidade_misto,
+    gerar_sorteio_mesmo_genero_v2
 )
 
 app = Flask(__name__)
@@ -25,6 +28,14 @@ RODADAS_FILE = "data/rodadas.json"
 RANKING_FILE = "data/ranking.json"
 VISITAS_FILE = "data/visitas.json"
 VISITAS_DETALHADAS_FILE = "data/visitas_detalhadas.json"
+
+# Arquivos v3 - por categoria
+RODADAS_MISTO_FILE = "data/rodadas_misto.json"
+RODADAS_MASCULINO_FILE = "data/rodadas_masculino.json"
+RODADAS_FEMININO_FILE = "data/rodadas_feminino.json"
+RANKING_MISTO_FILE = "data/ranking_misto.json"
+RANKING_MASCULINO_FILE = "data/ranking_masculino.json"
+RANKING_FEMININO_FILE = "data/ranking_feminino.json"
 
 
 # ============================================================================
@@ -84,6 +95,107 @@ def salvar_ranking(dados):
     """Salva o ranking no arquivo JSON"""
     with open(RANKING_FILE, "w", encoding="utf-8") as f:
         json.dump(dados, f, ensure_ascii=False, indent=2)
+
+
+# ============================================================================
+# FUNÇÕES AUXILIARES V3 - POR CATEGORIA
+# ============================================================================
+
+def get_rodadas_file(categoria: str) -> str:
+    """Retorna o caminho do arquivo de rodadas para a categoria"""
+    files = {
+        "misto": RODADAS_MISTO_FILE,
+        "masculino": RODADAS_MASCULINO_FILE,
+        "feminino": RODADAS_FEMININO_FILE
+    }
+    return files.get(categoria, RODADAS_FILE)
+
+
+def get_ranking_file(categoria: str) -> str:
+    """Retorna o caminho do arquivo de ranking para a categoria"""
+    files = {
+        "misto": RANKING_MISTO_FILE,
+        "masculino": RANKING_MASCULINO_FILE,
+        "feminino": RANKING_FEMININO_FILE
+    }
+    return files.get(categoria, RANKING_FILE)
+
+
+def carregar_rodadas_categoria(categoria: str):
+    """Carrega as rodadas de uma categoria específica"""
+    try:
+        file_path = get_rodadas_file(categoria)
+        with open(file_path, "r", encoding="utf-8") as f:
+            return json.load(f)
+    except FileNotFoundError:
+        return None
+
+
+def salvar_rodadas_categoria(categoria: str, dados):
+    """Salva as rodadas de uma categoria específica"""
+    file_path = get_rodadas_file(categoria)
+    with open(file_path, "w", encoding="utf-8") as f:
+        json.dump(dados, f, ensure_ascii=False, indent=2)
+
+
+def carregar_ranking_categoria(categoria: str):
+    """Carrega o ranking de uma categoria específica"""
+    try:
+        file_path = get_ranking_file(categoria)
+        with open(file_path, "r", encoding="utf-8") as f:
+            dados = json.load(f)
+            # Normaliza estrutura antiga (lista) para nova (dict)
+            if isinstance(dados, list):
+                return {"ranking": dados, "tem_resultados": False}
+            return dados
+    except FileNotFoundError:
+        return None
+
+
+def salvar_ranking_categoria(categoria: str, dados):
+    """Salva o ranking de uma categoria específica"""
+    file_path = get_ranking_file(categoria)
+    with open(file_path, "w", encoding="utf-8") as f:
+        json.dump(dados, f, ensure_ascii=False, indent=2)
+
+
+def calcular_ranking_categoria(categoria: str):
+    """Calcula o ranking para uma categoria específica"""
+    rodadas_data = carregar_rodadas_categoria(categoria)
+    
+    if not rodadas_data or "rodadas" not in rodadas_data:
+        # Se não há rodadas, retorna lista de participantes confirmados
+        jogadores = carregar_jogadores()
+        
+        if categoria == "misto":
+            participantes = [j["nome"] for j in jogadores if j.get("confirmado", False)]
+        elif categoria == "masculino":
+            participantes = [j["nome"] for j in jogadores if j.get("confirmado", False) and j.get("sexo") == "M"]
+        else:  # feminino
+            participantes = [j["nome"] for j in jogadores if j.get("confirmado", False) and j.get("sexo") == "F"]
+        
+        ranking = []
+        for nome in sorted(participantes):
+            ranking.append({
+                "nome": nome,
+                "vitorias": 0,
+                "derrotas": 0,
+                "games_feitos": 0,
+                "games_sofridos": 0,
+                "saldo_games": 0,
+                "jogos_realizados": 0,
+                "percentual_vitorias": 0.0
+            })
+        
+        return {"ranking": ranking, "tem_resultados": False}
+    
+    rodadas = rodadas_data["rodadas"]
+    ranking = calcular_ranking_individual(rodadas)
+    
+    # Verifica se há resultados
+    tem_resultados = any(p["jogos_realizados"] > 0 for p in ranking)
+    
+    return {"ranking": ranking, "tem_resultados": tem_resultados}
 
 
 # ============================================================================
@@ -424,7 +536,38 @@ def rota_salvar_resultado():
 
 @app.route("/ranking")
 def rota_ranking_individual():
-    """Exibe o ranking"""
+    """Exibe o ranking - suporta todas as categorias v3"""
+    # Carrega rankings de todas as categorias que têm sorteio
+    rankings_por_categoria = {}
+    categorias_com_sorteio = []
+    
+    for cat in ["misto", "masculino", "feminino"]:
+        rodadas_data = carregar_rodadas_categoria(cat)
+        if rodadas_data:
+            categorias_com_sorteio.append(cat)
+            ranking_data = carregar_ranking_categoria(cat)
+            if not ranking_data:
+                ranking_data = calcular_ranking_categoria(cat)
+                salvar_ranking_categoria(cat, ranking_data)
+            rankings_por_categoria[cat] = ranking_data
+    
+    # Se há categorias v3, usa o template v3
+    if categorias_com_sorteio:
+        jogadores = carregar_jogadores()
+        
+        # Para categoria mista, separa ranking por gênero
+        if "misto" in rankings_por_categoria:
+            ranking_misto = rankings_por_categoria["misto"]
+            ranking_separado = separar_ranking_por_genero(ranking_misto["ranking"], jogadores)
+            rankings_por_categoria["misto_separado"] = ranking_separado
+        
+        return render_template(
+            "ranking_todas_categorias.html",
+            rankings_por_categoria=rankings_por_categoria,
+            categorias_com_sorteio=categorias_com_sorteio
+        )
+    
+    # Sistema antigo (compatibilidade)
     ranking = carregar_ranking()
     
     # Verifica se o ranking existe e tem dados
@@ -580,6 +723,210 @@ def admin_visitas():
         )
     except Exception as e:
         return f"Erro ao carregar estatísticas: {e}", 500
+
+
+# ============================================================================
+# ROTAS V3 - SISTEMA DE CATEGORIAS SEPARADAS
+# ============================================================================
+
+@app.route("/gerar-sorteio")
+def rota_gerar_sorteio():
+    """Página para gerar sorteio v3"""
+    jogadores = carregar_jogadores()
+    return render_template("gerar_sorteio.html", jogadores=jogadores)
+
+
+@app.route("/api/analisar_categoria", methods=["POST"])
+def api_analisar_categoria():
+    """API para analisar viabilidade de uma categoria"""
+    data = request.json
+    categoria = data.get("categoria")
+    
+    jogadores = carregar_jogadores()
+    
+    if categoria == "misto":
+        homens = [j["nome"] for j in jogadores if j.get("confirmado") and j.get("sexo") == "M"]
+        mulheres = [j["nome"] for j in jogadores if j.get("confirmado") and j.get("sexo") == "F"]
+        resultado = analisar_viabilidade_misto(homens, mulheres)
+    else:
+        if categoria == "masculino":
+            participantes = [j["nome"] for j in jogadores if j.get("confirmado") and j.get("sexo") == "M"]
+        else:  # feminino
+            participantes = [j["nome"] for j in jogadores if j.get("confirmado") and j.get("sexo") == "F"]
+        resultado = analisar_viabilidade_categoria(categoria, participantes)
+    
+    return jsonify(resultado)
+
+
+@app.route("/api/gerar-sorteio", methods=["POST"])
+def api_gerar_sorteio():
+    """API para gerar sorteio v3"""
+    data = request.json
+    categoria = data.get("categoria")
+    jogos_por_pessoa = data.get("jogos_por_pessoa")
+    
+    if not categoria or not jogos_por_pessoa:
+        return jsonify({"erro": "Categoria e jogos_por_pessoa são obrigatórios"}), 400
+    
+    jogadores = carregar_jogadores()
+    
+    try:
+        if categoria == "misto":
+            # Valida viabilidade antes de gerar
+            homens = [j["nome"] for j in jogadores if j.get("confirmado") and j.get("sexo") == "M"]
+            mulheres = [j["nome"] for j in jogadores if j.get("confirmado") and j.get("sexo") == "F"]
+            
+            viabilidade = analisar_viabilidade_misto(homens, mulheres)
+            opcoes_validas = [op["jogos_por_pessoa"] for op in viabilidade.get("opcoes", [])]
+            
+            if jogos_por_pessoa not in opcoes_validas:
+                return jsonify({"erro": f"Jogos por pessoa ({jogos_por_pessoa}) não é viável para esta configuração"}), 400
+            
+            resultado = gerar_5_rodadas(homens, mulheres)
+        else:
+            # Valida viabilidade antes de gerar
+            if categoria == "masculino":
+                participantes = [j["nome"] for j in jogadores if j.get("confirmado") and j.get("sexo") == "M"]
+            else:  # feminino
+                participantes = [j["nome"] for j in jogadores if j.get("confirmado") and j.get("sexo") == "F"]
+            
+            viabilidade = analisar_viabilidade_categoria(categoria, participantes)
+            opcoes_validas = [op["jogos_por_pessoa"] for op in viabilidade.get("opcoes", [])]
+            
+            if jogos_por_pessoa not in opcoes_validas:
+                return jsonify({"erro": f"Jogos por pessoa ({jogos_por_pessoa}) não é viável para esta configuração"}), 400
+            
+            resultado = gerar_sorteio_mesmo_genero_v2(participantes, jogos_por_pessoa)
+        
+        if "erro" in resultado:
+            return jsonify(resultado), 400
+        
+        # Salva rodadas
+        salvar_rodadas_categoria(categoria, resultado)
+        
+        # Calcula e salva ranking inicial
+        ranking_data = calcular_ranking_categoria(categoria)
+        salvar_ranking_categoria(categoria, ranking_data)
+        
+        return jsonify({"sucesso": True, "rodadas": resultado})
+    
+    except Exception as e:
+        return jsonify({"erro": str(e)}), 500
+
+
+@app.route("/ranking/<categoria>")
+def rota_ranking_categoria(categoria):
+    """Ranking de uma categoria específica"""
+    if categoria not in ["misto", "masculino", "feminino"]:
+        return redirect(url_for("rota_ranking"))
+    
+    # Verifica se existe sorteio para esta categoria
+    rodadas_data = carregar_rodadas_categoria(categoria)
+    if not rodadas_data:
+        return redirect(url_for("rota_ranking"))
+    
+    # Carrega ou calcula ranking
+    ranking_data = carregar_ranking_categoria(categoria)
+    if not ranking_data:
+        ranking_data = calcular_ranking_categoria(categoria)
+        salvar_ranking_categoria(categoria, ranking_data)
+    
+    # Lista categorias com sorteio para o seletor
+    categorias_com_sorteio = []
+    for cat in ["misto", "masculino", "feminino"]:
+        if carregar_rodadas_categoria(cat):
+            categorias_com_sorteio.append(cat)
+    
+    jogadores = carregar_jogadores()
+    
+    if categoria == "misto":
+        # Separa ranking por gênero
+        ranking_separado = separar_ranking_por_genero(ranking_data["ranking"], jogadores)
+        return render_template(
+            "ranking_v3.html",
+            categoria=categoria,
+            ranking=ranking_data,
+            ranking_separado=ranking_separado,
+            categorias_com_sorteio=categorias_com_sorteio
+        )
+    else:
+        return render_template(
+            "ranking_v3.html",
+            categoria=categoria,
+            ranking=ranking_data,
+            categorias_com_sorteio=categorias_com_sorteio
+        )
+
+
+@app.route("/rodadas")
+def rota_ver_rodadas():
+    """Visualiza rodadas - suporta categoria via query param"""
+    categoria = request.args.get("categoria", "misto")
+    
+    if categoria not in ["misto", "masculino", "feminino"]:
+        categoria = "misto"
+    
+    rodadas_data = carregar_rodadas_categoria(categoria)
+    
+    if not rodadas_data:
+        # Se não há rodadas para esta categoria, mostra todas as categorias disponíveis
+        categorias_disponiveis = {}
+        for cat in ["misto", "masculino", "feminino"]:
+            rodadas_cat = carregar_rodadas_categoria(cat)
+            if rodadas_cat:
+                categorias_disponiveis[cat] = rodadas_cat
+        
+        return render_template(
+            "rodadas.html",
+            categorias_disponiveis=categorias_disponiveis,
+            categoria_selecionada=None
+        )
+    
+    return render_template(
+        "rodadas.html",
+        rodadas_data=rodadas_data,
+        categoria=categoria,
+        categoria_selecionada=categoria
+    )
+
+
+@app.route("/api/salvar-resultado", methods=["POST"])
+def api_salvar_resultado():
+    """API para salvar resultado de um confronto - suporta categoria"""
+    data = request.json
+    categoria = data.get("categoria", "misto")
+    rodada_num = data.get("rodada_num")
+    confronto_idx = data.get("confronto_idx")
+    games_dupla1 = data.get("games_dupla1")
+    games_dupla2 = data.get("games_dupla2")
+    
+    rodadas_data = carregar_rodadas_categoria(categoria)
+    
+    if not rodadas_data:
+        return jsonify({"erro": "Rodadas não encontradas"}), 404
+    
+    try:
+        rodada = rodadas_data["rodadas"][rodada_num - 1]
+        confronto = rodada["confrontos"][confronto_idx]
+        
+        # Inicializa resultado se não existir
+        if "resultado" not in confronto:
+            confronto["resultado"] = {}
+        
+        confronto["resultado"]["games_dupla1"] = games_dupla1
+        confronto["resultado"]["games_dupla2"] = games_dupla2
+        confronto["resultado"]["finalizado"] = True
+        
+        salvar_rodadas_categoria(categoria, rodadas_data)
+        
+        # Recalcula ranking
+        ranking_data = calcular_ranking_categoria(categoria)
+        salvar_ranking_categoria(categoria, ranking_data)
+        
+        return jsonify({"sucesso": True})
+    
+    except (IndexError, KeyError) as e:
+        return jsonify({"erro": f"Erro ao salvar resultado: {str(e)}"}), 400
 
 
 # ============================================================================

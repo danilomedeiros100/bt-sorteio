@@ -667,3 +667,535 @@ def separar_ranking_por_genero(ranking: List[Dict], jogadores_data: List[Dict]) 
         "masculino": masculino,
         "feminino": feminino
     }
+
+
+# ============================================================================
+# FUNÇÕES V3 - SISTEMA DE CATEGORIAS SEPARADAS
+# ============================================================================
+
+def analisar_viabilidade_categoria(categoria: str, participantes: List[str]) -> Dict:
+    """
+    Analisa a viabilidade de gerar um sorteio para uma categoria (masculino/feminino)
+    com diferentes números de jogos por pessoa.
+    
+    Retorna opções viáveis e sugestões.
+    """
+    num_participantes = len(participantes)
+    
+    if num_participantes < 4:
+        return {
+            "viavel": False,
+            "mensagem": f"Mínimo de 4 participantes necessário. Atualmente: {num_participantes}",
+            "opcoes": []
+        }
+    
+    # Calcula número máximo de duplas possíveis (C(n,2))
+    max_duplas_possiveis = (num_participantes * (num_participantes - 1)) // 2
+    
+    opcoes_viaveis = []
+    
+    # Testa de 3 a 10 jogos por pessoa
+    for jogos_por_pessoa in range(3, 11):
+        # Total de duplas necessárias
+        duplas_necessarias = (num_participantes * jogos_por_pessoa) // 2
+        
+        # Verifica se é matematicamente possível
+        if duplas_necessarias > max_duplas_possiveis:
+            continue
+        
+        # REGRA CRÍTICA: Total de duplas deve ser PAR para formar confrontos
+        if duplas_necessarias % 2 != 0:
+            continue
+        
+        # Calcula número mínimo de rodadas (considerando máximo de confrontos por rodada)
+        # Para número ímpar de participantes: máximo é (n-1)/2 confrontos por rodada
+        # Para número par: máximo é n/2 confrontos por rodada
+        if num_participantes % 2 == 0:
+            max_confrontos_por_rodada = num_participantes // 2
+        else:
+            max_confrontos_por_rodada = (num_participantes - 1) // 2
+        
+        num_rodadas_minimo = (duplas_necessarias // 2 + max_confrontos_por_rodada - 1) // max_confrontos_por_rodada
+        
+        # Descansos por rodada (aproximado)
+        descansos_por_rodada = num_participantes - (max_confrontos_por_rodada * 2)
+        
+        opcoes_viaveis.append({
+            "jogos_por_pessoa": jogos_por_pessoa,
+            "duplas_necessarias": duplas_necessarias,
+            "rodadas_estimadas": num_rodadas_minimo,
+            "descansos_por_rodada": descansos_por_rodada
+        })
+    
+    if not opcoes_viaveis:
+        return {
+            "viavel": False,
+            "mensagem": f"Não é possível gerar um sorteio viável com {num_participantes} participantes",
+            "opcoes": []
+        }
+    
+    # Sugere melhor opção (prioriza 5 jogos)
+    melhor_opcao = None
+    for opcao in opcoes_viaveis:
+        if opcao["jogos_por_pessoa"] == 5:
+            melhor_opcao = opcao
+            break
+    
+    if not melhor_opcao:
+        melhor_opcao = opcoes_viaveis[0]
+    
+    return {
+        "viavel": True,
+        "mensagem": f"✅ Viável com {num_participantes} participantes",
+        "opcoes": opcoes_viaveis,
+        "sugestao": melhor_opcao
+    }
+
+
+def analisar_viabilidade_misto(homens: List[str], mulheres: List[str]) -> Dict:
+    """
+    Analisa a viabilidade de gerar um sorteio misto com diferentes números de jogos por pessoa.
+    """
+    num_homens = len(homens)
+    num_mulheres = len(mulheres)
+    
+    if num_homens < 3 or num_mulheres < 3:
+        return {
+            "viavel": False,
+            "mensagem": f"Mínimo de 3 homens e 3 mulheres necessário. Atualmente: {num_homens}H x {num_mulheres}M",
+            "opcoes": []
+        }
+    
+    # Número máximo de duplas mistas possíveis
+    max_duplas_possiveis = num_homens * num_mulheres
+    
+    opcoes_viaveis = []
+    
+    # Testa de 3 a 10 jogos por pessoa
+    for jogos_por_pessoa in range(3, 11):
+        # Total de duplas necessárias
+        total_pessoas = num_homens + num_mulheres
+        duplas_necessarias = (total_pessoas * jogos_por_pessoa) // 2
+        
+        # Verifica se é matematicamente possível
+        if duplas_necessarias > max_duplas_possiveis:
+            continue
+        
+        # REGRA CRÍTICA: Total de duplas deve ser PAR para formar confrontos
+        if duplas_necessarias % 2 != 0:
+            continue
+        
+        # Calcula número mínimo de rodadas
+        min_pessoas = min(num_homens, num_mulheres)
+        max_confrontos_por_rodada = min_pessoas
+        
+        num_rodadas_minimo = (duplas_necessarias // 2 + max_confrontos_por_rodada - 1) // max_confrontos_por_rodada
+        
+        opcoes_viaveis.append({
+            "jogos_por_pessoa": jogos_por_pessoa,
+            "duplas_necessarias": duplas_necessarias,
+            "rodadas_estimadas": num_rodadas_minimo
+        })
+    
+    if not opcoes_viaveis:
+        return {
+            "viavel": False,
+            "mensagem": f"Não é possível gerar um sorteio viável com {num_homens}H x {num_mulheres}M",
+            "opcoes": []
+        }
+    
+    # Sugere melhor opção (prioriza 5 jogos)
+    melhor_opcao = None
+    for opcao in opcoes_viaveis:
+        if opcao["jogos_por_pessoa"] == 5:
+            melhor_opcao = opcao
+            break
+    
+    if not melhor_opcao:
+        melhor_opcao = opcoes_viaveis[0]
+    
+    return {
+        "viavel": True,
+        "mensagem": f"✅ Viável com {num_homens}H x {num_mulheres}M",
+        "opcoes": opcoes_viaveis,
+        "sugestao": melhor_opcao
+    }
+
+
+def gerar_duplas_mesmo_genero(participantes: List[str], jogos_por_pessoa: int) -> List[Tuple[str, str]]:
+    """
+    Gera todas as duplas necessárias para que cada participante jogue exatamente
+    jogos_por_pessoa vezes, sem repetir duplas.
+    
+    Retorna lista de tuplas (jogador1, jogador2) ordenadas.
+    """
+    num_participantes = len(participantes)
+    total_duplas_necessarias = (num_participantes * jogos_por_pessoa) // 2
+    
+    # Todas as duplas possíveis (sem ordem, sem repetição)
+    todas_duplas_possiveis = list(itertools.combinations(participantes, 2))
+    
+    # Contador de aparições por jogador
+    aparicoes_por_jogador = defaultdict(int)
+    
+    # Duplas selecionadas
+    duplas_selecionadas = []
+    
+    max_tentativas = 2000
+    
+    for tentativa in range(max_tentativas):
+        # Embaralha duplas possíveis
+        random.shuffle(todas_duplas_possiveis)
+        
+        duplas_selecionadas = []
+        aparicoes_por_jogador = defaultdict(int)
+        
+        # Tenta selecionar duplas até atingir o total necessário
+        for dupla in todas_duplas_possiveis:
+            j1, j2 = dupla
+            
+            # Verifica se ambos ainda podem jogar mais vezes
+            if aparicoes_por_jogador[j1] < jogos_por_pessoa and aparicoes_por_jogador[j2] < jogos_por_pessoa:
+                # Verifica se essa dupla já foi selecionada
+                if (j1, j2) not in duplas_selecionadas and (j2, j1) not in duplas_selecionadas:
+                    duplas_selecionadas.append((j1, j2))
+                    aparicoes_por_jogador[j1] += 1
+                    aparicoes_por_jogador[j2] += 1
+                    
+                    if len(duplas_selecionadas) >= total_duplas_necessarias:
+                        break
+        
+        # Verifica se todos os jogadores atingiram o número exato de jogos
+        todos_completos = all(aparicoes_por_jogador[p] == jogos_por_pessoa for p in participantes)
+        
+        if todos_completos and len(duplas_selecionadas) == total_duplas_necessarias:
+            return duplas_selecionadas
+    
+    # Se não encontrou solução perfeita, tenta completar o melhor resultado parcial
+    melhor_resultado = []
+    melhor_aparicoes = defaultdict(int)
+    melhor_score = -1
+    
+    for tentativa in range(500):
+        random.shuffle(todas_duplas_possiveis)
+        
+        duplas_temp = []
+        aparicoes_temp = defaultdict(int)
+        
+        for dupla in todas_duplas_possiveis:
+            j1, j2 = dupla
+            if aparicoes_temp[j1] < jogos_por_pessoa and aparicoes_temp[j2] < jogos_por_pessoa:
+                if (j1, j2) not in duplas_temp and (j2, j1) not in duplas_temp:
+                    duplas_temp.append((j1, j2))
+                    aparicoes_temp[j1] += 1
+                    aparicoes_temp[j2] += 1
+        
+        # Calcula score: penaliza jogadores que não completaram
+        score = sum(aparicoes_temp[p] for p in participantes)
+        
+        if score > melhor_score:
+            melhor_score = score
+            melhor_resultado = duplas_temp
+            melhor_aparicoes = aparicoes_temp.copy()
+    
+    # Tenta completar o melhor resultado
+    duplas_selecionadas = melhor_resultado.copy()
+    aparicoes_por_jogador = melhor_aparicoes.copy()
+    
+    # Força geração de duplas faltantes
+    for _ in range(1000):
+        if len(duplas_selecionadas) >= total_duplas_necessarias:
+            break
+        
+        # Encontra jogadores que ainda precisam jogar
+        jogadores_faltando = [p for p in participantes if aparicoes_por_jogador[p] < jogos_por_pessoa]
+        
+        if len(jogadores_faltando) < 2:
+            break
+        
+        # Tenta formar uma dupla com jogadores que ainda precisam jogar
+        random.shuffle(jogadores_faltando)
+        j1 = jogadores_faltando[0]
+        j2 = jogadores_faltando[1]
+        
+        dupla_key = tuple(sorted([j1, j2]))
+        if dupla_key not in [tuple(sorted([d[0], d[1]])) for d in duplas_selecionadas]:
+            duplas_selecionadas.append((j1, j2))
+            aparicoes_por_jogador[j1] += 1
+            aparicoes_por_jogador[j2] += 1
+    
+    return duplas_selecionadas
+
+
+def criar_confrontos_sem_byes_v3(duplas_list: List[Tuple[str, str]], max_tentativas: int = 100) -> List[Dict]:
+    """
+    Cria confrontos 2x2 a partir de uma lista de duplas, garantindo que todas as duplas
+    sejam incluídas, mesmo que algumas compartilhem jogadores.
+    
+    Retorna lista de confrontos, onde cada confronto pode ser:
+    - Normal: dupla1 vs dupla2 (sem jogadores compartilhados)
+    - Compartilha jogadores: dupla1 vs dupla2 (com jogadores compartilhados)
+    - Dupla única: dupla1 vs None (quando sobra uma dupla ímpar)
+    """
+    confrontos = []
+    duplas_restantes = duplas_list.copy()
+    random.shuffle(duplas_restantes)
+    
+    # PASSO 1: Tenta parear duplas sem compartilhar jogadores
+    i = 0
+    while i < len(duplas_restantes):
+        dupla1 = duplas_restantes[i]
+        j1_set = {dupla1[0], dupla1[1]}
+        
+        encontrou_par = False
+        for j in range(i + 1, len(duplas_restantes)):
+            dupla2 = duplas_restantes[j]
+            j2_set = {dupla2[0], dupla2[1]}
+            
+            # Se não compartilham jogadores, forma confronto
+            if not (j1_set & j2_set):
+                confronto = {
+                    "dupla1": {"jogador1": dupla1[0], "jogador2": dupla1[1]},
+                    "dupla2": {"jogador1": dupla2[0], "jogador2": dupla2[1]},
+                    "resultado": {"games_dupla1": 0, "games_dupla2": 0, "finalizado": False},
+                    "tipo": "normal"
+                }
+                confrontos.append(confronto)
+                
+                # Remove ambas as duplas
+                duplas_restantes.pop(j)
+                duplas_restantes.pop(i)
+                encontrou_par = True
+                break
+        
+        if not encontrou_par:
+            i += 1
+    
+    # PASSO 2: Pareia duplas que compartilham jogadores (marcando como tipo especial)
+    i = 0
+    while i < len(duplas_restantes):
+        dupla1 = duplas_restantes[i]
+        
+        if i + 1 < len(duplas_restantes):
+            dupla2 = duplas_restantes[i + 1]
+            
+            confronto = {
+                "dupla1": {"jogador1": dupla1[0], "jogador2": dupla1[1]},
+                "dupla2": {"jogador1": dupla2[0], "jogador2": dupla2[1]},
+                "resultado": {"games_dupla1": 0, "games_dupla2": 0, "finalizado": False},
+                "tipo": "compartilha_jogadores"
+            }
+            confrontos.append(confronto)
+            
+            duplas_restantes.pop(i + 1)
+            duplas_restantes.pop(i)
+        else:
+            i += 1
+    
+    # PASSO 3: Se sobrou uma dupla ímpar, adiciona como "dupla única"
+    if len(duplas_restantes) == 1:
+        dupla_unica = duplas_restantes[0]
+        confronto = {
+            "dupla1": {"jogador1": dupla_unica[0], "jogador2": dupla_unica[1]},
+            "dupla2": None,
+            "resultado": {"games_dupla1": 0, "games_dupla2": 0, "finalizado": False},
+            "tipo": "dupla_unica"
+        }
+        confrontos.append(confronto)
+    
+    return confrontos
+
+
+def gerar_sorteio_mesmo_genero_v2(participantes: List[str], jogos_por_pessoa: int) -> Dict:
+    """
+    Gera sorteio completo para categoria de mesmo gênero (masculino/feminino).
+    
+    Garante:
+    - Todos jogam exatamente jogos_por_pessoa vezes
+    - Nenhuma dupla se repete
+    - Distribuição otimizada de confrontos por rodada
+    """
+    num_participantes = len(participantes)
+    total_duplas_necessarias = (num_participantes * jogos_por_pessoa) // 2
+    
+    # PASSO 1: Gera todas as duplas necessárias
+    duplas_selecionadas = gerar_duplas_mesmo_genero(participantes, jogos_por_pessoa)
+    
+    # Validação: verifica se todas as duplas foram geradas
+    if len(duplas_selecionadas) != total_duplas_necessarias:
+        return {
+            "erro": f"Falha ao gerar duplas: esperado {total_duplas_necessarias}, gerado {len(duplas_selecionadas)}"
+        }
+    
+    # Validação: verifica se todos jogam o número exato de vezes
+    aparicoes = defaultdict(int)
+    for dupla in duplas_selecionadas:
+        aparicoes[dupla[0]] += 1
+        aparicoes[dupla[1]] += 1
+    
+    for p in participantes:
+        if aparicoes[p] != jogos_por_pessoa:
+            return {
+                "erro": f"Jogador {p} jogou {aparicoes[p]}x, esperado {jogos_por_pessoa}x"
+            }
+    
+    # PASSO 2: Cria confrontos
+    max_tentativas_confrontos = min(200, len(duplas_selecionadas) * 10)
+    confrontos = criar_confrontos_sem_byes_v3(duplas_selecionadas, max_tentativas_confrontos)
+    
+    # Validação: verifica se todos os confrontos foram criados
+    duplas_em_confrontos = set()
+    for conf in confrontos:
+        d1 = conf["dupla1"]
+        duplas_em_confrontos.add(tuple(sorted([d1["jogador1"], d1["jogador2"]])))
+        if conf.get("dupla2"):
+            d2 = conf["dupla2"]
+            duplas_em_confrontos.add(tuple(sorted([d2["jogador1"], d2["jogador2"]])))
+    
+    # Verifica se alguma dupla ficou de fora
+    duplas_selecionadas_set = {tuple(sorted(d)) for d in duplas_selecionadas}
+    duplas_faltando = duplas_selecionadas_set - duplas_em_confrontos
+    
+    if duplas_faltando:
+        # Adiciona duplas faltantes como "dupla_unica"
+        for dupla_faltando in duplas_faltando:
+            confronto = {
+                "dupla1": {"jogador1": dupla_faltando[0], "jogador2": dupla_faltando[1]},
+                "dupla2": None,
+                "resultado": {"games_dupla1": 0, "games_dupla2": 0, "finalizado": False},
+                "tipo": "dupla_unica"
+            }
+            confrontos.append(confronto)
+    
+    # PASSO 3: Calcula máximo de confrontos por rodada
+    if num_participantes % 2 == 0:
+        max_confrontos_por_rodada = num_participantes // 2
+    else:
+        max_confrontos_por_rodada = (num_participantes - 1) // 2
+    
+    # PASSO 4: Distribui confrontos em rodadas (OTIMIZADO)
+    def confronto_compativel(conf, jogadores_rodada):
+        """Verifica se um confronto pode ser adicionado à rodada sem conflito"""
+        jogadores_conf = set()
+        
+        d1 = conf["dupla1"]
+        jogadores_conf.add(d1["jogador1"])
+        jogadores_conf.add(d1["jogador2"])
+        
+        if conf.get("dupla2"):
+            d2 = conf["dupla2"]
+            jogadores_conf.add(d2["jogador1"])
+            jogadores_conf.add(d2["jogador2"])
+        
+        # Se é tipo "compartilha_jogadores" ou "dupla_unica", permite mesmo com conflito
+        if conf.get("tipo") in ["compartilha_jogadores", "dupla_unica"]:
+            return True
+        
+        # Para confrontos normais, não pode ter conflito
+        return not (jogadores_conf & jogadores_rodada)
+    
+    melhor_distribuicao = None
+    melhor_score = float('inf')
+    
+    # Tenta múltiplas distribuições para otimizar
+    for tentativa in range(20):
+        rodadas_temp = [[] for _ in range(100)]  # Inicializa com muitas rodadas
+        jogadores_rodada = [set() for _ in range(100)]
+        
+        confrontos_shuffled = confrontos.copy()
+        random.shuffle(confrontos_shuffled)
+        
+        for conf in confrontos_shuffled:
+            # Encontra primeira rodada compatível
+            rodada_idx = 0
+            while rodada_idx < len(rodadas_temp):
+                # Verifica se a rodada não está cheia
+                if len(rodadas_temp[rodada_idx]) >= max_confrontos_por_rodada:
+                    rodada_idx += 1
+                    continue
+                
+                # Verifica compatibilidade
+                if confronto_compativel(conf, jogadores_rodada[rodada_idx]):
+                    rodadas_temp[rodada_idx].append(conf)
+                    
+                    # Atualiza jogadores da rodada
+                    d1 = conf["dupla1"]
+                    jogadores_rodada[rodada_idx].add(d1["jogador1"])
+                    jogadores_rodada[rodada_idx].add(d1["jogador2"])
+                    
+                    if conf.get("dupla2"):
+                        d2 = conf["dupla2"]
+                        jogadores_rodada[rodada_idx].add(d2["jogador1"])
+                        jogadores_rodada[rodada_idx].add(d2["jogador2"])
+                    
+                    break
+                
+                rodada_idx += 1
+        
+        # Remove rodadas vazias
+        rodadas_temp = [r for r in rodadas_temp if r]
+        
+        # Calcula score: penaliza mais rodadas e rodadas com poucos confrontos
+        score = len(rodadas_temp) * 1000
+        for rodada in rodadas_temp:
+            if len(rodada) == 1:
+                score += 100  # Penaliza rodadas com apenas 1 confronto
+        
+        if score < melhor_score:
+            melhor_score = score
+            melhor_distribuicao = rodadas_temp
+    
+    rodadas_distribuidas = melhor_distribuicao if melhor_distribuicao else [confrontos]
+    
+    # PASSO 5: Monta estrutura final
+    rodadas_finais = []
+    for idx, confrontos_rodada in enumerate(rodadas_distribuidas):
+        # Identifica jogadores jogando
+        jogadores_jogando = set()
+        for conf in confrontos_rodada:
+            d1 = conf["dupla1"]
+            jogadores_jogando.add(d1["jogador1"])
+            jogadores_jogando.add(d1["jogador2"])
+            if conf.get("dupla2"):
+                d2 = conf["dupla2"]
+                jogadores_jogando.add(d2["jogador1"])
+                jogadores_jogando.add(d2["jogador2"])
+        
+        # Jogadores descansando
+        jogadores_descansando = sorted([p for p in participantes if p not in jogadores_jogando])
+        
+        # Adiciona número de quadra
+        confrontos_finais = []
+        for quadra_num, conf in enumerate(confrontos_rodada, 1):
+            conf_copy = conf.copy()
+            conf_copy["quadra"] = quadra_num
+            confrontos_finais.append(conf_copy)
+        
+        rodadas_finais.append({
+            "numero": idx + 1,
+            "confrontos": confrontos_finais,
+            "descansando": jogadores_descansando
+        })
+    
+    # Validação final: verifica se todos jogam o número exato de vezes
+    jogos_por_jogador = defaultdict(int)
+    for rodada in rodadas_finais:
+        for conf in rodada["confrontos"]:
+            d1 = conf["dupla1"]
+            jogos_por_jogador[d1["jogador1"]] += 1
+            jogos_por_jogador[d1["jogador2"]] += 1
+            if conf.get("dupla2"):
+                d2 = conf["dupla2"]
+                jogos_por_jogador[d2["jogador1"]] += 1
+                jogos_por_jogador[d2["jogador2"]] += 1
+    
+    for p in participantes:
+        if jogos_por_jogador[p] != jogos_por_pessoa:
+            return {
+                "erro": f"Validação final falhou: {p} jogou {jogos_por_jogador[p]}x, esperado {jogos_por_pessoa}x"
+            }
+    
+    return {
+        "total_rodadas": len(rodadas_finais),
+        "rodadas": rodadas_finais
+    }

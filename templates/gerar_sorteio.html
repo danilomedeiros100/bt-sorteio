@@ -40,67 +40,162 @@
     </div>
   </div>
 
-  <!-- Configuração do Sorteio -->
+  <!-- Configuração do Sorteio com Abas -->
   <div class="glass-card mb-4 slide-in">
     <h3 class="text-center mb-4" style="color: var(--color-text);">
       <i class="bi bi-gear me-2" style="color: var(--color-primary);"></i>
       Configuração do Sorteio
     </h3>
 
-    <form id="form-gerar-sorteio">
-      <div class="row justify-content-center">
-        <div class="col-md-6 mb-3">
-          <label for="categoria" class="form-label" style="color: var(--color-text); font-weight: 600;">
-            <i class="bi bi-trophy me-2"></i>
-            Categoria:
-          </label>
-          <select id="categoria" name="categoria" class="form-select form-select-lg" required>
-            <option value="misto">Misto</option>
-            <option value="masculino">Masculino</option>
-            <option value="feminino">Feminino</option>
-          </select>
-          <small class="text-muted" id="info-categoria" style="display: block; margin-top: 5px;">
-            Selecione a categoria para ver as opções disponíveis
-          </small>
-        </div>
-
-        <div class="col-md-6 mb-3">
-          <label for="jogos_por_pessoa" class="form-label" style="color: var(--color-text); font-weight: 600;">
-            <i class="bi bi-123 me-2"></i>
-            Quantos jogos cada pessoa fará?
-          </label>
-          <select id="jogos_por_pessoa" name="jogos_por_pessoa" class="form-select form-select-lg" required disabled>
-            <option value="">Analisando participantes...</option>
-          </select>
-          <small class="text-muted" id="info-jogos" style="display: block; margin-top: 5px;">
-            <i class="bi bi-hourglass-split me-1"></i>
-            Analisando opções viáveis...
-          </small>
-        </div>
-      </div>
-
-      <div class="text-center mt-4">
-        <button type="button" id="btn-gerar" class="btn btn-primary-custom" disabled style="font-size: 1.2rem; padding: 15px 40px;">
-          <i class="bi bi-play-circle me-2"></i>
-          Gerar Sorteio
+    <!-- Abas de Categorias -->
+    <ul class="nav nav-pills nav-justified mb-4" id="categoria-tabs" role="tablist" style="border-bottom: 2px solid rgba(255,255,255,0.2);">
+      <li class="nav-item" role="presentation">
+        <button class="nav-link active categoria-tab" id="tab-misto" data-categoria="misto" 
+                type="button" role="tab"
+                style="background: rgba(0,123,255,0.3); color: var(--color-text); border: none; border-radius: 8px 8px 0 0; font-weight: 600;">
+          <i class="bi bi-people-fill me-2"></i>
+          Misto
         </button>
-      </div>
-    </form>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link categoria-tab" id="tab-masculino" data-categoria="masculino" 
+                type="button" role="tab"
+                style="background: rgba(0,123,255,0.1); color: var(--color-text); border: none; border-radius: 8px 8px 0 0; font-weight: 600;">
+          <i class="bi bi-person-fill me-2"></i>
+          Masculino
+        </button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link categoria-tab" id="tab-feminino" data-categoria="feminino" 
+                type="button" role="tab"
+                style="background: rgba(0,123,255,0.1); color: var(--color-text); border: none; border-radius: 8px 8px 0 0; font-weight: 600;">
+          <i class="bi bi-person-fill me-2"></i>
+          Feminino
+        </button>
+      </li>
+    </ul>
 
-    <div id="preview-viabilidade" class="mt-4" style="display: none;">
-      <!-- Preview será preenchido via JavaScript -->
+    <!-- Conteúdo das Abas -->
+    <div class="tab-content" id="categoria-tab-content">
+      <!-- Aba Misto -->
+      <div class="tab-pane categoria-pane active" id="pane-misto" role="tabpanel">
+        <div id="config-misto">
+          <div class="text-center mb-3">
+            <p class="text-muted" id="info-misto">
+              <i class="bi bi-hourglass-split me-1"></i>
+              Analisando participantes...
+            </p>
+          </div>
+          <div class="row justify-content-center mb-3">
+            <div class="col-md-8">
+              <label for="jogos-misto" class="form-label" style="color: var(--color-text); font-weight: 600;">
+                <i class="bi bi-123 me-2"></i>
+                Quantos jogos cada pessoa fará?
+              </label>
+              <select id="jogos-misto" class="form-select form-select-lg" disabled>
+                <option value="">Carregando opções...</option>
+              </select>
+            </div>
+          </div>
+          <div id="preview-misto" class="mt-3" style="display: none;"></div>
+          <div class="text-center mt-4">
+            <button type="button" id="btn-gerar-misto" class="btn btn-primary-custom" disabled style="font-size: 1.2rem; padding: 15px 40px;">
+              <i class="bi bi-play-circle me-2"></i>
+              Gerar Sorteio Misto
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Aba Masculino -->
+      <div class="tab-pane categoria-pane" id="pane-masculino" role="tabpanel" style="display: none;">
+        <div id="config-masculino">
+          <div class="text-center mb-3">
+            <p class="text-muted" id="info-masculino">
+              <i class="bi bi-hourglass-split me-1"></i>
+              Analisando participantes...
+            </p>
+          </div>
+          <div class="row justify-content-center mb-3">
+            <div class="col-md-8">
+              <label for="jogos-masculino" class="form-label" style="color: var(--color-text); font-weight: 600;">
+                <i class="bi bi-123 me-2"></i>
+                Quantos jogos cada pessoa fará?
+              </label>
+              <select id="jogos-masculino" class="form-select form-select-lg" disabled>
+                <option value="">Carregando opções...</option>
+              </select>
+            </div>
+          </div>
+          <div id="preview-masculino" class="mt-3" style="display: none;"></div>
+          <div class="text-center mt-4">
+            <button type="button" id="btn-gerar-masculino" class="btn btn-primary-custom" disabled style="font-size: 1.2rem; padding: 15px 40px;">
+              <i class="bi bi-play-circle me-2"></i>
+              Gerar Sorteio Masculino
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Aba Feminino -->
+      <div class="tab-pane categoria-pane" id="pane-feminino" role="tabpanel" style="display: none;">
+        <div id="config-feminino">
+          <div class="text-center mb-3">
+            <p class="text-muted" id="info-feminino">
+              <i class="bi bi-hourglass-split me-1"></i>
+              Analisando participantes...
+            </p>
+          </div>
+          <div class="row justify-content-center mb-3">
+            <div class="col-md-8">
+              <label for="jogos-feminino" class="form-label" style="color: var(--color-text); font-weight: 600;">
+                <i class="bi bi-123 me-2"></i>
+                Quantos jogos cada pessoa fará?
+              </label>
+              <select id="jogos-feminino" class="form-select form-select-lg" disabled>
+                <option value="">Carregando opções...</option>
+              </select>
+            </div>
+          </div>
+          <div id="preview-feminino" class="mt-3" style="display: none;"></div>
+          <div class="text-center mt-4">
+            <button type="button" id="btn-gerar-feminino" class="btn btn-primary-custom" disabled style="font-size: 1.2rem; padding: 15px 40px;">
+              <i class="bi bi-play-circle me-2"></i>
+              Gerar Sorteio Feminino
+            </button>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </div>
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-  const categoriaSelect = document.getElementById('categoria');
-  const jogosSelect = document.getElementById('jogos_por_pessoa');
-  const btnGerar = document.getElementById('btn-gerar');
-  const previewDiv = document.getElementById('preview-viabilidade');
-  const infoCategoria = document.getElementById('info-categoria');
-  const infoJogos = document.getElementById('info-jogos');
+  // Elementos por categoria
+  const elementos = {
+    misto: {
+      select: document.getElementById('jogos-misto'),
+      btn: document.getElementById('btn-gerar-misto'),
+      preview: document.getElementById('preview-misto'),
+      info: document.getElementById('info-misto'),
+      categoria: 'misto'
+    },
+    masculino: {
+      select: document.getElementById('jogos-masculino'),
+      btn: document.getElementById('btn-gerar-masculino'),
+      preview: document.getElementById('preview-masculino'),
+      info: document.getElementById('info-masculino'),
+      categoria: 'masculino'
+    },
+    feminino: {
+      select: document.getElementById('jogos-feminino'),
+      btn: document.getElementById('btn-gerar-feminino'),
+      preview: document.getElementById('preview-feminino'),
+      info: document.getElementById('info-feminino'),
+      categoria: 'feminino'
+    }
+  };
 
   // Carrega informações dos participantes
   async function carregarInfoParticipantes() {
@@ -118,15 +213,16 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   }
 
-  // Carrega opções viáveis quando categoria muda
-  categoriaSelect.addEventListener('change', async function() {
-    const categoria = categoriaSelect.value;
+  // Função para carregar opções de uma categoria
+  async function carregarOpcoesCategoria(categoria) {
+    const el = elementos[categoria];
+    if (!el) return;
     
-    // Desabilita campos até carregar
-    jogosSelect.disabled = true;
-    jogosSelect.innerHTML = '<option value="">Carregando...</option>';
-    btnGerar.disabled = true;
-    previewDiv.style.display = 'none';
+    el.select.disabled = true;
+    el.select.innerHTML = '<option value="">Carregando...</option>';
+    el.btn.disabled = true;
+    el.preview.style.display = 'none';
+    el.info.innerHTML = '<i class="bi bi-hourglass-split me-1"></i> Analisando participantes...';
 
     try {
       const response = await fetch('/api/analisar_categoria', {
@@ -140,8 +236,7 @@ document.addEventListener('DOMContentLoaded', function() {
       const data = await response.json();
 
       if (data.viavel && data.opcoes && data.opcoes.length > 0) {
-        // Preenche select com opções viáveis
-        jogosSelect.innerHTML = '';
+        el.select.innerHTML = '';
         
         // Ordena opções por jogos_por_pessoa
         const opcoesOrdenadas = [...data.opcoes].sort((a, b) => a.jogos_por_pessoa - b.jogos_por_pessoa);
@@ -149,60 +244,98 @@ document.addEventListener('DOMContentLoaded', function() {
         opcoesOrdenadas.forEach(opcao => {
           const option = document.createElement('option');
           option.value = opcao.jogos_por_pessoa;
-          option.textContent = `${opcao.jogos_por_pessoa} jogos por pessoa (~${opcao.rodadas_estimadas} rodadas)`;
+          option.textContent = `${opcao.jogos_por_pessoa} jogos (~${opcao.rodadas_estimadas} rodadas)`;
           
-          // Seleciona a sugestão ou 5 (se disponível) ou primeira opção
+          // Seleciona a sugestão ou primeira opção
           if (data.sugestao && opcao.jogos_por_pessoa === data.sugestao.jogos_por_pessoa) {
             option.selected = true;
-            option.textContent += ' ⭐ (Sugerido)';
-          } else if (!data.sugestao && opcao.jogos_por_pessoa === 5 && jogosSelect.selectedIndex === -1) {
-            option.selected = true;
-          } else if (jogosSelect.selectedIndex === -1 && opcao === opcoesOrdenadas[0]) {
+            option.textContent += ' ⭐';
+          } else if (el.select.selectedIndex === -1 && opcao === opcoesOrdenadas[0]) {
             option.selected = true;
           }
           
-          jogosSelect.appendChild(option);
+          el.select.appendChild(option);
         });
 
-        jogosSelect.disabled = false;
-        infoCategoria.innerHTML = `
-          <i class="bi bi-check-circle me-1"></i>
-          <strong>${data.mensagem}</strong><br>
+        el.select.disabled = false;
+        el.info.innerHTML = `
+          <i class="bi bi-check-circle me-1" style="color: var(--color-success);"></i>
+          <strong style="color: var(--color-success);">${data.mensagem}</strong><br>
           <small style="opacity: 0.8;">${opcoesOrdenadas.length} opção(ões) viável(is): ${opcoesOrdenadas.map(o => o.jogos_por_pessoa).join(', ')} jogos</small>
         `;
-        infoCategoria.style.color = 'var(--color-success)';
         
         // Valida automaticamente a opção selecionada
-        validarConfiguracao();
+        validarConfiguracao(categoria);
       } else {
-        jogosSelect.innerHTML = '<option value="">Nenhuma opção viável</option>';
-        infoCategoria.textContent = `❌ ${data.mensagem}`;
-        infoCategoria.style.color = 'var(--color-danger)';
-        previewDiv.innerHTML = `
+        el.select.innerHTML = '<option value="">Nenhuma opção viável</option>';
+        el.info.innerHTML = `<i class="bi bi-x-circle me-1" style="color: var(--color-danger);"></i> <strong style="color: var(--color-danger);">${data.mensagem}</strong>`;
+        el.preview.innerHTML = `
           <div class="alert alert-danger">
             <h5><i class="bi bi-x-circle me-2"></i>Não é possível gerar sorteio</h5>
             <p>${data.mensagem}</p>
           </div>
         `;
-        previewDiv.style.display = 'block';
+        el.preview.style.display = 'block';
       }
     } catch (error) {
-      jogosSelect.innerHTML = '<option value="">Erro ao carregar</option>';
-      infoCategoria.textContent = `Erro: ${error.message}`;
-      infoCategoria.style.color = 'var(--color-danger)';
+      el.select.innerHTML = '<option value="">Erro ao carregar</option>';
+      el.info.innerHTML = `<i class="bi bi-x-circle me-1" style="color: var(--color-danger);"></i> Erro: ${error.message}`;
     }
+  }
+
+  // Event listeners para mudança de abas (implementação manual sem Bootstrap JS)
+  document.querySelectorAll('.categoria-tab').forEach(tab => {
+    tab.addEventListener('click', function(event) {
+      event.preventDefault();
+      const categoria = this.getAttribute('data-categoria');
+      
+      // Remove active de todas as abas
+      document.querySelectorAll('.categoria-tab').forEach(t => {
+        t.classList.remove('active');
+        t.style.background = 'rgba(0,123,255,0.1)';
+      });
+      
+      // Esconde todos os panes
+      document.querySelectorAll('.categoria-pane').forEach(p => {
+        p.style.display = 'none';
+        p.classList.remove('active');
+      });
+      
+      // Ativa aba clicada
+      this.classList.add('active');
+      this.style.background = 'rgba(0,123,255,0.3)';
+      
+      // Mostra pane correspondente
+      const pane = document.getElementById(`pane-${categoria}`);
+      if (pane) {
+        pane.style.display = 'block';
+        pane.classList.add('active');
+      }
+      
+      // Carrega opções se ainda não foram carregadas
+      if (categoria && elementos[categoria].select.innerHTML.includes('Carregando') || 
+          categoria && elementos[categoria].select.innerHTML.includes('Carregando opções')) {
+        carregarOpcoesCategoria(categoria);
+      } else if (categoria && elementos[categoria].select.value) {
+        validarConfiguracao(categoria);
+      }
+    });
   });
 
-  // Valida configuração quando jogos por pessoa muda
-  jogosSelect.addEventListener('change', validarConfiguracao);
+  // Event listeners para mudança de jogos
+  Object.keys(elementos).forEach(cat => {
+    elementos[cat].select.addEventListener('change', () => validarConfiguracao(cat));
+  });
 
-  async function validarConfiguracao() {
-    const categoria = categoriaSelect.value;
-    const jogosPorPessoa = parseInt(jogosSelect.value);
+  async function validarConfiguracao(categoria) {
+    const el = elementos[categoria];
+    if (!el) return;
+    
+    const jogosPorPessoa = parseInt(el.select.value);
 
-    if (!categoria || !jogosPorPessoa) {
-      btnGerar.disabled = true;
-      previewDiv.style.display = 'none';
+    if (!jogosPorPessoa) {
+      el.btn.disabled = true;
+      el.preview.style.display = 'none';
       return;
     }
 
@@ -222,7 +355,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const opcaoValida = opcoes.find(op => op.jogos_por_pessoa === jogosPorPessoa);
 
         if (opcaoValida) {
-          previewDiv.innerHTML = `
+          el.preview.innerHTML = `
             <div class="alert alert-success" style="background: rgba(6, 214, 160, 0.2); border: 2px solid var(--color-success);">
               <h5><i class="bi bi-check-circle me-2"></i>Configuração Válida!</h5>
               <div class="row mt-3">
@@ -241,65 +374,50 @@ document.addEventListener('DOMContentLoaded', function() {
               </div>
             </div>
           `;
-          previewDiv.style.display = 'block';
-          btnGerar.disabled = false;
-          infoJogos.textContent = '✅ Configuração válida e pronta para gerar';
-          infoJogos.style.color = 'var(--color-success)';
+          el.preview.style.display = 'block';
+          el.btn.disabled = false;
         } else {
-          previewDiv.innerHTML = `
+          el.preview.innerHTML = `
             <div class="alert alert-warning">
               <h5><i class="bi bi-exclamation-triangle me-2"></i>Configuração Inválida</h5>
               <p>O número de jogos selecionado (${jogosPorPessoa}) não é viável para esta categoria.</p>
               <p><strong>Opções viáveis:</strong> ${opcoes.map(op => op.jogos_por_pessoa).join(', ')}</p>
             </div>
           `;
-          previewDiv.style.display = 'block';
-          btnGerar.disabled = true;
-          infoJogos.textContent = '⚠️ Selecione uma opção viável';
-          infoJogos.style.color = 'var(--color-warning)';
+          el.preview.style.display = 'block';
+          el.btn.disabled = true;
         }
       } else {
-        previewDiv.innerHTML = `
+        el.preview.innerHTML = `
           <div class="alert alert-danger">
             <h5><i class="bi bi-x-circle me-2"></i>Não é possível gerar sorteio</h5>
             <p>${data.mensagem}</p>
           </div>
         `;
-        previewDiv.style.display = 'block';
-        btnGerar.disabled = true;
-        infoJogos.textContent = '❌ Não é possível gerar sorteio';
-        infoJogos.style.color = 'var(--color-danger)';
+        el.preview.style.display = 'block';
+        el.btn.disabled = true;
       }
     } catch (error) {
-      previewDiv.innerHTML = `
+      el.preview.innerHTML = `
         <div class="alert alert-danger">
           <h5><i class="bi bi-x-circle me-2"></i>Erro</h5>
           <p>Erro ao validar: ${error.message}</p>
         </div>
       `;
-      previewDiv.style.display = 'block';
-      btnGerar.disabled = true;
-      infoJogos.textContent = '❌ Erro ao validar';
-      infoJogos.style.color = 'var(--color-danger)';
+      el.preview.style.display = 'block';
+      el.btn.disabled = true;
     }
   }
 
-  // Carrega informações iniciais e analisa automaticamente
-  async function inicializar() {
-    await carregarInfoParticipantes();
-    // Carrega opções da categoria padrão (misto) automaticamente
-    categoriaSelect.dispatchEvent(new Event('change'));
-  }
-  
-  // Inicializa ao carregar a página
-  inicializar();
-
-  btnGerar.addEventListener('click', async function() {
-    const categoria = categoriaSelect.value;
-    const jogosPorPessoa = parseInt(jogosSelect.value);
-
-    btnGerar.disabled = true;
-    btnGerar.innerHTML = '<i class="bi bi-hourglass-split me-2"></i>Gerando...';
+  // Função para gerar sorteio
+  async function gerarSorteio(categoria) {
+    const el = elementos[categoria];
+    if (!el) return;
+    
+    const jogosPorPessoa = parseInt(el.select.value);
+    
+    el.btn.disabled = true;
+    el.btn.innerHTML = '<i class="bi bi-hourglass-split me-2"></i>Gerando...';
 
     try {
       const response = await fetch('/api/gerar-sorteio', {
@@ -316,15 +434,30 @@ document.addEventListener('DOMContentLoaded', function() {
         window.location.href = `/rodadas?categoria=${categoria}`;
       } else {
         alert('Erro ao gerar sorteio: ' + (data.erro || 'Erro desconhecido'));
-        btnGerar.disabled = false;
-        btnGerar.innerHTML = '<i class="bi bi-play-circle me-2"></i>Gerar Sorteio';
+        el.btn.disabled = false;
+        el.btn.innerHTML = '<i class="bi bi-play-circle me-2"></i>Gerar Sorteio ' + (categoria === 'misto' ? 'Misto' : categoria === 'masculino' ? 'Masculino' : 'Feminino');
       }
     } catch (error) {
       alert('Erro ao gerar sorteio: ' + error.message);
-      btnGerar.disabled = false;
-      btnGerar.innerHTML = '<i class="bi bi-play-circle me-2"></i>Gerar Sorteio';
+      el.btn.disabled = false;
+      el.btn.innerHTML = '<i class="bi bi-play-circle me-2"></i>Gerar Sorteio ' + (categoria === 'misto' ? 'Misto' : categoria === 'masculino' ? 'Masculino' : 'Feminino');
     }
-  });
+  }
+
+  // Event listeners para botões de gerar
+  elementos.misto.btn.addEventListener('click', () => gerarSorteio('misto'));
+  elementos.masculino.btn.addEventListener('click', () => gerarSorteio('masculino'));
+  elementos.feminino.btn.addEventListener('click', () => gerarSorteio('feminino'));
+
+  // Carrega informações iniciais e analisa automaticamente
+  async function inicializar() {
+    await carregarInfoParticipantes();
+    // Carrega opções da categoria padrão (misto) automaticamente
+    carregarOpcoesCategoria('misto');
+  }
+  
+  // Inicializa ao carregar a página
+  inicializar();
 });
 </script>
 {% endblock %}

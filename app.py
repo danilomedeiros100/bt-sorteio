@@ -722,7 +722,35 @@ def admin_visitas():
 def rota_gerar_sorteio():
     """Página para gerar sorteio v3"""
     jogadores = carregar_jogadores()
-    return render_template("gerar_sorteio.html", jogadores=jogadores)
+    
+    # Calcula contadores por categoria
+    confirmados = [j for j in jogadores if j.get("confirmado", False)]
+    homens = [j for j in confirmados if j.get("sexo") == "M"]
+    mulheres = [j for j in confirmados if j.get("sexo") == "F"]
+    
+    categorias_info = {
+        "misto_h": len(homens),
+        "misto_f": len(mulheres),
+        "masculino": len(homens),
+        "feminino": len(mulheres)
+    }
+    
+    return render_template("gerar_sorteio.html", jogadores=jogadores, categorias_info=categorias_info)
+
+
+@app.route("/api/info_participantes")
+def api_info_participantes():
+    """API para retornar informações dos participantes confirmados"""
+    jogadores = carregar_jogadores()
+    confirmados = [j for j in jogadores if j.get("confirmado", False)]
+    homens = [j for j in confirmados if j.get("sexo") == "M"]
+    mulheres = [j for j in confirmados if j.get("sexo") == "F"]
+    
+    return jsonify({
+        "misto": {"homens": len(homens), "mulheres": len(mulheres)},
+        "masculino": len(homens),
+        "feminino": len(mulheres)
+    })
 
 
 @app.route("/api/analisar_categoria", methods=["POST"])

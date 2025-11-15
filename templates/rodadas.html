@@ -1,15 +1,15 @@
 {% extends 'base.html' %}
-{% block title %}5 Rodadas - Torneio{% endblock %}
+{% block title %}Rodadas - Torneio{% endblock %}
 
 {% block content %}
 <div class="fade-in">
   
 <h1 class="text-center app-title mb-4">
   <i class="bi bi-calendar3 me-2" style="color: var(--color-accent);"></i>
-  5 Rodadas do Torneio
+  Rodadas do Torneio
 </h1>
 
-{% if not rodadas %}
+{% if not todas_rodadas or (not todas_rodadas.mista and not todas_rodadas.masculino and not todas_rodadas.feminino) %}
   <div class="glass-card text-center">
     <i class="bi bi-exclamation-triangle" style="font-size: 3rem; color: var(--color-warning);"></i>
     <h2 class="mt-3 mb-3">Nenhuma Rodada Gerada</h2>
@@ -22,165 +22,251 @@
   
 {% else %}
   
-  <!-- Info geral -->
-  <div class="glass-card text-center mb-4 slide-in">
-    <p class="mb-2" style="font-size: 1.1rem;">
-      <i class="bi bi-calendar-check me-2" style="color: var(--color-accent);"></i>
-      <strong>Torneio gerado em:</strong> {{ rodadas.data_sorteio[:10] }}
-    </p>
-    <p class="mb-0" style="font-size: 1.1rem;">
-      <i class="bi bi-people-fill me-2" style="color: var(--color-primary);"></i>
-      <strong>{{ rodadas.total_homens }}</strong> homens | 
-      <strong>{{ rodadas.total_mulheres }}</strong> mulheres | 
-      <strong>{{ rodadas.total_rodadas }}</strong> rodadas
-    </p>
-  </div>
-
-  <!-- Botões de ação -->
-  <div class="glass-card text-center mb-4 slide-in" style="animation-delay: 0.1s;">
-    <a href="{{ url_for('rota_ranking_individual') }}" class="btn-primary-custom btn-accent">
-      <i class="bi bi-bar-chart-fill me-2"></i>
-      Ver Ranking
-    </a>
-  </div>
-
-  <!-- Filtro por Atleta -->
-  <div class="glass-card mb-4 slide-in" style="animation-delay: 0.2s; background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.9)); border: 2px solid var(--color-primary); box-shadow: 0 8px 32px rgba(0, 123, 255, 0.2);">
-    <h3 class="text-center mb-3" style="color: #1a1a2e; font-size: 1.4rem; font-weight: 700;">
-      <i class="bi bi-funnel-fill me-2" style="color: var(--color-primary);"></i>
-      Filtrar por Atleta
-    </h3>
+  <!-- Seletor de Categoria -->
+  <div class="glass-card mb-4 slide-in">
     <div class="row justify-content-center">
       <div class="col-md-6">
-        <select id="filtroAtleta" class="form-select form-select-lg" style="
-          background: white !important; 
-          color: #1a1a2e !important; 
-          border: 2px solid var(--color-primary) !important; 
-          font-weight: 600 !important;
-          font-size: 1.1rem !important;
-          padding: 12px 16px !important;
-          box-shadow: 0 4px 12px rgba(0, 123, 255, 0.15) !important;
-        ">
-          <option value="">👥 Todos os Jogos</option>
-          {% set todos_jogadores = [] %}
-          {% for rodada in rodadas.rodadas %}
-            {% for confronto in rodada.confrontos %}
-              {% if confronto.dupla1.jogador1 not in todos_jogadores %}
-                {% set _ = todos_jogadores.append(confronto.dupla1.jogador1) %}
-              {% endif %}
-              {% if confronto.dupla1.jogador2 not in todos_jogadores %}
-                {% set _ = todos_jogadores.append(confronto.dupla1.jogador2) %}
-              {% endif %}
-              {% if confronto.dupla2.jogador1 not in todos_jogadores %}
-                {% set _ = todos_jogadores.append(confronto.dupla2.jogador1) %}
-              {% endif %}
-              {% if confronto.dupla2.jogador2 not in todos_jogadores %}
-                {% set _ = todos_jogadores.append(confronto.dupla2.jogador2) %}
-              {% endif %}
-            {% endfor %}
-          {% endfor %}
-          {% for rodada in rodadas.rodadas %}
-            {% if rodada.descansando %}
-              {% for jogador in rodada.descansando %}
-                {% if jogador not in todos_jogadores %}
-                  {% set _ = todos_jogadores.append(jogador) %}
-                {% endif %}
-              {% endfor %}
-            {% endif %}
-          {% endfor %}
-          {% for jogador in todos_jogadores|sort %}
-            <option value="{{ jogador }}">{{ jogador }}</option>
-          {% endfor %}
+        <label for="seletorCategoria" class="form-label text-center d-block mb-3" style="color: var(--color-text); font-size: 1.2rem; font-weight: 600;">
+          <i class="bi bi-funnel-fill me-2" style="color: var(--color-primary);"></i>
+          Selecionar Categoria
+        </label>
+        <select id="seletorCategoria" class="form-select form-select-lg" 
+                style="background: white !important; color: #1a1a2e !important; border: 2px solid var(--color-primary) !important; font-weight: 600 !important; font-size: 1.1rem !important; padding: 12px 16px !important; box-shadow: 0 4px 12px rgba(0, 123, 255, 0.15) !important;">
+          {% if todas_rodadas.mista %}
+          <option value="mista" {% if categoria_selecionada == 'mista' %}selected{% endif %}>Mista</option>
+          {% endif %}
+          
+          {% if todas_rodadas.masculino %}
+          <option value="masculino" {% if categoria_selecionada == 'masculino' %}selected{% endif %}>Masculino</option>
+          {% endif %}
+          
+          {% if todas_rodadas.feminino %}
+          <option value="feminino" {% if categoria_selecionada == 'feminino' %}selected{% endif %}>Feminino</option>
+          {% endif %}
         </select>
       </div>
     </div>
-    <p class="text-center mt-3 mb-0" style="color: #555; font-weight: 500;">
-      <small>
-        <i class="bi bi-info-circle me-1" style="color: var(--color-primary);"></i>
-        Selecione seu nome para ver apenas seus jogos
-      </small>
-    </p>
   </div>
 
-  <!-- Cada Rodada -->
-  {% for rodada in rodadas.rodadas %}
-    <div class="glass-card mb-4 rodada-card slide-in" style="animation-delay: {{ 0.1 * loop.index }}s;">
-      <h2 class="text-center mb-4" style="color: var(--color-accent); font-size: 1.8rem;">
-        <i class="bi bi-circle-fill me-2" style="font-size: 0.8rem;"></i>
-        RODADA {{ rodada.numero }}
-      </h2>
-      
-      <!-- Confrontos -->
-      {% for confronto in rodada.confrontos %}
-        <div class="matchup-container confronto-item" 
-             data-jogadores="{{ confronto.dupla1.jogador1 }},{{ confronto.dupla1.jogador2 }},{{ confronto.dupla2.jogador1 }},{{ confronto.dupla2.jogador2 }}">
-          
-          <!-- Quadra -->
-          <div class="matchup-quadra">
-            <span class="badge">
-              <i class="bi bi-geo-alt-fill me-1"></i>
-              Quadra {{ confronto.quadra }}
-            </span>
-          </div>
-          
-          <!-- Confronto -->
-          <div class="matchup-content">
-            <!-- Placar Dupla 1 -->
-            {% if confronto.resultado.finalizado %}
-              <span class="matchup-score">{{ confronto.resultado.games_dupla1 }}</span>
+  <!-- Conteúdo das Categorias -->
+  <div id="categoriaContent">
+    
+    {% for categoria_nome in ["mista", "masculino", "feminino"] %}
+      {% set rodadas = todas_rodadas[categoria_nome] %}
+      {% if rodadas %}
+      <div class="categoria-panel {% if categoria_selecionada == categoria_nome %}active{% else %}d-none{% endif %}" 
+           id="{{ categoria_nome }}-panel" 
+           data-categoria="{{ categoria_nome }}"
+           {% if categoria_selecionada == categoria_nome %}style="display: block;"{% endif %}>
+        
+        <!-- Info geral -->
+        <div class="glass-card text-center mb-4 slide-in">
+          <p class="mb-2" style="font-size: 1.1rem;">
+            <i class="bi bi-calendar-check me-2" style="color: var(--color-accent);"></i>
+            <strong>Torneio gerado em:</strong> {{ rodadas.data_sorteio[:10] }}
+          </p>
+          <p class="mb-0" style="font-size: 1.1rem;">
+            <i class="bi bi-people-fill me-2" style="color: var(--color-primary);"></i>
+            {% if rodadas.categoria == "masculino" or rodadas.categoria == "feminino" %}
+              <strong>{{ rodadas.total_jogadores }}</strong> jogadores | 
+              <strong>{{ rodadas.jogos_por_pessoa }}</strong> jogos por pessoa | 
+            {% else %}
+              <strong>{{ rodadas.total_homens }}</strong> homens | 
+              <strong>{{ rodadas.total_mulheres }}</strong> mulheres | 
             {% endif %}
-            
-            <!-- Dupla 1 -->
-            <div class="matchup-dupla {% if confronto.resultado.finalizado %}{% if confronto.resultado.games_dupla1 > confronto.resultado.games_dupla2 %}winner{% else %}loser{% endif %}{% endif %}" style="color: var(--color-text);">
-              <span class="jogador-nome" data-jogador="{{ confronto.dupla1.jogador1 }}" style="color: var(--color-text);">{{ confronto.dupla1.jogador1 }}</span>
-              <span class="mx-1" style="color: rgba(255,255,255,0.5);">&</span>
-              <span class="jogador-nome" data-jogador="{{ confronto.dupla1.jogador2 }}" style="color: var(--color-text);">{{ confronto.dupla1.jogador2 }}</span>
-            </div>
-            
-            <!-- VS -->
-            <div class="matchup-vs">VS</div>
-            
-            <!-- Dupla 2 -->
-            <div class="matchup-dupla {% if confronto.resultado.finalizado %}{% if confronto.resultado.games_dupla2 > confronto.resultado.games_dupla1 %}winner{% else %}loser{% endif %}{% endif %}" style="color: var(--color-text);">
-              <span class="jogador-nome" data-jogador="{{ confronto.dupla2.jogador1 }}" style="color: var(--color-text);">{{ confronto.dupla2.jogador1 }}</span>
-              <span class="mx-1" style="color: rgba(255,255,255,0.5);">&</span>
-              <span class="jogador-nome" data-jogador="{{ confronto.dupla2.jogador2 }}" style="color: var(--color-text);">{{ confronto.dupla2.jogador2 }}</span>
-            </div>
-            
-            <!-- Placar Dupla 2 -->
-            {% if confronto.resultado.finalizado %}
-              <span class="matchup-score">{{ confronto.resultado.games_dupla2 }}</span>
-            {% endif %}
-          </div>
-          
-          <!-- Status -->
-          {% if not confronto.resultado.finalizado %}
-            <div class="text-center mt-3">
-              <span class="badge-status badge-pending">
-                <i class="bi bi-clock me-1"></i>
-                Aguardando Resultado
-              </span>
-            </div>
-          {% endif %}
+            <strong>{{ rodadas.total_rodadas }}</strong> rodadas
+          </p>
         </div>
-      {% endfor %}
-      
-      <!-- Jogadores descansando -->
-      {% if rodada.descansando and rodada.descansando|length > 0 %}
-        <div class="alert-custom alert-info text-center mt-3 descansando-item" data-descansando="{{ rodada.descansando | join(',') }}">
-          <i class="bi bi-moon-stars-fill me-2" style="color: var(--color-primary);"></i>
-          <strong>Descansando:</strong> {{ rodada.descansando | join(', ') }}
-        </div>
-      {% endif %}
-    </div>
-  {% endfor %}
 
-  <!-- Botões no final -->
-  <div class="text-center mb-4">
-    <a href="{{ url_for('rota_ranking_individual') }}" class="btn-primary-custom btn-accent" style="font-size: 1.2rem; padding: 15px 40px;">
-      <i class="bi bi-bar-chart-fill me-2"></i>
-      Ver Ranking Atualizado
-    </a>
+        <!-- Botão de ação -->
+        <div class="glass-card text-center mb-4 slide-in" style="animation-delay: 0.1s;">
+          <a href="{{ url_for('rota_ranking_por_categoria', categoria=categoria_nome) }}" class="btn-primary-custom btn-accent">
+            <i class="bi bi-bar-chart-fill me-2"></i>
+            Ver Ranking
+          </a>
+        </div>
+
+        <!-- Filtro por Atleta -->
+        <div class="glass-card mb-4 slide-in categoria-content" 
+             data-categoria="{{ categoria_nome }}"
+             style="animation-delay: 0.2s; background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.9)); border: 2px solid var(--color-primary); box-shadow: 0 8px 32px rgba(0, 123, 255, 0.2);">
+          <h3 class="text-center mb-3" style="color: #1a1a2e; font-size: 1.4rem; font-weight: 700;">
+            <i class="bi bi-funnel-fill me-2" style="color: var(--color-primary);"></i>
+            Filtrar por Atleta
+          </h3>
+          <div class="row justify-content-center">
+            <div class="col-md-6">
+              <select class="form-select form-select-lg filtro-atleta" 
+                      data-categoria="{{ categoria_nome }}"
+                      style="background: white !important; color: #1a1a2e !important; border: 2px solid var(--color-primary) !important; font-weight: 600 !important; font-size: 1.1rem !important; padding: 12px 16px !important; box-shadow: 0 4px 12px rgba(0, 123, 255, 0.15) !important;">
+                <option value="">Todos os Jogos</option>
+                {% set todos_jogadores = [] %}
+                {% for rodada in rodadas.rodadas %}
+                  {% for confronto in rodada.confrontos %}
+                    {% if confronto.dupla1 and confronto.dupla1.jogador1 not in todos_jogadores %}
+                      {% set _ = todos_jogadores.append(confronto.dupla1.jogador1) %}
+                    {% endif %}
+                    {% if confronto.dupla1 and confronto.dupla1.jogador2 not in todos_jogadores %}
+                      {% set _ = todos_jogadores.append(confronto.dupla1.jogador2) %}
+                    {% endif %}
+                    {% if confronto.dupla2 %}
+                      {% if confronto.dupla2.jogador1 not in todos_jogadores %}
+                        {% set _ = todos_jogadores.append(confronto.dupla2.jogador1) %}
+                      {% endif %}
+                      {% if confronto.dupla2.jogador2 not in todos_jogadores %}
+                        {% set _ = todos_jogadores.append(confronto.dupla2.jogador2) %}
+                      {% endif %}
+                    {% endif %}
+                  {% endfor %}
+                {% endfor %}
+                {% for rodada in rodadas.rodadas %}
+                  {% if rodada.descansando %}
+                    {% for jogador in rodada.descansando %}
+                      {% if jogador not in todos_jogadores %}
+                        {% set _ = todos_jogadores.append(jogador) %}
+                      {% endif %}
+                    {% endfor %}
+                  {% endif %}
+                {% endfor %}
+                {% for jogador in todos_jogadores|sort %}
+                  <option value="{{ jogador }}">{{ jogador }}</option>
+                {% endfor %}
+              </select>
+            </div>
+          </div>
+          <p class="text-center mt-3 mb-0" style="color: #555; font-weight: 500;">
+            <small>
+              <i class="bi bi-info-circle me-1" style="color: var(--color-primary);"></i>
+              Selecione seu nome para ver apenas seus jogos
+            </small>
+          </p>
+        </div>
+
+        <!-- Cada Rodada -->
+        {% for rodada in rodadas.rodadas %}
+          <div class="glass-card mb-4 rodada-card categoria-{{ categoria_nome }}" style="animation-delay: {{ 0.1 * loop.index }}s;">
+            <h2 class="text-center mb-4" style="color: var(--color-accent); font-size: 1.8rem;">
+              <i class="bi bi-circle-fill me-2" style="font-size: 0.8rem;"></i>
+              RODADA {{ rodada.numero }}
+            </h2>
+            
+            <!-- Confrontos -->
+            {% for confronto in rodada.confrontos %}
+              {% if confronto.dupla2 %}
+                <!-- Confronto normal (2 duplas) -->
+                <div class="matchup-container confronto-item categoria-{{ categoria_nome }}" 
+                     data-jogadores="{{ confronto.dupla1.jogador1 }},{{ confronto.dupla1.jogador2 }},{{ confronto.dupla2.jogador1 }},{{ confronto.dupla2.jogador2 }}">
+                  
+                  <!-- Quadra -->
+                  <div class="matchup-quadra">
+                    <span class="badge">
+                      <i class="bi bi-geo-alt-fill me-1"></i>
+                      Quadra {{ confronto.quadra }}
+                    </span>
+                  </div>
+                  
+                  <!-- Confronto -->
+                  <div class="matchup-content">
+                    <!-- Placar Dupla 1 -->
+                    {% if confronto.resultado and confronto.resultado.finalizado %}
+                      <span class="matchup-score">{{ confronto.resultado.games_dupla1 }}</span>
+                    {% endif %}
+                    
+                    <!-- Dupla 1 -->
+                    <div class="matchup-dupla {% if confronto.resultado and confronto.resultado.finalizado %}{% if confronto.resultado.games_dupla1 > confronto.resultado.games_dupla2 %}winner{% else %}loser{% endif %}{% endif %}" style="color: var(--color-text);">
+                      <span class="jogador-nome" data-jogador="{{ confronto.dupla1.jogador1 }}" style="color: var(--color-text);">{{ confronto.dupla1.jogador1 }}</span>
+                      <span class="mx-1" style="color: rgba(255,255,255,0.5);">&</span>
+                      <span class="jogador-nome" data-jogador="{{ confronto.dupla1.jogador2 }}" style="color: var(--color-text);">{{ confronto.dupla1.jogador2 }}</span>
+                    </div>
+                    
+                    <!-- VS -->
+                    <div class="matchup-vs">VS</div>
+                    
+                    <!-- Dupla 2 -->
+                    <div class="matchup-dupla {% if confronto.resultado and confronto.resultado.finalizado %}{% if confronto.resultado.games_dupla2 > confronto.resultado.games_dupla1 %}winner{% else %}loser{% endif %}{% endif %}" style="color: var(--color-text);">
+                      <span class="jogador-nome" data-jogador="{{ confronto.dupla2.jogador1 }}" style="color: var(--color-text);">{{ confronto.dupla2.jogador1 }}</span>
+                      <span class="mx-1" style="color: rgba(255,255,255,0.5);">&</span>
+                      <span class="jogador-nome" data-jogador="{{ confronto.dupla2.jogador2 }}" style="color: var(--color-text);">{{ confronto.dupla2.jogador2 }}</span>
+                    </div>
+                    
+                    <!-- Placar Dupla 2 -->
+                    {% if confronto.resultado and confronto.resultado.finalizado %}
+                      <span class="matchup-score">{{ confronto.resultado.games_dupla2 }}</span>
+                    {% endif %}
+                  </div>
+                  
+                  <!-- Status -->
+                  {% if not confronto.resultado or not confronto.resultado.finalizado %}
+                    <div class="text-center mt-3">
+                      <span class="badge-status badge-pending">
+                        <i class="bi bi-clock me-1"></i>
+                        Aguardando Resultado
+                      </span>
+                    </div>
+                  {% endif %}
+                </div>
+              {% else %}
+                <!-- Confronto com BYE (dupla sem adversário) -->
+                <div class="matchup-container confronto-item categoria-{{ categoria_nome }}" 
+                     data-jogadores="{{ confronto.dupla1.jogador1 }},{{ confronto.dupla1.jogador2 }}">
+                  
+                  <!-- Quadra -->
+                  <div class="matchup-quadra">
+                    <span class="badge">
+                      <i class="bi bi-geo-alt-fill me-1"></i>
+                      Quadra {{ confronto.quadra }}
+                    </span>
+                  </div>
+                  
+                  <!-- Confronto -->
+                  <div class="matchup-content">
+                    <!-- Dupla 1 -->
+                    <div class="matchup-dupla" style="color: var(--color-text);">
+                      <span class="jogador-nome" data-jogador="{{ confronto.dupla1.jogador1 }}" style="color: var(--color-text);">{{ confronto.dupla1.jogador1 }}</span>
+                      <span class="mx-1" style="color: rgba(255,255,255,0.5);">&</span>
+                      <span class="jogador-nome" data-jogador="{{ confronto.dupla1.jogador2 }}" style="color: var(--color-text);">{{ confronto.dupla1.jogador2 }}</span>
+                    </div>
+                    
+                    <!-- VS -->
+                    <div class="matchup-vs">BYE</div>
+                    
+                    <!-- Sem adversário -->
+                    <div class="matchup-dupla" style="color: var(--color-text-muted); opacity: 0.6;">
+                      <span>Sem adversário</span>
+                    </div>
+                  </div>
+                  
+                  <!-- Status -->
+                  <div class="text-center mt-3">
+                    <span class="badge-status badge-pending">
+                      <i class="bi bi-info-circle me-1"></i>
+                      {{ confronto.obs or "Dupla sem adversário" }}
+                    </span>
+                  </div>
+                </div>
+              {% endif %}
+            {% endfor %}
+            
+            <!-- Jogadores descansando -->
+            {% if rodada.descansando and rodada.descansando|length > 0 %}
+              <div class="alert-custom alert-info text-center mt-3 descansando-item categoria-{{ categoria_nome }}" data-descansando="{{ rodada.descansando | join(',') }}">
+                <i class="bi bi-moon-stars-fill me-2" style="color: var(--color-primary);"></i>
+                <strong>Descansando:</strong> {{ rodada.descansando | join(', ') }}
+              </div>
+            {% endif %}
+          </div>
+        {% endfor %}
+
+        <!-- Botão no final -->
+        <div class="text-center mb-4">
+          <a href="{{ url_for('rota_ranking_por_categoria', categoria=categoria_nome) }}" class="btn-primary-custom btn-accent" style="font-size: 1.2rem; padding: 15px 40px;">
+            <i class="bi bi-bar-chart-fill me-2"></i>
+            Ver Ranking Atualizado
+          </a>
+        </div>
+      </div>
+      {% endif %}
+    {% endfor %}
   </div>
 
   <div class="text-center mb-4">
@@ -199,73 +285,139 @@
 
 {% block scripts %}
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-  const filtroAtleta = document.getElementById('filtroAtleta');
+function mostrarCategoria(categoria) {
+  // Atualiza URL sem recarregar a página
+  const url = new URL(window.location);
+  url.searchParams.set('categoria', categoria);
+  window.history.pushState({}, '', url);
   
-  if (filtroAtleta) {
-    filtroAtleta.addEventListener('change', function() {
-      const atletaSelecionado = this.value;
+  // Esconde todos os painéis
+  document.querySelectorAll('.categoria-panel').forEach(panel => {
+    panel.classList.add('d-none');
+    panel.classList.remove('active');
+  });
+  
+  // Mostra o painel selecionado
+  const painelSelecionado = document.getElementById(categoria + '-panel');
+  if (painelSelecionado) {
+    painelSelecionado.classList.remove('d-none');
+    painelSelecionado.classList.add('active');
+  }
+  
+  // Reseta filtros
+  document.querySelectorAll('.filtro-atleta').forEach(select => {
+    select.value = '';
+  });
+  
+  // Aplica filtro se houver
+  aplicarFiltro(categoria);
+}
+
+function aplicarFiltro(categoria) {
+  const filtro = document.querySelector(`.filtro-atleta[data-categoria="${categoria}"]`);
+  if (!filtro) return;
+  
+  const atletaSelecionado = filtro.value;
+  const categoriaContainer = document.getElementById(categoria + '-panel');
+  
+  if (!categoriaContainer) return;
+  
+  // Remove todos os destaques anteriores
+  categoriaContainer.querySelectorAll('.jogador-nome').forEach(el => {
+    el.classList.remove('highlight-player');
+  });
+  
+  if (atletaSelecionado === '') {
+    // Mostrar todos os jogos
+    categoriaContainer.querySelectorAll('.confronto-item, .descansando-item, .rodada-card').forEach(el => {
+      if (el.classList.contains('categoria-' + categoria)) {
+        el.style.display = '';
+      }
+    });
+  } else {
+    // Filtrar por atleta
+    categoriaContainer.querySelectorAll('.rodada-card.categoria-' + categoria).forEach(rodadaCard => {
+      let temJogoDoAtleta = false;
       
-      // Remove todos os destaques anteriores
-      document.querySelectorAll('.jogador-nome').forEach(el => {
-        el.classList.remove('highlight-player');
+      // Verifica confrontos
+      rodadaCard.querySelectorAll('.confronto-item').forEach(confronto => {
+        const jogadores = confronto.dataset.jogadores.split(',');
+        if (jogadores.includes(atletaSelecionado)) {
+          confronto.style.display = '';
+          temJogoDoAtleta = true;
+          
+          // Destaca o atleta selecionado
+          confronto.querySelectorAll('.jogador-nome').forEach(nomeEl => {
+            if (nomeEl.dataset.jogador === atletaSelecionado) {
+              nomeEl.classList.add('highlight-player');
+            }
+          });
+        } else {
+          confronto.style.display = 'none';
+        }
       });
       
-      if (atletaSelecionado === '') {
-        // Mostrar todos os jogos
-        document.querySelectorAll('.confronto-item').forEach(el => {
-          el.style.display = '';
-        });
-        document.querySelectorAll('.descansando-item').forEach(el => {
-          el.style.display = '';
-        });
-        document.querySelectorAll('.rodada-card').forEach(el => {
-          el.style.display = '';
-        });
+      // Verifica descansando
+      rodadaCard.querySelectorAll('.descansando-item').forEach(descItem => {
+        const descansando = descItem.dataset.descansando ? descItem.dataset.descansando.split(',') : [];
+        if (descansando.includes(atletaSelecionado)) {
+          descItem.style.display = '';
+          temJogoDoAtleta = true;
+        } else {
+          descItem.style.display = 'none';
+        }
+      });
+      
+      // Mostra/esconde a rodada inteira
+      if (temJogoDoAtleta) {
+        rodadaCard.style.display = '';
       } else {
-        // Filtrar por atleta
-        document.querySelectorAll('.rodada-card').forEach(rodadaCard => {
-          let temJogoDoAtleta = false;
-          
-          // Verifica confrontos
-          rodadaCard.querySelectorAll('.confronto-item').forEach(confronto => {
-            const jogadores = confronto.dataset.jogadores.split(',');
-            if (jogadores.includes(atletaSelecionado)) {
-              confronto.style.display = '';
-              temJogoDoAtleta = true;
-              
-              // Destaca o atleta selecionado
-              confronto.querySelectorAll('.jogador-nome').forEach(nomeEl => {
-                if (nomeEl.dataset.jogador === atletaSelecionado) {
-                  nomeEl.classList.add('highlight-player');
-                }
-              });
-            } else {
-              confronto.style.display = 'none';
-            }
-          });
-          
-          // Verifica descansando
-          rodadaCard.querySelectorAll('.descansando-item').forEach(descItem => {
-            const descansando = descItem.dataset.descansando ? descItem.dataset.descansando.split(',') : [];
-            if (descansando.includes(atletaSelecionado)) {
-              descItem.style.display = '';
-              temJogoDoAtleta = true;
-            } else {
-              descItem.style.display = 'none';
-            }
-          });
-          
-          // Mostra/esconde a rodada inteira
-          if (temJogoDoAtleta) {
-            rodadaCard.style.display = '';
-          } else {
-            rodadaCard.style.display = 'none';
-          }
-        });
+        rodadaCard.style.display = 'none';
       }
     });
   }
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  // Inicializa categoria ativa
+  const urlParams = new URLSearchParams(window.location.search);
+  const categoriaUrl = urlParams.get('categoria');
+  const categoriaAtiva = categoriaUrl || '{{ categoria_selecionada or "mista" }}';
+  
+  // Garante que o painel correto está visível
+  const painelAtivo = document.getElementById(categoriaAtiva + '-panel');
+  if (painelAtivo) {
+    painelAtivo.classList.remove('d-none');
+    painelAtivo.classList.add('active');
+    painelAtivo.style.display = 'block';
+  }
+  
+  // Esconde outros painéis
+  document.querySelectorAll('.categoria-panel').forEach(panel => {
+    if (panel.id !== categoriaAtiva + '-panel') {
+      panel.classList.add('d-none');
+      panel.classList.remove('active');
+      panel.style.display = 'none';
+    }
+  });
+  
+  mostrarCategoria(categoriaAtiva);
+  
+  // Event listener para seletor de categoria
+  const seletorCategoria = document.getElementById('seletorCategoria');
+  if (seletorCategoria) {
+    seletorCategoria.addEventListener('change', function() {
+      mostrarCategoria(this.value);
+    });
+  }
+  
+  // Event listeners para filtros
+  document.querySelectorAll('.filtro-atleta').forEach(select => {
+    select.addEventListener('change', function() {
+      const categoria = this.dataset.categoria;
+      aplicarFiltro(categoria);
+    });
+  });
 });
 </script>
 {% endblock %}

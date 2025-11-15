@@ -17,7 +17,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
   
   <!-- CSS Global -->
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v=2.4">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v=2.5">
   
   <style>
     /* Ajustes específicos do Bootstrap para integrar com o tema */
@@ -99,6 +99,86 @@
     /* Labels e forms */
     label, .form-label, .form-check-label {
       color: var(--color-text) !important;
+    }
+    
+    /* Alerts do Bootstrap - Ajustes para tema escuro */
+    .alert {
+      background-color: rgba(255, 255, 255, 0.1) !important;
+      border: 1px solid rgba(255, 255, 255, 0.2) !important;
+      color: var(--color-text) !important;
+      border-radius: 8px;
+      padding: 15px 20px;
+    }
+    
+    .alert-success {
+      background-color: rgba(6, 214, 160, 0.2) !important;
+      border-color: rgba(6, 214, 160, 0.5) !important;
+      color: #06d6a0 !important;
+    }
+    
+    .alert-info {
+      background-color: rgba(0, 123, 255, 0.2) !important;
+      border-color: rgba(0, 123, 255, 0.5) !important;
+      color: #4da3ff !important;
+    }
+    
+    .alert-warning {
+      background-color: rgba(255, 209, 102, 0.2) !important;
+      border-color: rgba(255, 209, 102, 0.5) !important;
+      color: #ffd166 !important;
+    }
+    
+    .alert-danger {
+      background-color: rgba(239, 71, 111, 0.2) !important;
+      border-color: rgba(239, 71, 111, 0.5) !important;
+      color: #ef476f !important;
+    }
+    
+    .alert h5 {
+      color: inherit !important;
+      font-weight: 600;
+      margin-bottom: 10px;
+    }
+    
+    .alert p {
+      color: inherit !important;
+      margin-bottom: 5px;
+    }
+    
+    .alert strong {
+      color: inherit !important;
+      font-weight: 600;
+    }
+    
+    /* Texto dentro dos alerts */
+    .alert * {
+      color: inherit !important;
+    }
+    
+    /* Textos em divs de opções e preview */
+    #mista-opcoes p,
+    #masculino-opcoes p,
+    #feminino-opcoes p,
+    #mista-preview-content p,
+    #masculino-preview-content p,
+    #feminino-preview-content p {
+      color: var(--color-text) !important;
+      margin-bottom: 8px;
+    }
+    
+    #mista-opcoes strong,
+    #masculino-opcoes strong,
+    #feminino-opcoes strong,
+    #mista-preview-content strong,
+    #masculino-preview-content strong,
+    #feminino-preview-content strong {
+      color: var(--color-accent) !important;
+      font-weight: 600;
+    }
+    
+    /* Texto muted dentro dos divs */
+    .text-muted {
+      color: var(--color-text-muted) !important;
     }
   </style>
 </head>

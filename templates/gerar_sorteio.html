@@ -1,0 +1,456 @@
+{% extends "base.html" %}
+{% block title %}Gerar Sorteio{% endblock %}
+
+{% block content %}
+<div class="fade-in" style="min-height: 70vh; padding-top: 40px;">
+  
+  <div class="text-center mb-4">
+    <h1 class="app-title">
+      <i class="bi bi-shuffle me-2" style="color: var(--color-accent);"></i>
+      Gerar Sorteio - Sistema Flexível
+    </h1>
+    <p class="text-muted">Escolha a categoria e o sistema sugerirá as melhores opções</p>
+  </div>
+  
+  <div class="glass-card" style="max-width: 800px; margin: 0 auto;">
+    
+    <!-- PASSO 1: Seleção de Categoria -->
+    <div id="passo1" class="mb-4">
+      <h3 class="mb-3">
+        <i class="bi bi-1-circle-fill me-2" style="color: var(--color-primary);"></i>
+        Selecione a Categoria
+      </h3>
+      
+      <div class="row g-3">
+        <div class="col-md-4">
+          <div class="card categoria-card" data-categoria="mista" style="cursor: pointer; transition: all 0.3s;">
+            <div class="card-body text-center">
+              <i class="bi bi-people-fill" style="font-size: 2rem; color: var(--color-primary);"></i>
+              <h5 class="mt-2">Mista</h5>
+              <small class="text-muted">{{ categorias.mista.total }} participantes</small>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="card categoria-card" data-categoria="masculino" style="cursor: pointer; transition: all 0.3s;">
+            <div class="card-body text-center">
+              <i class="bi bi-person-fill" style="font-size: 2rem; color: var(--color-accent);"></i>
+              <h5 class="mt-2">Masculino</h5>
+              <small class="text-muted">{{ categorias.masculino.total }} participantes</small>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="card categoria-card" data-categoria="feminino" style="cursor: pointer; transition: all 0.3s;">
+            <div class="card-body text-center">
+              <i class="bi bi-person-heart" style="font-size: 2rem; color: var(--color-success);"></i>
+              <h5 class="mt-2">Feminino</h5>
+              <small class="text-muted">{{ categorias.feminino.total }} participantes</small>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- PASSO 2: Análise e Opções -->
+    <div id="passo2" style="display: none;">
+      <h3 class="mb-3">
+        <i class="bi bi-2-circle-fill me-2" style="color: var(--color-primary);"></i>
+        Opções Disponíveis
+      </h3>
+      
+      <div id="loading" class="text-center py-4" style="display: none;">
+        <div class="spinner-border text-primary" role="status">
+          <span class="visually-hidden">Analisando...</span>
+        </div>
+        <p class="mt-2">Analisando participantes...</p>
+      </div>
+      
+      <div id="erro" class="alert alert-danger" style="display: none;"></div>
+      
+      <div id="opcoes-container" style="display: none;">
+        <div class="alert-custom alert-info-custom mb-3">
+          <i id="info-categoria-icon" class="bi bi-people-fill me-2" style="color: var(--color-primary); font-size: 1.3rem; display: inline-block; vertical-align: middle;"></i>
+          <strong id="info-categoria">Selecione uma categoria</strong>
+        </div>
+        
+        <div id="sugestao-card" class="card mb-3" style="border: 2px solid var(--color-accent); background: rgba(255, 193, 7, 0.1);">
+          <div class="card-body">
+            <div class="d-flex align-items-center mb-2">
+              <i class="bi bi-star-fill me-2" style="color: var(--color-accent); font-size: 1.5rem;"></i>
+              <h5 class="mb-0">Sugestão do Sistema</h5>
+            </div>
+            <div id="sugestao-content">
+              <p class="text-muted">Selecione uma categoria para ver as opções</p>
+            </div>
+          </div>
+        </div>
+        
+        <h5 class="mb-3">Outras Opções:</h5>
+        <div id="outras-opcoes" class="row g-3"></div>
+      </div>
+    </div>
+    
+    <!-- Botão Voltar -->
+    <div id="btn-voltar" class="mt-4" style="display: none;">
+      <button class="btn btn-secondary" onclick="voltarPasso1()">
+        <i class="bi bi-arrow-left me-2"></i>
+        Voltar
+      </button>
+    </div>
+    
+  </div>
+  
+</div>
+
+<style>
+.categoria-card {
+  background: rgba(255, 255, 255, 0.05);
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  transition: all 0.3s;
+  color: var(--color-text);
+}
+
+.categoria-card:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: var(--color-primary);
+  transform: translateY(-5px);
+}
+
+.categoria-card.selected {
+  background: rgba(0, 123, 255, 0.2);
+  border-color: var(--color-primary);
+}
+
+.opcao-card {
+  background: rgba(255, 255, 255, 0.05);
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  cursor: pointer;
+  transition: all 0.3s;
+  color: var(--color-text);
+}
+
+.opcao-card:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: var(--color-accent);
+  transform: translateY(-3px);
+}
+
+.opcao-card.selected {
+  background: rgba(255, 193, 7, 0.2);
+  border-color: var(--color-accent);
+}
+
+.alert-info-custom {
+  background: rgba(0, 123, 255, 0.15);
+  border: 2px solid rgba(0, 123, 255, 0.3);
+  border-radius: 8px;
+  padding: 15px 20px;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+}
+
+.alert-info-custom i {
+  font-size: 1.3rem;
+  display: inline-block;
+  vertical-align: middle;
+}
+
+.card {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: var(--color-text);
+}
+
+.card-body {
+  color: var(--color-text);
+}
+
+.card h5 {
+  color: var(--color-text);
+}
+
+.spinner-border {
+  color: var(--color-primary);
+}
+</style>
+
+<script>
+let categoriaSelecionada = null;
+let opcaoSelecionada = null;
+let dadosAnalise = null;
+
+// Seleção de categoria
+document.querySelectorAll('.categoria-card').forEach(card => {
+  card.addEventListener('click', function() {
+    // Remove seleção anterior
+    document.querySelectorAll('.categoria-card').forEach(c => c.classList.remove('selected'));
+    // Seleciona atual
+    this.classList.add('selected');
+    categoriaSelecionada = this.dataset.categoria;
+    
+    // Analisa categoria
+    analisarCategoria();
+  });
+});
+
+function analisarCategoria() {
+  document.getElementById('passo2').style.display = 'block';
+  document.getElementById('btn-voltar').style.display = 'block';
+  document.getElementById('loading').style.display = 'block';
+  document.getElementById('opcoes-container').style.display = 'none';
+  document.getElementById('erro').style.display = 'none';
+  
+  fetch('/api/analisar_categoria', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({ categoria: categoriaSelecionada })
+  })
+    .then(response => response.json())
+    .then(data => {
+      document.getElementById('loading').style.display = 'none';
+      
+      if (data.erro || !data.viável) {
+        document.getElementById('erro').style.display = 'block';
+        document.getElementById('erro').textContent = data.erro || data.mensagem || 'Não foi possível analisar a categoria';
+        return;
+      }
+      
+      dadosAnalise = data;
+      exibirOpcoes(data);
+    })
+    .catch(error => {
+      document.getElementById('loading').style.display = 'none';
+      document.getElementById('erro').style.display = 'block';
+      document.getElementById('erro').textContent = 'Erro ao analisar categoria: ' + error.message;
+    });
+}
+
+function exibirOpcoes(data) {
+  const categoriaNome = categoriaSelecionada.charAt(0).toUpperCase() + categoriaSelecionada.slice(1);
+  
+  // Define ícone e cor baseado na categoria
+  const iconElement = document.getElementById('info-categoria-icon');
+  
+  let iconClass = '';
+  let iconColor = '';
+  
+  if (categoriaSelecionada === 'mista') {
+    iconClass = 'bi bi-people-fill';
+    iconColor = 'var(--color-primary)';
+  } else if (categoriaSelecionada === 'masculino') {
+    iconClass = 'bi bi-person-fill';
+    iconColor = 'var(--color-accent)';
+  } else if (categoriaSelecionada === 'feminino') {
+    iconClass = 'bi bi-person-heart';
+    iconColor = 'var(--color-success)';
+  }
+  
+  iconElement.className = iconClass + ' me-2';
+  iconElement.setAttribute('style', `color: ${iconColor}; font-size: 1.3rem; display: inline-block; vertical-align: middle;`);
+  
+  // Info da categoria
+  let infoText = '';
+  if (categoriaSelecionada === 'mista') {
+    infoText = `${categoriaNome}: ${data.total_homens || 0} homens e ${data.total_mulheres || 0} mulheres confirmados`;
+  } else {
+    const total = categoriaSelecionada === 'masculino' ? 
+      {{ categorias.masculino.total }} : 
+      {{ categorias.feminino.total }};
+    infoText = `${categoriaNome}: ${total} participantes confirmados`;
+  }
+  document.getElementById('info-categoria').textContent = infoText;
+  
+  // Sugestão
+  if (data.sugestao && data.opcoes) {
+    const sugestaoOpcao = data.opcoes.find(op => op.jogos === data.sugestao);
+    if (sugestaoOpcao) {
+      const sugestaoHtml = `
+        <div class="d-flex justify-content-between align-items-center">
+          <div>
+            <h4 class="mb-1">${sugestaoOpcao.jogos} jogos por pessoa</h4>
+            <p class="mb-0 text-muted">
+              • ${sugestaoOpcao.duplas} duplas (sem repetir)<br>
+              • ~${sugestaoOpcao.rodadas_estimadas} rodadas
+            </p>
+          </div>
+          <button class="btn btn-primary" onclick="selecionarOpcao(${sugestaoOpcao.jogos}, true)">
+            Selecionar
+          </button>
+        </div>
+      `;
+      document.getElementById('sugestao-content').innerHTML = sugestaoHtml;
+    }
+  }
+  
+  // Outras opções
+  const outrasOpcoes = data.opcoes ? data.opcoes.filter(op => op.jogos !== data.sugestao) : [];
+  const container = document.getElementById('outras-opcoes');
+  container.innerHTML = '';
+  
+  outrasOpcoes.forEach(opcao => {
+    const col = document.createElement('div');
+    col.className = 'col-md-6';
+    const card = document.createElement('div');
+    card.className = 'card opcao-card';
+    card.onclick = () => selecionarOpcao(opcao.jogos, false);
+    card.innerHTML = `
+      <div class="card-body">
+        <h5 class="mb-2">${opcao.jogos} jogos por pessoa</h5>
+        <p class="mb-1 small">
+          • ${opcao.duplas} duplas<br>
+          • ~${opcao.rodadas_estimadas} rodadas
+        </p>
+      </div>
+    `;
+    col.appendChild(card);
+    container.appendChild(col);
+  });
+  
+  document.getElementById('opcoes-container').style.display = 'block';
+}
+
+function selecionarOpcao(jogos, isSugestao) {
+  opcaoSelecionada = jogos;
+  
+  // Remove seleção anterior
+  document.querySelectorAll('.opcao-card').forEach(c => c.classList.remove('selected'));
+  
+  // Seleciona atual
+  if (isSugestao) {
+    document.getElementById('sugestao-card').style.borderColor = 'var(--color-success)';
+  } else {
+    event.currentTarget.classList.add('selected');
+  }
+  
+  // Mostra botão de gerar
+  mostrarBotaoGerar();
+}
+
+function mostrarBotaoGerar() {
+  const btnContainer = document.getElementById('btn-gerar-container');
+  if (!btnContainer) {
+    const container = document.createElement('div');
+    container.id = 'btn-gerar-container';
+    container.className = 'mt-4 text-center';
+    container.innerHTML = `
+      <button class="btn btn-success btn-lg" onclick="gerarSorteio()" style="min-width: 200px;">
+        <i class="bi bi-check-circle me-2"></i>
+        Gerar Sorteio
+      </button>
+    `;
+    document.getElementById('passo2').appendChild(container);
+  }
+}
+
+function gerarSorteio() {
+  if (!categoriaSelecionada || !opcaoSelecionada) {
+    alert('Por favor, selecione uma opção primeiro');
+    return;
+  }
+  
+  if (!confirm(`Gerar sorteio ${categoriaSelecionada} com ${opcaoSelecionada} jogos por pessoa?`)) {
+    return;
+  }
+  
+  const btnGerar = document.querySelector('#btn-gerar-container button');
+  if (!btnGerar) {
+    console.error('Botão de gerar não encontrado');
+    return;
+  }
+  
+  console.log('Iniciando geração de sorteio...', { categoria: categoriaSelecionada, jogos: opcaoSelecionada });
+  
+  btnGerar.disabled = true;
+  btnGerar.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Gerando...';
+  
+  // Timeout de 60 segundos
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => {
+    console.error('Timeout na requisição');
+    controller.abort();
+  }, 60000);
+  
+  fetch('/api/gerar-sorteio', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      categoria: categoriaSelecionada,
+      jogos_por_pessoa: opcaoSelecionada
+    }),
+    signal: controller.signal
+  })
+  .then(response => {
+    clearTimeout(timeoutId);
+    console.log('Response recebido:', response.status, response.statusText);
+    
+    if (!response.ok) {
+      return response.json().then(data => {
+        console.error('Erro na resposta:', data);
+        throw new Error(data.erro || `Erro ${response.status}: ${response.statusText}`);
+      });
+    }
+    return response.json();
+  })
+  .then(data => {
+    console.log('Dados recebidos:', data);
+    
+    if (data.erro) {
+      alert('Erro: ' + data.erro);
+      btnGerar.disabled = false;
+      btnGerar.innerHTML = '<i class="bi bi-check-circle me-2"></i>Gerar Sorteio';
+      return;
+    }
+    
+    // Sucesso
+    console.log('Sucesso! Redirecionando...');
+    
+    // Mostra mensagem de sucesso
+    btnGerar.innerHTML = '<i class="bi bi-check-circle me-2"></i>Sorteio Gerado!';
+    btnGerar.style.background = 'var(--color-success)';
+    
+    // Redireciona após 1 segundo
+    setTimeout(() => {
+      if (categoriaSelecionada === 'mista') {
+        window.location.href = '/rodadas';
+      } else {
+        window.location.href = `/rodadas?categoria=${categoriaSelecionada}`;
+      }
+    }, 1000);
+  })
+  .catch(error => {
+    clearTimeout(timeoutId);
+    console.error('Erro capturado:', error);
+    
+    if (error.name === 'AbortError') {
+      alert('⏱️ Tempo esgotado! O sorteio está demorando muito. Tente novamente ou escolha menos jogos por pessoa.');
+    } else {
+      alert('Erro ao gerar sorteio: ' + error.message);
+    }
+    
+    btnGerar.disabled = false;
+    btnGerar.innerHTML = '<i class="bi bi-check-circle me-2"></i>Gerar Sorteio';
+  });
+}
+
+function voltarPasso1() {
+  document.getElementById('passo2').style.display = 'none';
+  document.getElementById('btn-voltar').style.display = 'none';
+  document.querySelectorAll('.categoria-card').forEach(c => c.classList.remove('selected'));
+  categoriaSelecionada = null;
+  opcaoSelecionada = null;
+  dadosAnalise = null;
+  
+  // Remove botão de gerar se existir
+  const btnContainer = document.getElementById('btn-gerar-container');
+  if (btnContainer) {
+    btnContainer.remove();
+  }
+}
+</script>
+{% endblock %}

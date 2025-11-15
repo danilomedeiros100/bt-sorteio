@@ -697,7 +697,13 @@ def analisar_viabilidade_categoria(categoria: str, participantes: List[str]) -> 
     # Testa de 3 a 10 jogos por pessoa
     for jogos_por_pessoa in range(3, 11):
         # Total de duplas necessárias
-        duplas_necessarias = (num_participantes * jogos_por_pessoa) // 2
+        total_aparições = num_participantes * jogos_por_pessoa
+        
+        # REGRA 1: Total de aparições deve ser PAR (para formar duplas inteiras)
+        if total_aparições % 2 != 0:
+            continue
+        
+        duplas_necessarias = total_aparições // 2
         
         # Verifica se é matematicamente possível
         if duplas_necessarias > max_duplas_possiveis:

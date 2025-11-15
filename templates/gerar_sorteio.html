@@ -258,10 +258,19 @@ document.addEventListener('DOMContentLoaded', function() {
         });
 
         el.select.disabled = false;
+        
+        // Destaca opções para números ímpares
+        let infoText = '';
+        if (opcoesOrdenadas.length === 2 && opcoesOrdenadas[0].jogos_por_pessoa === 4 && opcoesOrdenadas[1].jogos_por_pessoa === 8) {
+          infoText = `<small style="opacity: 0.9; color: var(--color-accent); font-weight: 600;">⚠️ Número ímpar de participantes: apenas <strong>4</strong> ou <strong>8</strong> jogos funcionam</small>`;
+        } else {
+          infoText = `<small style="opacity: 0.8;">${opcoesOrdenadas.length} opção(ões) viável(is): ${opcoesOrdenadas.map(o => o.jogos_por_pessoa).join(', ')} jogos</small>`;
+        }
+        
         el.info.innerHTML = `
           <i class="bi bi-check-circle me-1" style="color: var(--color-success);"></i>
           <strong style="color: var(--color-success);">${data.mensagem}</strong><br>
-          <small style="opacity: 0.8;">${opcoesOrdenadas.length} opção(ões) viável(is): ${opcoesOrdenadas.map(o => o.jogos_por_pessoa).join(', ')} jogos</small>
+          ${infoText}
         `;
         
         // Valida automaticamente a opção selecionada

@@ -1,0 +1,162 @@
+{% extends "base.html" %}
+{% block title %}Gerar Sorteio{% endblock %}
+
+{% block content %}
+<div class="fade-in">
+  <h1 class="text-center app-title mb-4">
+    <i class="bi bi-shuffle me-2" style="color: var(--color-primary);"></i>
+    Gerar Sorteio
+  </h1>
+
+  <div class="glass-card mb-4 slide-in">
+    <h3 class="text-center mb-4" style="color: var(--color-text);">
+      <i class="bi bi-gear me-2" style="color: var(--color-primary);"></i>
+      Configuração do Sorteio
+    </h3>
+
+    <form id="form-gerar-sorteio">
+      <div class="row justify-content-center">
+        <div class="col-md-6 mb-3">
+          <label for="categoria" class="form-label" style="color: var(--color-text); font-weight: 600;">
+            Categoria:
+          </label>
+          <select id="categoria" name="categoria" class="form-select form-select-lg" required>
+            <option value="misto">Misto</option>
+            <option value="masculino">Masculino</option>
+            <option value="feminino">Feminino</option>
+          </select>
+        </div>
+
+        <div class="col-md-6 mb-3">
+          <label for="jogos_por_pessoa" class="form-label" style="color: var(--color-text); font-weight: 600;">
+            Quantos jogos cada pessoa fará?
+          </label>
+          <input type="number" id="jogos_por_pessoa" name="jogos_por_pessoa" 
+                 class="form-control form-control-lg" min="3" max="10" value="5" required>
+        </div>
+      </div>
+
+      <div class="text-center mt-4">
+        <button type="button" id="btn-validar" class="btn btn-primary-custom me-2">
+          <i class="bi bi-check-circle me-2"></i>
+          Validar
+        </button>
+        <button type="button" id="btn-gerar" class="btn btn-primary-custom" disabled>
+          <i class="bi bi-play-circle me-2"></i>
+          Gerar Sorteio
+        </button>
+      </div>
+    </form>
+
+    <div id="preview-viabilidade" class="mt-4" style="display: none;">
+      <!-- Preview será preenchido via JavaScript -->
+    </div>
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const categoriaSelect = document.getElementById('categoria');
+  const jogosInput = document.getElementById('jogos_por_pessoa');
+  const btnValidar = document.getElementById('btn-validar');
+  const btnGerar = document.getElementById('btn-gerar');
+  const previewDiv = document.getElementById('preview-viabilidade');
+
+  btnValidar.addEventListener('click', async function() {
+    const categoria = categoriaSelect.value;
+    const jogosPorPessoa = parseInt(jogosInput.value);
+
+    try {
+      const response = await fetch('/api/analisar_categoria', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ categoria })
+      });
+
+      const data = await response.json();
+
+      if (data.viavel) {
+        const opcoes = data.opcoes || [];
+        const opcaoValida = opcoes.find(op => op.jogos_por_pessoa === jogosPorPessoa);
+
+        if (opcaoValida) {
+          previewDiv.innerHTML = `
+            <div class="alert alert-success">
+              <h5><i class="bi bi-check-circle me-2"></i>Configuração Válida!</h5>
+              <p><strong>Cada pessoa jogará:</strong> ${jogosPorPessoa} vezes</p>
+              <p><strong>Rodadas estimadas:</strong> ~${opcaoValida.rodadas_estimadas}</p>
+              <p><strong>Duplas necessárias:</strong> ${opcaoValida.duplas_necessarias}</p>
+            </div>
+          `;
+          previewDiv.style.display = 'block';
+          btnGerar.disabled = false;
+        } else {
+          previewDiv.innerHTML = `
+            <div class="alert alert-warning">
+              <h5><i class="bi bi-exclamation-triangle me-2"></i>Configuração Inválida</h5>
+              <p>O número de jogos selecionado (${jogosPorPessoa}) não é viável para esta categoria.</p>
+              <p><strong>Opções viáveis:</strong> ${opcoes.map(op => op.jogos_por_pessoa).join(', ')}</p>
+            </div>
+          `;
+          previewDiv.style.display = 'block';
+          btnGerar.disabled = true;
+        }
+      } else {
+        previewDiv.innerHTML = `
+          <div class="alert alert-danger">
+            <h5><i class="bi bi-x-circle me-2"></i>Não é possível gerar sorteio</h5>
+            <p>${data.mensagem}</p>
+          </div>
+        `;
+        previewDiv.style.display = 'block';
+        btnGerar.disabled = true;
+      }
+    } catch (error) {
+      previewDiv.innerHTML = `
+        <div class="alert alert-danger">
+          <h5><i class="bi bi-x-circle me-2"></i>Erro</h5>
+          <p>Erro ao validar: ${error.message}</p>
+        </div>
+      `;
+      previewDiv.style.display = 'block';
+      btnGerar.disabled = true;
+    }
+  });
+
+  btnGerar.addEventListener('click', async function() {
+    const categoria = categoriaSelect.value;
+    const jogosPorPessoa = parseInt(jogosInput.value);
+
+    btnGerar.disabled = true;
+    btnGerar.innerHTML = '<i class="bi bi-hourglass-split me-2"></i>Gerando...';
+
+    try {
+      const response = await fetch('/api/gerar-sorteio', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ categoria, jogos_por_pessoa: jogosPorPessoa })
+      });
+
+      const data = await response.json();
+
+      if (data.sucesso) {
+        window.location.href = `/rodadas?categoria=${categoria}`;
+      } else {
+        alert('Erro ao gerar sorteio: ' + (data.erro || 'Erro desconhecido'));
+        btnGerar.disabled = false;
+        btnGerar.innerHTML = '<i class="bi bi-play-circle me-2"></i>Gerar Sorteio';
+      }
+    } catch (error) {
+      alert('Erro ao gerar sorteio: ' + error.message);
+      btnGerar.disabled = false;
+      btnGerar.innerHTML = '<i class="bi bi-play-circle me-2"></i>Gerar Sorteio';
+    }
+  });
+});
+</script>
+{% endblock %}
+

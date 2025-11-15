@@ -445,17 +445,6 @@ def rota_gerar_rodadas():
     return jsonify({"status": "ok", "total_rodadas": resultado["total_rodadas"]})
 
 
-@app.route("/rodadas")
-def rota_ver_rodadas():
-    """Visualiza todas as rodadas geradas"""
-    dados_rodadas = carregar_rodadas()
-    
-    if not dados_rodadas:
-        return render_template("rodadas.html", rodadas=None)
-    
-    return render_template("rodadas.html", rodadas=dados_rodadas)
-
-
 @app.route("/resetar-rodadas")
 def rota_resetar_rodadas():
     """Remove as rodadas e ranking gerados"""

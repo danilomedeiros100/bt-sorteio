@@ -17,7 +17,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
   
   <!-- CSS Global -->
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v=2.5">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v=2.6">
   
   <style>
     /* Ajustes específicos do Bootstrap para integrar com o tema */
@@ -179,6 +179,100 @@
     /* Texto muted dentro dos divs */
     .text-muted {
       color: var(--color-text-muted) !important;
+    }
+    
+    /* === MELHORIAS VISUAIS PARA RESULTADOS CADASTRADOS === */
+    
+    /* Confronto com resultado finalizado - destaque geral */
+    .matchup-container.resultado-finalizado {
+      background: linear-gradient(135deg, rgba(6, 214, 160, 0.15), rgba(6, 214, 160, 0.05)) !important;
+      border: 2px solid rgba(6, 214, 160, 0.4) !important;
+      box-shadow: 0 4px 20px rgba(6, 214, 160, 0.2) !important;
+    }
+    
+    /* Fallback para navegadores que suportam :has() */
+    @supports selector(:has(*)) {
+      .matchup-container:has(.matchup-dupla.winner) {
+        background: linear-gradient(135deg, rgba(6, 214, 160, 0.15), rgba(6, 214, 160, 0.05)) !important;
+        border: 2px solid rgba(6, 214, 160, 0.4) !important;
+        box-shadow: 0 4px 20px rgba(6, 214, 160, 0.2) !important;
+      }
+    }
+    
+    /* Placar destacado para resultados finalizados */
+    .matchup-score {
+      font-size: 2.2rem !important;
+      font-weight: 800 !important;
+      background: linear-gradient(135deg, var(--color-accent), var(--color-primary)) !important;
+      -webkit-background-clip: text !important;
+      -webkit-text-fill-color: transparent !important;
+      background-clip: text !important;
+      text-shadow: 0 2px 10px rgba(0, 123, 255, 0.3) !important;
+      min-width: 50px !important;
+    }
+    
+    /* Dupla vencedora - destaque melhorado */
+    .matchup-dupla.winner {
+      background: linear-gradient(135deg, rgba(6, 214, 160, 0.3), rgba(6, 214, 160, 0.15)) !important;
+      border: 2px solid #06d6a0 !important;
+      box-shadow: 0 4px 15px rgba(6, 214, 160, 0.3) !important;
+      color: #06d6a0 !important;
+      font-weight: 700 !important;
+      transform: scale(1.02);
+      transition: all 0.3s ease;
+    }
+    
+    .matchup-dupla.winner:hover {
+      transform: scale(1.05);
+      box-shadow: 0 6px 20px rgba(6, 214, 160, 0.4) !important;
+    }
+    
+    /* Dupla perdedora - estilo mais sutil */
+    .matchup-dupla.loser {
+      background: rgba(239, 71, 111, 0.1) !important;
+      border: 1px solid rgba(239, 71, 111, 0.3) !important;
+      color: rgba(255, 255, 255, 0.6) !important;
+      opacity: 0.8;
+    }
+    
+    /* Badge de resultado finalizado */
+    .badge-completed {
+      background: linear-gradient(135deg, rgba(6, 214, 160, 0.3), rgba(6, 214, 160, 0.2)) !important;
+      border: 1px solid #06d6a0 !important;
+      color: #06d6a0 !important;
+      box-shadow: 0 2px 10px rgba(6, 214, 160, 0.2) !important;
+    }
+    
+    /* Quadra destacada quando há resultado */
+    .matchup-container.resultado-finalizado .matchup-quadra .badge {
+      background: rgba(6, 214, 160, 0.2) !important;
+      border-color: #06d6a0 !important;
+      color: #06d6a0 !important;
+    }
+    
+    /* Fallback para navegadores que suportam :has() */
+    @supports selector(:has(*)) {
+      .matchup-container:has(.matchup-dupla.winner) .matchup-quadra .badge {
+        background: rgba(6, 214, 160, 0.2) !important;
+        border-color: #06d6a0 !important;
+        color: #06d6a0 !important;
+      }
+    }
+    
+    /* Animação suave para resultados finalizados */
+    @keyframes resultPulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.9; }
+    }
+    
+    .matchup-container.resultado-finalizado {
+      animation: resultPulse 3s ease-in-out infinite;
+    }
+    
+    @supports selector(:has(*)) {
+      .matchup-container:has(.matchup-dupla.winner) {
+        animation: resultPulse 3s ease-in-out infinite;
+      }
     }
   </style>
 </head>

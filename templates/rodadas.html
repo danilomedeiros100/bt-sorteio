@@ -154,7 +154,7 @@
             {% for confronto in rodada.confrontos %}
               {% if confronto.dupla2 %}
                 <!-- Confronto normal (2 duplas) -->
-                <div class="matchup-container confronto-item categoria-{{ categoria_nome }}" 
+                <div class="matchup-container confronto-item categoria-{{ categoria_nome }} {% if confronto.resultado and confronto.resultado.finalizado %}resultado-finalizado{% endif %}" 
                      data-jogadores="{{ confronto.dupla1.jogador1 }},{{ confronto.dupla1.jogador2 }},{{ confronto.dupla2.jogador1 }},{{ confronto.dupla2.jogador2 }}">
                   
                   <!-- Quadra -->
@@ -196,7 +196,14 @@
                   </div>
                   
                   <!-- Status -->
-                  {% if not confronto.resultado or not confronto.resultado.finalizado %}
+                  {% if confronto.resultado and confronto.resultado.finalizado %}
+                    <div class="text-center mt-3">
+                      <span class="badge-status badge-completed">
+                        <i class="bi bi-check-circle-fill me-1"></i>
+                        Resultado Finalizado
+                      </span>
+                    </div>
+                  {% else %}
                     <div class="text-center mt-3">
                       <span class="badge-status badge-pending">
                         <i class="bi bi-clock me-1"></i>

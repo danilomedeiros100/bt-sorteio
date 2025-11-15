@@ -5,7 +5,7 @@ Sistema de Torneio de Beach Tennis - 5 Rodadas com Duplas Mistas
 Desenvolvido para BT Mania
 """
 
-from flask import Flask, render_template, redirect, url_for, request, jsonify
+from flask import Flask, render_template, redirect, url_for, request, jsonify, session
 import json
 import os
 import hashlib
@@ -21,6 +21,10 @@ from utils.sorteio_rodadas import (
 )
 
 app = Flask(__name__)
+app.secret_key = os.environ.get('SECRET_KEY', 'bt-sorteio-secret-key-2024')
+
+# Senha administrativa (em produção, usar variável de ambiente)
+ADMIN_PASSWORD = os.environ.get('ADMIN_PASSWORD', 'admin123')
 
 # Arquivos de dados
 DATA_FILE = os.path.join("data", "jogadores.json")
@@ -964,10 +968,20 @@ def carregar_rodadas_por_categoria(categoria: str):
 # ROTAS - ADMINISTRAÇÃO
 # ============================================================================
 
-@app.route("/admin")
+@app.route("/admin", methods=["GET", "POST"])
 def admin():
-    """Painel administrativo"""
-    return render_template("admin.html")
+    """Painel administrativo com validação de senha apenas para configuração"""
+    erro = None
+    senha_valida = False
+    
+    if request.method == "POST":
+        senha = request.form.get("senha", "")
+        if senha == ADMIN_PASSWORD:
+            senha_valida = True
+        else:
+            erro = "Senha incorreta!"
+    
+    return render_template("admin.html", senha_valida=senha_valida, erro=erro)
 
 
 @app.route("/admin/visitas")

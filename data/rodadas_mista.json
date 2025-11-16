@@ -595,9 +595,9 @@
             "jogador2": "Michele"
           },
           "resultado": {
-            "games_dupla1": 6,
+            "games_dupla1": 0,
             "games_dupla2": 0,
-            "finalizado": true
+            "finalizado": false
           },
           "quadra": 4
         }

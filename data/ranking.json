@@ -1,17 +1,7 @@
 {
   "categoria": "mista",
-  "ultima_atualizacao": "2025-11-16T17:45:29.795045",
+  "ultima_atualizacao": "2025-11-16T19:04:08.321248",
   "masculino": [
-    {
-      "nome": "Carlos",
-      "vitorias": 4,
-      "derrotas": 1,
-      "games_feitos": 26,
-      "games_sofridos": 11,
-      "jogos_realizados": 5,
-      "saldo_games": 15,
-      "percentual_vitorias": 80.0
-    },
     {
       "nome": "Arthur",
       "vitorias": 4,
@@ -53,6 +43,16 @@
       "percentual_vitorias": 60.0
     },
     {
+      "nome": "Carlos",
+      "vitorias": 3,
+      "derrotas": 1,
+      "games_feitos": 20,
+      "games_sofridos": 11,
+      "jogos_realizados": 4,
+      "saldo_games": 9,
+      "percentual_vitorias": 75.0
+    },
+    {
       "nome": "Emmanuel ",
       "vitorias": 3,
       "derrotas": 2,
@@ -73,6 +73,16 @@
       "percentual_vitorias": 60.0
     },
     {
+      "nome": "David",
+      "vitorias": 1,
+      "derrotas": 3,
+      "games_feitos": 19,
+      "games_sofridos": 22,
+      "jogos_realizados": 4,
+      "saldo_games": -3,
+      "percentual_vitorias": 25.0
+    },
+    {
       "nome": "Luciano",
       "vitorias": 1,
       "derrotas": 4,
@@ -84,16 +94,6 @@
     },
     {
       "nome": "Marcelo",
-      "vitorias": 1,
-      "derrotas": 4,
-      "games_feitos": 19,
-      "games_sofridos": 28,
-      "jogos_realizados": 5,
-      "saldo_games": -9,
-      "percentual_vitorias": 20.0
-    },
-    {
-      "nome": "David",
       "vitorias": 1,
       "derrotas": 4,
       "games_feitos": 19,
@@ -175,16 +175,6 @@
       "percentual_vitorias": 60.0
     },
     {
-      "nome": "Lettícia",
-      "vitorias": 2,
-      "derrotas": 3,
-      "games_feitos": 20,
-      "games_sofridos": 22,
-      "jogos_realizados": 5,
-      "saldo_games": -2,
-      "percentual_vitorias": 40.0
-    },
-    {
       "nome": "Rayanne",
       "vitorias": 2,
       "derrotas": 3,
@@ -215,17 +205,27 @@
       "percentual_vitorias": 40.0
     },
     {
-      "nome": "Stephanie",
+      "nome": "Michele",
       "vitorias": 1,
-      "derrotas": 4,
+      "derrotas": 3,
       "games_feitos": 14,
-      "games_sofridos": 28,
-      "jogos_realizados": 5,
-      "saldo_games": -14,
-      "percentual_vitorias": 20.0
+      "games_sofridos": 22,
+      "jogos_realizados": 4,
+      "saldo_games": -8,
+      "percentual_vitorias": 25.0
     },
     {
-      "nome": "Michele",
+      "nome": "Lettícia",
+      "vitorias": 1,
+      "derrotas": 3,
+      "games_feitos": 14,
+      "games_sofridos": 22,
+      "jogos_realizados": 4,
+      "saldo_games": -8,
+      "percentual_vitorias": 25.0
+    },
+    {
+      "nome": "Stephanie",
       "vitorias": 1,
       "derrotas": 4,
       "games_feitos": 14,

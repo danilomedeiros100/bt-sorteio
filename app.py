@@ -546,7 +546,8 @@ def rota_ranking_individual():
         return redirect(url_for("rota_ranking_por_categoria", categoria=categoria))
     
     # Verifica quais categorias têm rodadas geradas
-    rodadas_mista = carregar_rodadas()
+    # Prioriza arquivos por categoria; mantém fallback para compatibilidade
+    rodadas_mista = carregar_rodadas_por_categoria("mista") or carregar_rodadas()
     rodadas_masculino = carregar_rodadas_por_categoria("masculino")
     rodadas_feminino = carregar_rodadas_por_categoria("feminino")
     
@@ -585,14 +586,14 @@ def rota_ranking_por_categoria(categoria):
         return redirect(url_for("rota_ranking_individual"))
     
     if categoria == "mista":
-        ranking = carregar_ranking()
+        ranking = carregar_ranking()  # compatibilidade para ranking mista consolidado
     else:
         ranking = carregar_ranking_por_categoria(categoria)
     
     # Verifica se o ranking existe e tem dados
     if categoria == "mista":
         tem_dados_ranking = ranking and ranking.get("masculino") and len(ranking.get("masculino", [])) > 0
-        dados_rodadas = carregar_rodadas()
+        dados_rodadas = carregar_rodadas_por_categoria("mista") or carregar_rodadas()
     else:
         tem_dados_ranking = ranking and ranking.get("ranking") and len(ranking.get("ranking", [])) > 0
         dados_rodadas = carregar_rodadas_por_categoria(categoria)

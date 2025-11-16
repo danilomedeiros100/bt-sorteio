@@ -1,8 +1,8 @@
 {
   "categoria": "mista",
-  "data_sorteio": "2025-11-15T17:10:01.556722",
-  "total_homens": 10,
-  "total_mulheres": 10,
+  "data_sorteio": "2025-11-15T21:57:45.189594",
+  "total_homens": 12,
+  "total_mulheres": 12,
   "total_rodadas": 8,
   "rodadas": [
     {
@@ -10,12 +10,12 @@
       "confrontos": [
         {
           "dupla1": {
-            "jogador1": "Luciano",
-            "jogador2": "Paula"
+            "jogador1": "Danilo",
+            "jogador2": "Lorrany"
           },
           "dupla2": {
-            "jogador1": "Carlos",
-            "jogador2": "Lettícia"
+            "jogador1": "Arthur",
+            "jogador2": "Paula"
           },
           "resultado": {
             "games_dupla1": 0,
@@ -26,11 +26,11 @@
         },
         {
           "dupla1": {
-            "jogador1": "David",
-            "jogador2": "Larissa"
+            "jogador1": "Raul",
+            "jogador2": "Stephanie"
           },
           "dupla2": {
-            "jogador1": "Arthur",
+            "jogador1": "Emmanuel ",
             "jogador2": "Mercia"
           },
           "resultado": {
@@ -42,12 +42,12 @@
         },
         {
           "dupla1": {
-            "jogador1": "Francisco",
-            "jogador2": "Stephanie"
+            "jogador1": "Marcelo",
+            "jogador2": "Priscila"
           },
           "dupla2": {
-            "jogador1": "Raul",
-            "jogador2": "Rayanne"
+            "jogador1": "Sérgio",
+            "jogador2": "Larissa"
           },
           "resultado": {
             "games_dupla1": 0,
@@ -55,17 +55,33 @@
             "finalizado": false
           },
           "quadra": 3
+        },
+        {
+          "dupla1": {
+            "jogador1": "Wellington",
+            "jogador2": "Dani"
+          },
+          "dupla2": {
+            "jogador1": "Francisco",
+            "jogador2": "Rita"
+          },
+          "resultado": {
+            "games_dupla1": 0,
+            "games_dupla2": 0,
+            "finalizado": false
+          },
+          "quadra": 4
         }
       ],
       "descansando": [
-        "Dani",
-        "Danilo",
+        "Carlos",
         "Davi",
-        "Emmanuel ",
+        "David",
         "Júlia",
-        "Lorrany",
-        "Rita",
-        "Wellington"
+        "Lettícia",
+        "Luciano",
+        "Rayanne",
+        "Sil"
       ]
     },
     {
@@ -73,12 +89,12 @@
       "confrontos": [
         {
           "dupla1": {
-            "jogador1": "Wellington",
-            "jogador2": "Rita"
+            "jogador1": "Raul",
+            "jogador2": "Mercia"
           },
           "dupla2": {
-            "jogador1": "Luciano",
-            "jogador2": "Lorrany"
+            "jogador1": "Francisco",
+            "jogador2": "Larissa"
           },
           "resultado": {
             "games_dupla1": 0,
@@ -89,12 +105,12 @@
         },
         {
           "dupla1": {
-            "jogador1": "Danilo",
-            "jogador2": "Dani"
+            "jogador1": "Luciano",
+            "jogador2": "Júlia"
           },
           "dupla2": {
-            "jogador1": "Davi",
-            "jogador2": "Larissa"
+            "jogador1": "Wellington",
+            "jogador2": "Rayanne"
           },
           "resultado": {
             "games_dupla1": 0,
@@ -105,8 +121,24 @@
         },
         {
           "dupla1": {
-            "jogador1": "Francisco",
-            "jogador2": "Júlia"
+            "jogador1": "Marcelo",
+            "jogador2": "Lorrany"
+          },
+          "dupla2": {
+            "jogador1": "Davi",
+            "jogador2": "Sil"
+          },
+          "resultado": {
+            "games_dupla1": 0,
+            "games_dupla2": 0,
+            "finalizado": false
+          },
+          "quadra": 3
+        },
+        {
+          "dupla1": {
+            "jogador1": "David",
+            "jogador2": "Lettícia"
           },
           "dupla2": {
             "jogador1": "Emmanuel ",
@@ -117,18 +149,18 @@
             "games_dupla2": 0,
             "finalizado": false
           },
-          "quadra": 3
+          "quadra": 4
         }
       ],
       "descansando": [
         "Arthur",
         "Carlos",
-        "David",
-        "Lettícia",
-        "Mercia",
+        "Dani",
+        "Danilo",
         "Paula",
-        "Raul",
-        "Rayanne"
+        "Priscila",
+        "Rita",
+        "Sérgio"
       ]
     },
     {
@@ -137,11 +169,11 @@
         {
           "dupla1": {
             "jogador1": "Wellington",
-            "jogador2": "Júlia"
+            "jogador2": "Stephanie"
           },
           "dupla2": {
-            "jogador1": "Danilo",
-            "jogador2": "Paula"
+            "jogador1": "Emmanuel ",
+            "jogador2": "Rayanne"
           },
           "resultado": {
             "games_dupla1": 0,
@@ -152,12 +184,103 @@
         },
         {
           "dupla1": {
-            "jogador1": "Raul",
-            "jogador2": "Lorrany"
+            "jogador1": "Carlos",
+            "jogador2": "Dani"
           },
           "dupla2": {
             "jogador1": "Davi",
-            "jogador2": "Mercia"
+            "jogador2": "Rita"
+          },
+          "resultado": {
+            "games_dupla1": 0,
+            "games_dupla2": 0,
+            "finalizado": false
+          },
+          "quadra": 2
+        },
+        {
+          "dupla1": {
+            "jogador1": "Arthur",
+            "jogador2": "Lorrany"
+          },
+          "dupla2": {
+            "jogador1": "Danilo",
+            "jogador2": "Larissa"
+          },
+          "resultado": {
+            "games_dupla1": 0,
+            "games_dupla2": 0,
+            "finalizado": false
+          },
+          "quadra": 3
+        },
+        {
+          "dupla1": {
+            "jogador1": "David",
+            "jogador2": "Sil"
+          },
+          "dupla2": {
+            "jogador1": "Raul",
+            "jogador2": "Priscila"
+          },
+          "resultado": {
+            "games_dupla1": 0,
+            "games_dupla2": 0,
+            "finalizado": false
+          },
+          "quadra": 4
+        },
+        {
+          "dupla1": {
+            "jogador1": "Marcelo",
+            "jogador2": "Paula"
+          },
+          "dupla2": {
+            "jogador1": "Sérgio",
+            "jogador2": "Júlia"
+          },
+          "resultado": {
+            "games_dupla1": 0,
+            "games_dupla2": 0,
+            "finalizado": false
+          },
+          "quadra": 5
+        }
+      ],
+      "descansando": [
+        "Francisco",
+        "Lettícia",
+        "Luciano",
+        "Mercia"
+      ]
+    },
+    {
+      "numero": 4,
+      "confrontos": [
+        {
+          "dupla1": {
+            "jogador1": "Sérgio",
+            "jogador2": "Dani"
+          },
+          "dupla2": {
+            "jogador1": "Luciano",
+            "jogador2": "Lettícia"
+          },
+          "resultado": {
+            "games_dupla1": 0,
+            "games_dupla2": 0,
+            "finalizado": false
+          },
+          "quadra": 1
+        },
+        {
+          "dupla1": {
+            "jogador1": "Danilo",
+            "jogador2": "Sil"
+          },
+          "dupla2": {
+            "jogador1": "Raul",
+            "jogador2": "Rayanne"
           },
           "resultado": {
             "games_dupla1": 0,
@@ -170,77 +293,18 @@
       "descansando": [
         "Arthur",
         "Carlos",
-        "Dani",
+        "Davi",
         "David",
         "Emmanuel ",
         "Francisco",
-        "Larissa",
-        "Lettícia",
-        "Luciano",
-        "Rayanne",
-        "Rita",
-        "Stephanie"
-      ]
-    },
-    {
-      "numero": 4,
-      "confrontos": [
-        {
-          "dupla1": {
-            "jogador1": "David",
-            "jogador2": "Paula"
-          },
-          "dupla2": {
-            "jogador1": "Carlos",
-            "jogador2": "Dani"
-          },
-          "resultado": {
-            "games_dupla1": 0,
-            "games_dupla2": 0,
-            "finalizado": false
-          },
-          "quadra": 1
-        },
-        {
-          "dupla1": {
-            "jogador1": "Luciano",
-            "jogador2": "Rayanne"
-          },
-          "dupla2": {
-            "jogador1": "Raul",
-            "jogador2": "Júlia"
-          },
-          "resultado": {
-            "games_dupla1": 0,
-            "games_dupla2": 0,
-            "finalizado": false
-          },
-          "quadra": 2
-        },
-        {
-          "dupla1": {
-            "jogador1": "Arthur",
-            "jogador2": "Rita"
-          },
-          "dupla2": {
-            "jogador1": "Emmanuel ",
-            "jogador2": "Lettícia"
-          },
-          "resultado": {
-            "games_dupla1": 0,
-            "games_dupla2": 0,
-            "finalizado": false
-          },
-          "quadra": 3
-        }
-      ],
-      "descansando": [
-        "Danilo",
-        "Davi",
-        "Francisco",
+        "Júlia",
         "Larissa",
         "Lorrany",
+        "Marcelo",
         "Mercia",
+        "Paula",
+        "Priscila",
+        "Rita",
         "Stephanie",
         "Wellington"
       ]
@@ -250,12 +314,79 @@
       "confrontos": [
         {
           "dupla1": {
-            "jogador1": "Danilo",
+            "jogador1": "Wellington",
+            "jogador2": "Júlia"
+          },
+          "dupla2": {
+            "jogador1": "Francisco",
+            "jogador2": "Lettícia"
+          },
+          "resultado": {
+            "games_dupla1": 0,
+            "games_dupla2": 0,
+            "finalizado": false
+          },
+          "quadra": 1
+        },
+        {
+          "dupla1": {
+            "jogador1": "Carlos",
             "jogador2": "Mercia"
           },
           "dupla2": {
-            "jogador1": "Wellington",
-            "jogador2": "Stephanie"
+            "jogador1": "Arthur",
+            "jogador2": "Priscila"
+          },
+          "resultado": {
+            "games_dupla1": 0,
+            "games_dupla2": 0,
+            "finalizado": false
+          },
+          "quadra": 2
+        },
+        {
+          "dupla1": {
+            "jogador1": "Luciano",
+            "jogador2": "Rita"
+          },
+          "dupla2": {
+            "jogador1": "David",
+            "jogador2": "Lorrany"
+          },
+          "resultado": {
+            "games_dupla1": 0,
+            "games_dupla2": 0,
+            "finalizado": false
+          },
+          "quadra": 3
+        }
+      ],
+      "descansando": [
+        "Dani",
+        "Danilo",
+        "Davi",
+        "Emmanuel ",
+        "Larissa",
+        "Marcelo",
+        "Paula",
+        "Raul",
+        "Rayanne",
+        "Sil",
+        "Stephanie",
+        "Sérgio"
+      ]
+    },
+    {
+      "numero": 6,
+      "confrontos": [
+        {
+          "dupla1": {
+            "jogador1": "Emmanuel ",
+            "jogador2": "Júlia"
+          },
+          "dupla2": {
+            "jogador1": "David",
+            "jogador2": "Paula"
           },
           "resultado": {
             "games_dupla1": 0,
@@ -270,86 +401,7 @@
             "jogador2": "Rayanne"
           },
           "dupla2": {
-            "jogador1": "Carlos",
-            "jogador2": "Júlia"
-          },
-          "resultado": {
-            "games_dupla1": 0,
-            "games_dupla2": 0,
-            "finalizado": false
-          },
-          "quadra": 2
-        },
-        {
-          "dupla1": {
-            "jogador1": "David",
-            "jogador2": "Rita"
-          },
-          "dupla2": {
             "jogador1": "Davi",
-            "jogador2": "Lettícia"
-          },
-          "resultado": {
-            "games_dupla1": 0,
-            "games_dupla2": 0,
-            "finalizado": false
-          },
-          "quadra": 3
-        }
-      ],
-      "descansando": [
-        "Arthur",
-        "Dani",
-        "Emmanuel ",
-        "Larissa",
-        "Lorrany",
-        "Luciano",
-        "Paula",
-        "Raul"
-      ]
-    },
-    {
-      "numero": 6,
-      "confrontos": [
-        {
-          "dupla1": {
-            "jogador1": "Raul",
-            "jogador2": "Larissa"
-          },
-          "dupla2": {
-            "jogador1": "Emmanuel ",
-            "jogador2": "Rita"
-          },
-          "resultado": {
-            "games_dupla1": 0,
-            "games_dupla2": 0,
-            "finalizado": false
-          },
-          "quadra": 1
-        },
-        {
-          "dupla1": {
-            "jogador1": "Arthur",
-            "jogador2": "Stephanie"
-          },
-          "dupla2": {
-            "jogador1": "Davi",
-            "jogador2": "Dani"
-          },
-          "resultado": {
-            "games_dupla1": 0,
-            "games_dupla2": 0,
-            "finalizado": false
-          },
-          "quadra": 2
-        },
-        {
-          "dupla1": {
-            "jogador1": "Danilo",
-            "jogador2": "Lettícia"
-          },
-          "dupla2": {
-            "jogador1": "Carlos",
             "jogador2": "Lorrany"
           },
           "resultado": {
@@ -357,17 +409,49 @@
             "games_dupla2": 0,
             "finalizado": false
           },
+          "quadra": 2
+        },
+        {
+          "dupla1": {
+            "jogador1": "Carlos",
+            "jogador2": "Priscila"
+          },
+          "dupla2": {
+            "jogador1": "Raul",
+            "jogador2": "Dani"
+          },
+          "resultado": {
+            "games_dupla1": 0,
+            "games_dupla2": 0,
+            "finalizado": false
+          },
           "quadra": 3
+        },
+        {
+          "dupla1": {
+            "jogador1": "Marcelo",
+            "jogador2": "Mercia"
+          },
+          "dupla2": {
+            "jogador1": "Luciano",
+            "jogador2": "Larissa"
+          },
+          "resultado": {
+            "games_dupla1": 0,
+            "games_dupla2": 0,
+            "finalizado": false
+          },
+          "quadra": 4
         }
       ],
       "descansando": [
-        "David",
-        "Francisco",
-        "Júlia",
-        "Luciano",
-        "Mercia",
-        "Paula",
-        "Rayanne",
+        "Arthur",
+        "Danilo",
+        "Lettícia",
+        "Rita",
+        "Sil",
+        "Stephanie",
+        "Sérgio",
         "Wellington"
       ]
     },
@@ -376,12 +460,12 @@
       "confrontos": [
         {
           "dupla1": {
-            "jogador1": "Carlos",
-            "jogador2": "Larissa"
+            "jogador1": "Davi",
+            "jogador2": "Paula"
           },
           "dupla2": {
-            "jogador1": "David",
-            "jogador2": "Mercia"
+            "jogador1": "Luciano",
+            "jogador2": "Sil"
           },
           "resultado": {
             "games_dupla1": 0,
@@ -392,12 +476,12 @@
         },
         {
           "dupla1": {
-            "jogador1": "Wellington",
-            "jogador2": "Lorrany"
+            "jogador1": "Danilo",
+            "jogador2": "Rita"
           },
           "dupla2": {
-            "jogador1": "Davi",
-            "jogador2": "Júlia"
+            "jogador1": "Emmanuel ",
+            "jogador2": "Dani"
           },
           "resultado": {
             "games_dupla1": 0,
@@ -408,12 +492,12 @@
         },
         {
           "dupla1": {
-            "jogador1": "Emmanuel ",
-            "jogador2": "Paula"
+            "jogador1": "Arthur",
+            "jogador2": "Mercia"
           },
           "dupla2": {
-            "jogador1": "Francisco",
-            "jogador2": "Dani"
+            "jogador1": "Wellington",
+            "jogador2": "Larissa"
           },
           "resultado": {
             "games_dupla1": 0,
@@ -424,70 +508,11 @@
         },
         {
           "dupla1": {
-            "jogador1": "Luciano",
-            "jogador2": "Rita"
-          },
-          "dupla2": {
-            "jogador1": "Arthur",
-            "jogador2": "Rayanne"
-          },
-          "resultado": {
-            "games_dupla1": 0,
-            "games_dupla2": 0,
-            "finalizado": false
-          },
-          "quadra": 4
-        }
-      ],
-      "descansando": [
-        "Danilo",
-        "Lettícia",
-        "Raul",
-        "Stephanie"
-      ]
-    },
-    {
-      "numero": 8,
-      "confrontos": [
-        {
-          "dupla1": {
-            "jogador1": "Raul",
-            "jogador2": "Dani"
-          },
-          "dupla2": {
-            "jogador1": "Danilo",
-            "jogador2": "Larissa"
-          },
-          "resultado": {
-            "games_dupla1": 0,
-            "games_dupla2": 0,
-            "finalizado": false
-          },
-          "quadra": 1
-        },
-        {
-          "dupla1": {
-            "jogador1": "Luciano",
+            "jogador1": "Carlos",
             "jogador2": "Stephanie"
           },
           "dupla2": {
-            "jogador1": "Arthur",
-            "jogador2": "Paula"
-          },
-          "resultado": {
-            "games_dupla1": 0,
-            "games_dupla2": 0,
-            "finalizado": false
-          },
-          "quadra": 2
-        },
-        {
-          "dupla1": {
-            "jogador1": "Francisco",
-            "jogador2": "Lorrany"
-          },
-          "dupla2": {
-            "jogador1": "David",
+            "jogador1": "Sérgio",
             "jogador2": "Lettícia"
           },
           "resultado": {
@@ -495,16 +520,79 @@
             "games_dupla2": 0,
             "finalizado": false
           },
+          "quadra": 4
+        }
+      ],
+      "descansando": [
+        "David",
+        "Francisco",
+        "Júlia",
+        "Lorrany",
+        "Marcelo",
+        "Priscila",
+        "Raul",
+        "Rayanne"
+      ]
+    },
+    {
+      "numero": 8,
+      "confrontos": [
+        {
+          "dupla1": {
+            "jogador1": "Carlos",
+            "jogador2": "Paula"
+          },
+          "dupla2": {
+            "jogador1": "Davi",
+            "jogador2": "Priscila"
+          },
+          "resultado": {
+            "games_dupla1": 0,
+            "games_dupla2": 0,
+            "finalizado": false
+          },
+          "quadra": 1
+        },
+        {
+          "dupla1": {
+            "jogador1": "Arthur",
+            "jogador2": "Sil"
+          },
+          "dupla2": {
+            "jogador1": "Danilo",
+            "jogador2": "Lettícia"
+          },
+          "resultado": {
+            "games_dupla1": 0,
+            "games_dupla2": 0,
+            "finalizado": false
+          },
+          "quadra": 2
+        },
+        {
+          "dupla1": {
+            "jogador1": "Sérgio",
+            "jogador2": "Rayanne"
+          },
+          "dupla2": {
+            "jogador1": "Francisco",
+            "jogador2": "Júlia"
+          },
+          "resultado": {
+            "games_dupla1": 0,
+            "games_dupla2": 0,
+            "finalizado": false
+          },
           "quadra": 3
         },
         {
           "dupla1": {
-            "jogador1": "Wellington",
-            "jogador2": "Rayanne"
+            "jogador1": "David",
+            "jogador2": "Rita"
           },
           "dupla2": {
-            "jogador1": "Emmanuel ",
-            "jogador2": "Mercia"
+            "jogador1": "Marcelo",
+            "jogador2": "Stephanie"
           },
           "resultado": {
             "games_dupla1": 0,
@@ -515,10 +603,14 @@
         }
       ],
       "descansando": [
-        "Carlos",
-        "Davi",
-        "Júlia",
-        "Rita"
+        "Dani",
+        "Emmanuel ",
+        "Larissa",
+        "Lorrany",
+        "Luciano",
+        "Mercia",
+        "Raul",
+        "Wellington"
       ]
     }
   ]

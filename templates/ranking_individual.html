@@ -6,7 +6,7 @@
 
 <h1 class="text-center app-title mb-4">
   <i class="bi bi-trophy-fill me-2" style="color: var(--color-accent);"></i>
-  Ranking {% if categoria == "masculino" %}- Masculino{% elif categoria == "feminino" %}- Feminino{% else %}- Mista{% endif %}
+  Ranking {% if categoria == "masculino" %}- Masculino{% elif categoria == "feminino" %}- Feminino{% elif categoria == "mista" and not mostrar_modal %}- Mista{% endif %}
 </h1>
 
 <!-- Modal de Seleção de Categoria -->
@@ -115,45 +115,29 @@
   {% endif %}
 </div>
 
-<!-- Filtro de Categoria (apenas para mista) -->
-{% if categoria_atual == "mista" %}
+<!-- Seletor de categoria (para todas as categorias) -->
 <div class="glass-card mb-4 slide-in" style="animation-delay: 0.05s; background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.9)); border: 2px solid var(--color-primary); box-shadow: 0 8px 32px rgba(0, 123, 255, 0.2);">
   <h3 class="text-center mb-3" style="color: #1a1a2e; font-size: 1.4rem; font-weight: 700;">
     <i class="bi bi-funnel-fill me-2" style="color: var(--color-primary);"></i>
-    Filtrar por Categoria
+    Selecionar Categoria
   </h3>
   <div class="row justify-content-center">
     <div class="col-md-6">
-      <select id="filtroCategoria" class="form-select form-select-lg" style="
-        background: white !important; 
-        color: #1a1a2e !important; 
-        border: 2px solid var(--color-primary) !important; 
-        font-weight: 600 !important;
-        font-size: 1.1rem !important;
-        padding: 12px 16px !important;
-        box-shadow: 0 4px 12px rgba(0, 123, 255, 0.15) !important;
-      ">
-        <option value="todos">Todos (Masculino e Feminino)</option>
-        <option value="masculino">Apenas Masculino</option>
-        <option value="feminino">Apenas Feminino</option>
+      <select id="seletorCategoriaRanking" class="form-select form-select-lg"
+              style="background: white !important; color: #1a1a2e !important; border: 2px solid var(--color-primary) !important; font-weight: 600 !important; font-size: 1.1rem !important; padding: 12px 16px !important; box-shadow: 0 4px 12px rgba(0, 123, 255, 0.15) !important;">
+        <option value="mista" {% if categoria_atual == 'mista' %}selected{% endif %}>Mista</option>
+        <option value="masculino" {% if categoria_atual == 'masculino' %}selected{% endif %}>Masculino</option>
+        <option value="feminino" {% if categoria_atual == 'feminino' %}selected{% endif %}>Feminino</option>
       </select>
     </div>
   </div>
   <p class="text-center mt-3 mb-0" style="color: #555; font-weight: 500;">
     <small>
       <i class="bi bi-info-circle me-1" style="color: var(--color-primary);"></i>
-      Escolha uma categoria para visualizar o ranking e pódio
+      Troque a categoria para visualizar outro ranking
     </small>
   </p>
 </div>
-{% else %}
-<!-- Links para outras categorias -->
-<div class="glass-card mb-4 slide-in text-center" style="animation-delay: 0.05s;">
-  <a href="/ranking/mista" class="btn btn-outline-primary me-2">Mista</a>
-  <a href="/ranking/masculino" class="btn btn-outline-primary me-2">Masculino</a>
-  <a href="/ranking/feminino" class="btn btn-outline-primary">Feminino</a>
-</div>
-{% endif %}
 
 <!-- Pódio de Destaque (apenas se houver resultados) -->
 {% if categoria_atual == "mista" %}
@@ -523,6 +507,7 @@ function fecharModal() {
 // Filtro de categoria
 document.addEventListener('DOMContentLoaded', function() {
   const filtroCategoria = document.getElementById('filtroCategoria');
+  const seletorCategoriaRanking = document.getElementById('seletorCategoriaRanking');
   
   if (filtroCategoria) {
     filtroCategoria.addEventListener('change', function() {
@@ -536,6 +521,20 @@ document.addEventListener('DOMContentLoaded', function() {
       } else {
         // 'todos' ou qualquer outro valor volta para mista
         window.location.href = '/ranking/mista';
+      }
+    });
+  }
+
+  // Seletor de categoria no topo (quando não está na mista)
+  if (seletorCategoriaRanking) {
+    seletorCategoriaRanking.addEventListener('change', function() {
+      const categoria = this.value;
+      if (categoria === 'mista') {
+        window.location.href = '/ranking/mista';
+      } else if (categoria === 'masculino') {
+        window.location.href = '/ranking/masculino';
+      } else if (categoria === 'feminino') {
+        window.location.href = '/ranking/feminino';
       }
     });
   }

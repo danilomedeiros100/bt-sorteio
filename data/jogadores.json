@@ -1,178 +1,26 @@
 [
-  {
-    "nome": "Danilo",
-    "sexo": "M",
-    "categorias": [
-      "mista"
-    ],
-    "confirmado": true
-  },
-  {
-    "nome": "David",
-    "sexo": "M",
-    "categorias": [
-      "mista"
-    ],
-    "confirmado": true
-  },
-  {
-    "nome": "Marcelo",
-    "sexo": "M",
-    "categorias": [
-      "mista"
-    ],
-    "confirmado": false
-  },
-  {
-    "nome": "Francisco",
-    "sexo": "M",
-    "categorias": [
-      "mista"
-    ],
-    "confirmado": true
-  },
-  {
-    "nome": "Luciano",
-    "sexo": "M",
-    "categorias": [
-      "mista"
-    ],
-    "confirmado": true
-  },
-  {
-    "nome": "Wellington",
-    "sexo": "M",
-    "categorias": [
-      "mista"
-    ],
-    "confirmado": true
-  },
-  {
-    "nome": "Davi",
-    "sexo": "M",
-    "categorias": [
-      "mista"
-    ],
-    "confirmado": true
-  },
-  {
-    "nome": "Raul",
-    "sexo": "M",
-    "categorias": [
-      "mista"
-    ],
-    "confirmado": true
-  },
-  {
-    "nome": "Emmanuel ",
-    "sexo": "M",
-    "categorias": [
-      "mista"
-    ],
-    "confirmado": true
-  },
-  {
-    "nome": "Carlos",
-    "sexo": "M",
-    "categorias": [
-      "mista"
-    ],
-    "confirmado": true
-  },
-  {
-    "nome": "Arthur",
-    "sexo": "M",
-    "categorias": [
-      "mista"
-    ],
-    "confirmado": true
-  },
-  {
-    "nome": "Rayanne",
-    "sexo": "F",
-    "categorias": [
-      "mista"
-    ],
-    "confirmado": true
-  },
-  {
-    "nome": "Sil",
-    "sexo": "F",
-    "categorias": [
-      "mista"
-    ],
-    "confirmado": false
-  },
-  {
-    "nome": "Stephanie",
-    "sexo": "F",
-    "categorias": [
-      "mista"
-    ],
-    "confirmado": true
-  },
-  {
-    "nome": "Lettícia",
-    "sexo": "F",
-    "categorias": [
-      "mista"
-    ],
-    "confirmado": true
-  },
-  {
-    "nome": "Dani",
-    "sexo": "F",
-    "categorias": [
-      "mista"
-    ],
-    "confirmado": true
-  },
-  {
-    "nome": "Paula",
-    "sexo": "F",
-    "categorias": [
-      "mista"
-    ],
-    "confirmado": true
-  },
-  {
-    "nome": "Rita",
-    "sexo": "F",
-    "categorias": [
-      "mista"
-    ],
-    "confirmado": true
-  },
-  {
-    "nome": "Larissa",
-    "sexo": "F",
-    "categorias": [
-      "mista"
-    ],
-    "confirmado": true
-  },
-  {
-    "nome": "Lorrany",
-    "sexo": "F",
-    "categorias": [
-      "mista"
-    ],
-    "confirmado": true
-  },
-  {
-    "nome": "Júlia",
-    "sexo": "F",
-    "categorias": [
-      "mista"
-    ],
-    "confirmado": true
-  },
-  {
-    "nome": "Mercia",
-    "sexo": "F",
-    "categorias": [
-      "mista"
-    ],
-    "confirmado": true
-  }
+  {"nome": "Danilo","sexo": "M","categorias": ["mista"],"confirmado": true},
+  {"nome": "David","sexo": "M","categorias": ["mista"],"confirmado": true},
+  {"nome": "Marcelo","sexo": "M","categorias": ["mista"],"confirmado": true},
+  {"nome": "Francisco","sexo": "M","categorias": ["mista"],"confirmado": true},
+  {"nome": "Luciano","sexo": "M","categorias": ["mista"],"confirmado": true},
+  {"nome": "Wellington","sexo": "M","categorias": ["mista"],"confirmado": true},
+  {"nome": "Davi","sexo": "M","categorias": ["mista"],"confirmado": true},
+  {"nome": "Raul","sexo": "M","categorias": ["mista"],"confirmado": true},
+  {"nome": "Emmanuel ","sexo": "M","categorias": ["mista"],"confirmado": true},
+  {"nome": "Carlos","sexo": "M","categorias": ["mista"],"confirmado": true},
+  {"nome": "Arthur","sexo": "M","categorias": ["mista"],"confirmado": true},
+  {"nome": "Sérgio","sexo": "M","categorias": ["mista"],"confirmado": true},
+  {"nome": "Rayanne","sexo": "F","categorias": ["mista"],"confirmado": true},
+  {"nome": "Sil","sexo": "F","categorias": ["mista"],"confirmado": true},
+  {"nome": "Stephanie","sexo": "F","categorias": ["mista"],"confirmado": true},
+  {"nome": "Lettícia","sexo": "F","categorias": ["mista"],"confirmado": true},
+  {"nome": "Dani","sexo": "F","categorias": ["mista"],"confirmado": true},
+  {"nome": "Paula","sexo": "F","categorias": ["mista"],"confirmado": true},
+  {"nome": "Rita","sexo": "F","categorias": ["mista"],"confirmado": true},
+  {"nome": "Larissa","sexo": "F","categorias": ["mista"],"confirmado": true},
+  {"nome": "Lorrany","sexo": "F","categorias": ["mista"],"confirmado": true},
+  {"nome": "Júlia","sexo": "F","categorias": ["mista"],"confirmado": true},
+  {"nome": "Priscila","sexo": "F","categorias": ["mista"],"confirmado": true},
+  {"nome": "Mercia","sexo": "F","categorias": ["mista"],"confirmado": true}
 ]

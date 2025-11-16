@@ -1,6 +1,6 @@
 {
   "categoria": "feminino",
-  "ultima_atualizacao": "2025-11-15T17:11:10.633264",
+  "ultima_atualizacao": "2025-11-15T21:58:45.649582",
   "ranking": [
     {
       "nome": "Dani",
@@ -66,6 +66,15 @@
       "games_sofridos": 0
     },
     {
+      "nome": "Priscila",
+      "vitorias": 0,
+      "derrotas": 0,
+      "percentual_vitorias": 0,
+      "saldo_games": 0,
+      "games_feitos": 0,
+      "games_sofridos": 0
+    },
+    {
       "nome": "Rayanne",
       "vitorias": 0,
       "derrotas": 0,
@@ -76,6 +85,15 @@
     },
     {
       "nome": "Rita",
+      "vitorias": 0,
+      "derrotas": 0,
+      "percentual_vitorias": 0,
+      "saldo_games": 0,
+      "games_feitos": 0,
+      "games_sofridos": 0
+    },
+    {
+      "nome": "Sil",
       "vitorias": 0,
       "derrotas": 0,
       "percentual_vitorias": 0,

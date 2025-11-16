@@ -1,106 +1,114 @@
 {
   "categoria": "masculino",
-  "ultima_atualizacao": "2025-11-15T17:20:47.971476",
+  "ultima_atualizacao": "2025-11-15T21:44:15.780932",
   "ranking": [
     {
-      "nome": "Luciano",
-      "vitorias": 4,
+      "nome": "Arthur",
+      "vitorias": 0,
       "derrotas": 0,
-      "games_feitos": 24,
-      "games_sofridos": 10,
-      "jogos_realizados": 4,
-      "saldo_games": 14,
-      "percentual_vitorias": 100.0
+      "percentual_vitorias": 0,
+      "saldo_games": 0,
+      "games_feitos": 0,
+      "games_sofridos": 0
     },
     {
       "nome": "Carlos",
-      "vitorias": 3,
-      "derrotas": 1,
-      "games_feitos": 23,
-      "games_sofridos": 16,
-      "jogos_realizados": 4,
-      "saldo_games": 7,
-      "percentual_vitorias": 75.0
+      "vitorias": 0,
+      "derrotas": 0,
+      "percentual_vitorias": 0,
+      "saldo_games": 0,
+      "games_feitos": 0,
+      "games_sofridos": 0
     },
     {
       "nome": "Danilo",
-      "vitorias": 3,
-      "derrotas": 1,
-      "games_feitos": 23,
-      "games_sofridos": 19,
-      "jogos_realizados": 4,
-      "saldo_games": 4,
-      "percentual_vitorias": 75.0
-    },
-    {
-      "nome": "Arthur",
-      "vitorias": 2,
-      "derrotas": 2,
-      "games_feitos": 19,
-      "games_sofridos": 18,
-      "jogos_realizados": 4,
-      "saldo_games": 1,
-      "percentual_vitorias": 50.0
-    },
-    {
-      "nome": "Wellington",
-      "vitorias": 2,
-      "derrotas": 2,
-      "games_feitos": 18,
-      "games_sofridos": 17,
-      "jogos_realizados": 4,
-      "saldo_games": 1,
-      "percentual_vitorias": 50.0
-    },
-    {
-      "nome": "Emmanuel ",
-      "vitorias": 2,
-      "derrotas": 2,
-      "games_feitos": 18,
-      "games_sofridos": 18,
-      "jogos_realizados": 4,
+      "vitorias": 0,
+      "derrotas": 0,
+      "percentual_vitorias": 0,
       "saldo_games": 0,
-      "percentual_vitorias": 50.0
-    },
-    {
-      "nome": "Raul",
-      "vitorias": 2,
-      "derrotas": 2,
-      "games_feitos": 17,
-      "games_sofridos": 20,
-      "jogos_realizados": 4,
-      "saldo_games": -3,
-      "percentual_vitorias": 50.0
+      "games_feitos": 0,
+      "games_sofridos": 0
     },
     {
       "nome": "Davi",
-      "vitorias": 1,
-      "derrotas": 3,
-      "games_feitos": 16,
-      "games_sofridos": 19,
-      "jogos_realizados": 4,
-      "saldo_games": -3,
-      "percentual_vitorias": 25.0
-    },
-    {
-      "nome": "Francisco",
-      "vitorias": 1,
-      "derrotas": 3,
-      "games_feitos": 13,
-      "games_sofridos": 23,
-      "jogos_realizados": 4,
-      "saldo_games": -10,
-      "percentual_vitorias": 25.0
+      "vitorias": 0,
+      "derrotas": 0,
+      "percentual_vitorias": 0,
+      "saldo_games": 0,
+      "games_feitos": 0,
+      "games_sofridos": 0
     },
     {
       "nome": "David",
       "vitorias": 0,
-      "derrotas": 4,
-      "games_feitos": 13,
-      "games_sofridos": 24,
-      "jogos_realizados": 4,
-      "saldo_games": -11,
-      "percentual_vitorias": 0.0
+      "derrotas": 0,
+      "percentual_vitorias": 0,
+      "saldo_games": 0,
+      "games_feitos": 0,
+      "games_sofridos": 0
+    },
+    {
+      "nome": "Emmanuel ",
+      "vitorias": 0,
+      "derrotas": 0,
+      "percentual_vitorias": 0,
+      "saldo_games": 0,
+      "games_feitos": 0,
+      "games_sofridos": 0
+    },
+    {
+      "nome": "Francisco",
+      "vitorias": 0,
+      "derrotas": 0,
+      "percentual_vitorias": 0,
+      "saldo_games": 0,
+      "games_feitos": 0,
+      "games_sofridos": 0
+    },
+    {
+      "nome": "Luciano",
+      "vitorias": 0,
+      "derrotas": 0,
+      "percentual_vitorias": 0,
+      "saldo_games": 0,
+      "games_feitos": 0,
+      "games_sofridos": 0
+    },
+    {
+      "nome": "Marcelo",
+      "vitorias": 0,
+      "derrotas": 0,
+      "percentual_vitorias": 0,
+      "saldo_games": 0,
+      "games_feitos": 0,
+      "games_sofridos": 0
+    },
+    {
+      "nome": "Raul",
+      "vitorias": 0,
+      "derrotas": 0,
+      "percentual_vitorias": 0,
+      "saldo_games": 0,
+      "games_feitos": 0,
+      "games_sofridos": 0
+    },
+    {
+      "nome": "Sérgio",
+      "vitorias": 0,
+      "derrotas": 0,
+      "percentual_vitorias": 0,
+      "saldo_games": 0,
+      "games_feitos": 0,
+      "games_sofridos": 0
+    },
+    {
+      "nome": "Wellington",
+      "vitorias": 0,
+      "derrotas": 0,
+      "percentual_vitorias": 0,
+      "saldo_games": 0,
+      "games_feitos": 0,
+      "games_sofridos": 0
     }
   ]
 }

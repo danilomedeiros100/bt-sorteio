@@ -26,6 +26,11 @@ app.secret_key = os.environ.get('SECRET_KEY', 'bt-sorteio-secret-key-2024')
 # Senha administrativa (em produção, usar variável de ambiente)
 ADMIN_PASSWORD = os.environ.get('ADMIN_PASSWORD', 'admin123')
 
+# Favicon (evita 404 no navegador)
+@app.route("/favicon.ico")
+def favicon():
+    return ("", 204)
+
 # Arquivos de dados
 DATA_FILE = os.path.join("data", "jogadores.json")
 RODADAS_FILE = "data/rodadas.json"
@@ -466,9 +471,9 @@ def rota_salvar_resultado():
     if categoria not in ["mista", "masculino", "feminino"]:
         categoria = "mista"
     
-    # Carrega rodadas da categoria específica
+    # Carrega rodadas da categoria específica (prioriza arquivos por categoria)
     if categoria == "mista":
-        dados_rodadas = carregar_rodadas()
+        dados_rodadas = carregar_rodadas_por_categoria("mista") or carregar_rodadas()
     else:
         dados_rodadas = carregar_rodadas_por_categoria(categoria)
     
@@ -501,9 +506,9 @@ def rota_salvar_resultado():
     confronto["resultado"]["games_dupla2"] = games_d2
     confronto["resultado"]["finalizado"] = True
     
-    # Salva rodadas atualizadas
+    # Salva rodadas atualizadas (sempre por categoria)
     if categoria == "mista":
-        salvar_rodadas(dados_rodadas)
+        salvar_rodadas_por_categoria("mista", dados_rodadas)
     else:
         salvar_rodadas_por_categoria(categoria, dados_rodadas)
     
